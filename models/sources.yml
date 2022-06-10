@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: prod
+    database: chainwalkers
+    schema: prod
+    tables:
+      - name: optimism_blocks
+      - name: optimism_txs
+  
