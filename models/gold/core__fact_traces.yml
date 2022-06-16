@@ -1,0 +1,40 @@
+version: 2
+models:
+  - name: core__fact_traces
+    description: '{{ doc("opt_traces_table_doc") }}'  
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("opt_traces_block_no") }}'   
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("opt_traces_blocktime") }}'
+      - name: TX_HASH
+        description: '{{ doc("opt_traces_tx_hash") }}' 
+      - name: FROM_ADDRESS
+        description: '{{ doc("opt_traces_from") }}'
+      - name: TO_ADDRESS
+        description: '{{ doc("opt_traces_to") }}'
+      - name: ETH_VALUE
+        description: '{{ doc("opt_traces_value") }}'
+      - name: GAS
+        description: '{{ doc("opt_traces_gas") }}'
+      - name: GAS_USED
+        description: '{{ doc("opt_traces_gas_used") }}'
+      - name: INPUT
+        description: '{{ doc("opt_traces_input") }}'
+      - name: OUTPUT
+        description: '{{ doc("opt_traces_output") }}'
+      - name: TYPE
+        description: '{{ doc("opt_traces_type") }}'
+      - name: IDENTIFIER
+        description: '{{ doc("opt_traces_identifier") }}'
+      - name: DATA
+        description: '{{ doc("opt_traces_call_data") }}'
+      - name: TX_STATUS
+        description: '{{ doc("opt_tx_status") }}' 
+      - name: SUB_TRACES
+        description: '{{ doc("opt_traces_sub") }}' 
+
+
+
+        

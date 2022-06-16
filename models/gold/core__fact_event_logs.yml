@@ -1,0 +1,38 @@
+version: 2
+models:
+  - name: core__fact_event_logs
+    description: '{{ doc("opt_logs_table_doc") }}'
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("opt_block_number") }}'   
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("opt_block_timestamp") }}'
+      - name: TX_HASH
+        description: '{{ doc("opt_logs_tx_hash") }}'
+      - name: EVENT_INDEX
+        description: '{{ doc("opt_event_index") }}'
+      - name: CONTRACT_ADDRESS
+        description: '{{ doc("opt_logs_contract_address") }}'
+      - name: CONTRACT_NAME
+        description: '{{ doc("opt_logs_contract_name") }}'
+      - name: EVENT_NAME
+        description: '{{ doc("opt_event_name") }}'
+      - name: EVENT_INPUTS
+        description: '{{ doc("opt_event_inputs") }}'
+      - name: TOPICS
+        description: '{{ doc("opt_topics") }}'
+      - name: DATA
+        description: '{{ doc("opt_logs_data") }}'
+      - name: EVENT_REMOVED
+        description: '{{ doc("opt_event_removed") }}'  
+      - name: _LOG_ID
+        description: '{{ doc("opt_log_id_events") }}'  
+      - name: TX_STATUS
+        description: '{{ doc("opt_tx_status") }}' 
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description: '{{ doc("opt_origin_sig") }}'
+      - name: ORIGIN_FROM_ADDRESS
+        description: '{{ doc("opt_origin_from") }}'
+      - name: ORIGIN_TO_ADDRESS
+        description: '{{ doc("opt_origin_to") }}'
