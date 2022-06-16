@@ -1,8 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = "tx_hash",
-    cluster_by = ['ingested_at::DATE'],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
+    cluster_by = ['block_timestamp::DATE']
 ) }}
 
 WITH base_table AS (
@@ -53,6 +52,7 @@ WITH base_table AS (
         ) :: INTEGER AS effective_Gas_Price,
         (gas_price * gas_used) / pow(10,9) As tx_fee,
         ingested_at :: TIMESTAMP AS ingested_at,
+        _inserted_timestamp :: TIMESTAMP as _inserted_timestamp,
         OBJECT_DELETE(
             tx,
             'traces'
@@ -96,8 +96,9 @@ SELECT
     effective_Gas_Price,
     tx_fee,
     ingested_at,
+    _inserted_timestamp,
     tx_json
 FROM
     base_table qualify(ROW_NUMBER() over(PARTITION BY tx_hash
 ORDER BY
-    ingested_at DESC)) = 1
+    _inserted_timestamp DESC)) = 1

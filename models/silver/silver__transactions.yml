@@ -102,9 +102,6 @@ models:
               column_type_list:
                 - NUMBER    
                 - FLOAT
-      - name: EFFECTIVE_GAS_PRICE
-        tests:
-          - not_null
       - name: TX_JSON 
         tests:
           - not_null

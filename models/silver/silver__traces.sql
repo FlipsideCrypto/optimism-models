@@ -1,8 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = '_call_id',
-    cluster_by = ['ingested_at::DATE'],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
+    cluster_by = ['block_timestamp::DATE']
 ) }}
 
 WITH new_blocks AS (
@@ -23,7 +22,7 @@ AND block_id NOT IN (
 )
 {% endif %}
 ORDER BY
-    ingested_at DESC
+    _inserted_timestamp DESC
 LIMIT
     500000
 ), traces_txs AS (
@@ -39,7 +38,7 @@ LIMIT
                 new_blocks
         ) qualify(ROW_NUMBER() over(PARTITION BY tx_id
     ORDER BY
-        ingested_at DESC)) = 1
+        _inserted_timestamp DESC)) = 1
 ),
 base_table AS (
     SELECT
@@ -69,7 +68,8 @@ base_table AS (
             WHEN txs.tx :receipt :status :: STRING = '0x1' THEN 'SUCCESS'
             ELSE 'FAIL'
         END AS tx_status,
-        txs.ingested_at AS ingested_at
+        txs.ingested_at AS ingested_at,
+        txs._inserted_timestamp as _inserted_timestamp
     FROM
         traces_txs txs,
         TABLE(
@@ -88,6 +88,7 @@ base_table AS (
         id,
         block_number,
         block_timestamp,
+        _inserted_timestamp,
         ingested_at,
         tx_status
 ),
@@ -175,8 +176,8 @@ flattened_traces AS (
                 flattened_traces.from_address AS from_address,
                 flattened_traces.to_address AS to_address,
                 flattened_traces.eth_value AS eth_value,
-                flattened_traces.gas AS gas,
-                flattened_traces.gas_used AS gas_used,
+                coalesce(flattened_traces.gas,0) AS gas,
+                coalesce(flattened_traces.gas_used,0) AS gas_used,
                 flattened_traces.input AS input,
                 flattened_traces.output AS output,
                 flattened_traces.type AS TYPE,
@@ -185,6 +186,7 @@ flattened_traces AS (
                 flattened_traces.ingested_at AS ingested_at,
                 flattened_traces.data AS DATA,
                 flattened_traces.tx_status AS tx_status,
+                flattened_traces._inserted_timestamp as _inserted_timestamp,
                 group_sub_traces.sub_traces AS sub_traces
             FROM
                 flattened_traces
@@ -209,10 +211,11 @@ flattened_traces AS (
         ingested_at,
         DATA,
         tx_status,
-        sub_traces
+        sub_traces,
+        _inserted_timestamp
     FROM
         FINAL
     WHERE
         identifier IS NOT NULL qualify(ROW_NUMBER() over(PARTITION BY _call_id
     ORDER BY
-        ingested_at DESC)) = 1
+        _inserted_timestamp DESC)) = 1
