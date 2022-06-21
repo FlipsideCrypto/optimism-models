@@ -7,4 +7,9 @@ sources:
     tables:
       - name: optimism_blocks
       - name: optimism_txs
+  - name: crosschain
+    database: flipside_prod_db
+    schema: crosschain
+    tables:
+      - name: address_labels
   
