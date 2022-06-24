@@ -18,8 +18,7 @@ WITH eth_base AS (
     FROM
         {{ ref('silver__traces') }}
     WHERE
-        TYPE = 'CALL'
-        AND eth_value > 0
+        eth_value > 0
         AND tx_status = 'SUCCESS'
         and gas_used is not null
 ),
