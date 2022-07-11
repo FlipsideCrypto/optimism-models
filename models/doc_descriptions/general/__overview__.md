@@ -30,6 +30,8 @@ The documentation included here details the design of the Optimism tables and vi
 - [fact_traces](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_traces)
 - [fact_transactions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_transactions)
 - [dim_lables](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__dim_labels)
+- [ez_eth_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_eth_transfers)
+- [fact_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_token_transfers)
 
 ## **Data Model Overview**
 
