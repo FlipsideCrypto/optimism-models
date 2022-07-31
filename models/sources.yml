@@ -17,4 +17,16 @@ sources:
     schema: core
     tables:
       - name: fact_hourly_token_prices
+  - name: shared
+    schema: silver
+    tables:
+      - name: prices_v2
+      - name: market_asset_metadata
+  - name: legacy_silver
+    database: flipside_prod_db
+    schema: silver
+    tables:
+      - name: hours
+      - name: market_asset_metadata
+      - name: prices_v2
   
