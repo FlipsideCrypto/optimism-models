@@ -88,13 +88,8 @@ models:
                 - FLOAT 
       - name: DEPOSIT_TYPE
         tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER    
-                - FLOAT 
-        tests:
-          - not_null
+          - not_null:
+              where: VELO_ACTION = 'deposit'
       - name: _INSERTED_TIMESTAMP
         tests:
           - not_null
