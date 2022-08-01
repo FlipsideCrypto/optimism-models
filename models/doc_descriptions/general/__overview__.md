@@ -2,7 +2,7 @@
 
 # Welcome to the Flipside Crypto Optimism Models Documentation!
 
-# NOTE: Data is in 'lite mode' - meaning, histrorical data has not yet been backfilled. Please see `min(block_timestamp)`
+# NOTE: Data is in 'lite mode' - meaning, historical data have not yet been backfilled. Please see `min(block_timestamp)`
 
 ## **What is Flipside?**
 
