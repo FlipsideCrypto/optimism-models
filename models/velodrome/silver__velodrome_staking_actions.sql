@@ -128,7 +128,6 @@ SELECT
     A.amount AS lp_token_amount,
     A.lp_provider_address AS lp_provider_address,
     A.gauge_address AS gauge_address,
-    token_id,
     b.pool_address AS pool_address,
     pool_name,
     pool_type,
