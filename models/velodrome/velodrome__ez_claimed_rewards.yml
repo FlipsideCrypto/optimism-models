@@ -1,7 +1,8 @@
 version: 2
 models:
   - name: velodrome__ez_claimed_rewards
-    description: 'This table contains details about claimed rewards on Velodrome. Rewards are paid to VELO lockers, LP stakers, and veVELO voters.'
+    description: '{{ doc("velo_claimed_table_doc") }}'
+  
       
     columns:
       - name: BLOCK_NUMBER

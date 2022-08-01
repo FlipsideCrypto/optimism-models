@@ -9,7 +9,7 @@ models:
       - name: POOL_NAME
         description: 'The name of the liquidity pool.'
       - name: POOL_TYPE
-        description: 'The type of liquidity pool, either stable or volatile.'
+        description: '{{ doc("op_pool_type") }}'
       - name: TOKEN0_SYMBOL
         description: 'The symbol of token0 in the pool.'
       - name: TOKEN1_SYMBOL

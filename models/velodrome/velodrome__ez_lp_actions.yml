@@ -29,9 +29,9 @@ models:
       - name: LP_ACTION
         description: 'The liquidity action, either deposit or withdraw.'
       - name: TOKEN0_SYMBOL
-        description: 'The symbol of token0 in the pool.'
+        description: '{{ doc("op_token0_symbol") }}'
       - name: TOKEN1_SYMBOL
-        description: 'The symbol of token1 in the pool.'
+        description: '{{ doc("op_token1_symbol") }}'
       - name: TOKEN0_AMOUNT
         description: 'The amount of token0 deposited or withdrawn.'
       - name: TOKEN1_AMOUNT
@@ -41,9 +41,9 @@ models:
       - name: TOKEN1_AMOUNT_USD
         description: 'The amount of token1 in USD deposited or withdrawn.'
       - name: TOKEN0_ADDRESS
-        description: 'The address of token0 in the pool.'
+        description: '{{ doc("op_token0_address") }}'
       - name: TOKEN1_ADDRESS
-        description: 'The address of token1 in the pool.'
+        description: '{{ doc("op_token1_address") }}'
       - name: LP_TOKEN_ACTION
         description: 'The LP token action, either mint or burn.'
       - name: LP_TOKEN_AMOUNT
