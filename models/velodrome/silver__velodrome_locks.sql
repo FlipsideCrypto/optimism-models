@@ -80,11 +80,11 @@ SELECT
     provider_address,
     unlock_date,
     token_id,
-    velo_value,
+    velo_value AS velo_amount,
     ROUND(
         velo_price * velo_value,
         2
-    ) AS velo_value_usd,
+    ) AS velo_amount_usd,
     deposit_type,
     _log_id,
     _inserted_timestamp
