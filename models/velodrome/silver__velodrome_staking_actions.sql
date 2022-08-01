@@ -142,7 +142,7 @@ FROM
     LEFT JOIN token_transfer b
     ON A.tx_hash = b.tx_hash
     AND A.amount = b.amount
-    LEFT JOIN velo_pools C
+    INNER JOIN velo_pools C
     ON b.pool_address = C.pool_address qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY
     _inserted_timestamp DESC) = 1)

@@ -80,7 +80,7 @@ SELECT
     event_index,
     provider_address,
     unlock_date,
-    token_id,
+    token_id :: NUMBER AS token_id,
     velo_value AS velo_amount,
     ROUND(
         velo_price * velo_value,

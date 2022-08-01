@@ -66,6 +66,56 @@ gauges AS (
         pool_name
     FROM
         {{ ref('silver__velodrome_gauges') }}
+),
+FINAL AS (
+    SELECT
+        block_number,
+        block_timestamp,
+        tx_hash,
+        origin_function_signature,
+        origin_from_address,
+        origin_to_address,
+        COALESCE(
+            g1.gauge_address,
+            g0.gauge_address
+        ) AS gauge_address,
+        COALESCE(
+            g1.external_bribe_address,
+            g0.external_bribe_address
+        ) AS external_bribe_address,
+        COALESCE(
+            g1.internal_bribe_address,
+            g0.internal_bribe_address
+        ) AS internal_bribe_address,
+        votes_base.contract_address AS contract_address,
+        COALESCE(
+            g1.pool_address,
+            g0.pool_address
+        ) AS pool_address,
+        COALESCE(
+            g1.pool_name,
+            g0.pool_name
+        ) AS pool_name,
+        from_address,
+        token_id :: INTEGER AS token_id,
+        amount AS vote_amount,
+        vote_action,
+        _log_id,
+        _inserted_timestamp
+    FROM
+        votes_base
+        LEFT JOIN gauges g1
+        ON LOWER(
+            votes_base.contract_address
+        ) = LOWER(
+            g1.external_bribe_address
+        )
+        LEFT JOIN gauges g0
+        ON LOWER(
+            votes_base.contract_address
+        ) = LOWER(
+            g0.internal_bribe_address
+        )
 )
 SELECT
     block_number,
@@ -81,14 +131,13 @@ SELECT
     pool_name,
     from_address,
     token_id,
-    amount AS vote_amount,
+    vote_amount,
     vote_action,
     _log_id,
     _inserted_timestamp
 FROM
-    votes_base
-    LEFT JOIN gauges
-    ON votes_base.contract_address = external_bribe_address
-    OR votes_base.contract_address = internal_bribe_address qualify(ROW_NUMBER() over(PARTITION BY tx_hash, pool_address, vote_action
+    FINAL
+WHERE
+    pool_address IS NOT NULL qualify(ROW_NUMBER() over(PARTITION BY tx_hash, pool_address, vote_action
 ORDER BY
     _inserted_timestamp DESC) = 1)
