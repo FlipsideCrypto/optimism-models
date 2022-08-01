@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
     unique_key = '_log_id',
-    cluster_by = ['block_timestamp::DATE']
+    cluster_by = ['block_timestamp::DATE'],
+    tags = ['velodrome']
 ) }}
 
 WITH lp_actions AS (
@@ -56,7 +57,7 @@ WITH lp_actions AS (
         END AS lp_token_amount,
         CASE
             WHEN topics [0] :: STRING = '0x4c209b5fc8ad50758f13e2e1088ba56a560dff690a1c6fef26394f4c03821c4f' THEN 'deposit'
-            WHEN topics [0] :: STRING = '0xdccd412f0b1252819cb1fd330b93224ca42612892bb3f4f789976e6d81936496' THEN 'withdrawal'
+            WHEN topics [0] :: STRING = '0xdccd412f0b1252819cb1fd330b93224ca42612892bb3f4f789976e6d81936496' THEN 'withdraw'
         END AS lp_action,
         CASE
             WHEN topics [0] :: STRING = '0x4c209b5fc8ad50758f13e2e1088ba56a560dff690a1c6fef26394f4c03821c4f' THEN 'mint'

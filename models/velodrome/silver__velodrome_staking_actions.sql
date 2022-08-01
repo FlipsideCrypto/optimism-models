@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
     unique_key = '_log_id',
-    cluster_by = ['block_timestamp::DATE']
+    cluster_by = ['block_timestamp::DATE'],
+    tags = ['velodrome']
 ) }}
 
 WITH staking_actions AS (
@@ -18,7 +19,7 @@ WITH staking_actions AS (
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CASE
             WHEN topics [0] :: STRING = '0xdcbc1c05240f31ff3ad067ef1ee35ce4997762752e3a095284754544f4c709d7' THEN 'deposit'
-            WHEN topics [0] :: STRING = '0xf341246adaac6f497bc2a656f546ab9e182111d630394f0c57c710a59a2cb567' THEN 'withdrawal'
+            WHEN topics [0] :: STRING = '0xf341246adaac6f497bc2a656f546ab9e182111d630394f0c57c710a59a2cb567' THEN 'withdraw'
         END AS staking_action_type,
         PUBLIC.udf_hex_to_int(
             segmented_data [0] :: STRING
