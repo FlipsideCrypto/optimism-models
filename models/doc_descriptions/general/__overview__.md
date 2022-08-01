@@ -32,6 +32,19 @@ The documentation included here details the design of the Optimism tables and vi
 - [dim_lables](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__dim_labels)
 - [ez_eth_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_eth_transfers)
 - [fact_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_token_transfers)
+- [fact_hourly_token_prices](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_hourly_token_prices)
+- [ez_nft_sales](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_sales)
+
+
+**Velodrome**
+ - [ez_claimed_rewards](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_claimed_rewards)
+ - [ez_lp_actions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_lp_actions)
+ - [ez_pool_details](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_pool_details)
+ - [ez_staking_actions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_staking_actions)
+ - [ez_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_swaps)
+ - [ez_velo_locks](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_velo_locks)
+ - [ez_votes](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_votes)
+
 
 ## **Data Model Overview**
 
