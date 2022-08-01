@@ -1,7 +1,7 @@
 version: 2
 models:   
   - name: velodrome__ez_velo_locks
-    description: 'This table contains details on locked VELO positions.'
+    description: 'This table contains details on the locking and unlocking of VELO positions.'
       
     columns:
       - name: BLOCK_NUMBER
@@ -26,6 +26,8 @@ models:
         description: 'The date at which the lock expires.'
       - name: TOKEN_ID
         description: 'The token ID of the created lock.'
+      - name: VELO_ACTION
+        description: 'Users can create new VELO locks (deposits) or withdraw their VELO tokens. Either deposit or withdraw.'
       - name: VELO_AMOUNT
         description: 'The amount of VELO tokens locked.'
       - name: VELO_AMOUNT_USD

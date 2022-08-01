@@ -15,6 +15,7 @@ SELECT
     contract_address,
     event_index,
     provider_address,
+    velo_action,
     unlock_date,
     token_id,
     velo_amount,
