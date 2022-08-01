@@ -1,3 +1,5 @@
+version: 2
+models:
   - name: velodrome__ez_lp_actions
     description: 'This table contains details about deposits and withdraws into Velodrome liquidity pools.'
       

@@ -30,4 +30,4 @@ SELECT
     lp_token_amount,
     lp_token_amount_usd
 FROM
-    {{ ref('silver__velodrome_lp_actions') }}
+    {{ ref('silver__velodrome_LP_actions') }}

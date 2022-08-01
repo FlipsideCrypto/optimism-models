@@ -1,3 +1,5 @@
+version: 2
+models:  
   - name: velodrome__ez_votes
     description: 'This table contains details on LP voting events by VELO lockers on Velodrome.'
       

@@ -1,3 +1,5 @@
+version: 2
+models:
   - name: velodrome__ez_pool_details
     description: 'This table contains metadata details for liquidity pools on Velodrome.'
       

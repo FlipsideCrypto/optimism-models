@@ -1,4 +1,6 @@
-  - name: velodrome__ez_locks
+version: 2
+models:   
+  - name: velodrome__ez_velo_locks
     description: 'This table contains details on locked VELO positions.'
       
     columns:

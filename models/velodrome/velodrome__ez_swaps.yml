@@ -1,3 +1,5 @@
+version: 2
+models:  
   - name: velodrome__ez_swaps
     description: 'This table contains details on swaps executed on Velodrome.'
       

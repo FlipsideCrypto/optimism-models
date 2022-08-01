@@ -1,3 +1,5 @@
+version: 2
+models:
   - name: velodrome__ez_staking_actions
     description: 'This table contains details on liquidity pool staking actions for Velodrome.'
       

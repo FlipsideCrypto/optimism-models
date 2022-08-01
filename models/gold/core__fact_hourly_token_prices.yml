@@ -1,3 +1,6 @@
+version: 2
+models:
+
   - name: core__fact_hourly_token_prices
     description: 'This table contains the hourly USD prices for tokens on the Optimism blockchain.'
       
