@@ -224,12 +224,18 @@ SELECT
     pool_name,
     amount_in,
     CASE
-        WHEN decimals_in IS NOT NULL THEN amount_in * p0.price
+        WHEN decimals_in IS NOT NULL THEN ROUND(
+            amount_in * p0.price,
+            2
+        )
         ELSE NULL
     END AS amount_in_usd,
     amount_out,
     CASE
-        WHEN decimals_out IS NOT NULL THEN amount_out * p1.price
+        WHEN decimals_out IS NOT NULL THEN ROUND(
+            amount_out * p1.price,
+            2
+        )
         ELSE NULL
     END AS amount_out_usd,
     sender_address,
@@ -250,7 +256,10 @@ SELECT
     token1_symbol,
     lp_fee,
     CASE
-        WHEN decimals_in IS NOT NULL THEN lp_fee * p0.price
+        WHEN decimals_in IS NOT NULL THEN ROUND(
+            lp_fee * p0.price,
+            2
+        )
         ELSE NULL
     END AS lp_fee_usd,
     symbol_in AS lp_fee_symbol,
