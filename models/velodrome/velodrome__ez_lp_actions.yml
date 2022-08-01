@@ -1,54 +1,50 @@
   - name: velodrome__ez_lp_actions
-    description: ''
+    description: 'This table contains details about deposits and withdraws into Velodrome liquidity pools.'
       
     columns:
       - name: BLOCK_NUMBER
-        description:
+        description: '{{ doc("opt_block_number") }}'
       - name: BLOCK_TIMESTAMP
-        description:
+        description: '{{ doc("opt_block_timestamp") }}'
       - name: TX_HASH
-        description:
-      - name: DECIMALS
-        description:
-      - name: PRICE
-        description:
+        description: '{{ doc("opt_tx_hash") }}'
       - name: EVENT_INDEX
-        description:
+        description: '{{ doc("opt_event_index") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description:
+        description: '{{ doc("opt_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_to") }}'
       - name: POOL_ADDRESS
-        description:
+        description: '{{ doc("op_pool_address") }}'
       - name: POOL_NAME
-        description:
+        description: '{{ doc("op_pool_name") }}'
       - name: POOL_TYPE
-        description:
+        description: '{{ doc("op_pool_type") }}'
       - name: SENDER_ADDRESS
-        description:
+        description: 'The sender of the liquidity action.'
       - name: LP_ACTION
-        description:
+        description: 'The liquidity action, either deposit or withdraw.'
       - name: TOKEN0_SYMBOL
-        description:
+        description: 'The symbol of token0 in the pool.'
       - name: TOKEN1_SYMBOL
-        description:
+        description: 'The symbol of token1 in the pool.'
       - name: TOKEN0_AMOUNT
-        description:
+        description: 'The amount of token0 deposited or withdrawn.'
       - name: TOKEN1_AMOUNT
-        description:
+        description: 'The amount of token1 deposited or withdrawn.'
       - name: TOKEN0_AMOUNT_USD
-        description:
+        description: 'The amount of token0 in USD deposited or withdrawn.'
       - name: TOKEN1_AMOUNT_USD
-        description:
+        description: 'The amount of token1 in USD deposited or withdrawn.'
       - name: TOKEN0_ADDRESS
-        description:
+        description: 'The address of token0 in the pool.'
       - name: TOKEN1_ADDRESS
-        description:
+        description: 'The address of token1 in the pool.'
       - name: LP_TOKEN_ACTION
-        description:
+        description: 'The LP token action, either mint or burn.'
       - name: LP_TOKEN_AMOUNT
-        description:
+        description: 'The amount of LP tokens minted or burned.'
       - name: LP_TOKEN_AMOUNT_USD
-        description:
+        description: 'The amount of LP tokens minted or burned in USD.'

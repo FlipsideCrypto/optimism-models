@@ -1,59 +1,59 @@
   - name: velodrome__ez_swaps
-    description: ''
+    description: 'This table contains details on swaps executed on Velodrome.'
       
     columns:
       - name: BLOCK_NUMBER
-        description:
+        description: '{{ doc("opt_block_number") }}'
       - name: BLOCK_TIMESTAMP
-        description:
+        description: '{{ doc("opt_block_timestamp") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description:
+        description: '{{ doc("opt_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_to") }}'
       - name: TX_HASH
-        description:
+        description: '{{ doc("opt_tx_hash") }}' 
       - name: EVENT_INDEX
-        description:
+        description: 'The index of this event within this transcation.'
       - name: PLATFORM
-        description:
+        description: 'The name of the dex. In this case, Velodrome.'
       - name: CONTRACT_ADDRESS
-        description:
+        description: 'The address of the contract interacted with in the swap.'
       - name: POOL_ADDRESS
-        description:
+        description: 'The address of the liquidity pool used for the swap.'
       - name: POOL_NAME
-        description:
+        description: 'The name of the liquidity pool used for the swap.'
       - name: SENDER_ADDRESS
-        description:
+        description: 'The sender of the swap event.'
       - name: TO_ADDRESS
-        description:
+        description: 'The receiver of the swap event.'
       - name: AMOUNT_IN
-        description:
+        description: 'The amount of tokens in.'
       - name: AMOUNT_IN_USD
-        description:
+        description: 'The amount of tokens in, in USD.'
       - name: AMOUNT_OUT
-        description:
+        description: 'The amount of tokens out.'
       - name: AMOUNT_OUT_USD
-        description:
+        description: 'The amount of tokens out, in USD.'
       - name: TOKEN_ADDRESS_IN
-        description:
+        description: 'The contract address of the token in.'
       - name: TOKEN_ADDRESS_OUT
-        description:
+        description: 'The contract address of the token out.'
       - name: SYMBOL_IN
-        description:
+        description: 'The symbol of the token in.'
       - name: SYMBOL_OUT
-        description:
+        description: 'The symbol of the token out.'
       - name: TOKEN0_SYMBOL
-        description:   
+        description:  'The symbol of token0 in the LP.'
       - name: TOKEN1_SYMBOL
-        description:
+        description: 'The symbol of token1 in the LP.'
       - name: LP_FEE
-        description:
+        description: 'The amount of tokens paid to the LP as a fee.'
       - name: LP_FEE_USD
-        description:
+        description: 'The amount of tokens paid to the LP as a fee, in USD.'
       - name: LP_FEE_SYMBOL
-        description:
+        description: 'The symbol of the LP token fees.'
       - name: LP_FEE_TOKEN_ADDRESS
-        description:
+        description: 'The contract address of the LP token fees.'
      

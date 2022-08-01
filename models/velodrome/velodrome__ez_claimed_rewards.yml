@@ -1,37 +1,37 @@
   - name: velodrome__ez_claimed_rewards
-    description: ''
+    description: 'This table contains details about claimed rewards on Velodrome. Rewards are paid to VELO lockers, LP stakers, and veVELO voters.'
       
     columns:
       - name: BLOCK_NUMBER
-        description:
+        description: '{{ doc("opt_block_number") }}'
       - name: BLOCK_TIMESTAMP
-        description:
+        description: '{{ doc("opt_block_timestamp") }}'
       - name: TX_HASH
-        description:
+        description: '{{ doc("opt_tx_hash") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description:
+        description: '{{ doc("opt_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_to") }}'
       - name: CONTRACT_ADDRESS
-        description:
+        description: 'The contract address interacted with in this event.'
       - name: EVENT_INDEX
-        description:
+        description: 'The event index within the transaction.'
       - name: REWARD_TYPE
-        description:
+        description: 'The type of rewards claimed, either `voter_rewards`, `venft_distribution`, or `lp_reward`.'
       - name: TOKEN_ID
-        description:
+        description: 'The veNFT token ID. Only applies to veNFT distributions.'
       - name: CLAIMED_AMOUNT
-        description:
+        description: 'The amount of tokens claimed, decimal adjusted.'
       - name: CLAIMED_AMOUNT_USD
-        description:
+        description: 'The amount of tokens claimed, in USD.'
       - name: TOKEN_SYMBOL
-        description:
+        description: 'The symbol of the claimed tokens.'
       - name: TOKEN_ADDRESS
-        description:
+        description: 'The contract address of the claimed tokens'
       - name: CLAIM_EPOCH
-        description:
+        description: 'The claim epoch, only applicable to veNFT distributions.'
       - name: MAX_EPOCH
-        description:
+        description: 'The max epoch, only applicable to veNFT distributions.'
      

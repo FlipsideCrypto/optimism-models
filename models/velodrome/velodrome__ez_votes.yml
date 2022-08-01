@@ -1,34 +1,34 @@
   - name: velodrome__ez_votes
-    description: ''
+    description: 'This table contains details on LP voting events by VELO lockers on Velodrome.'
       
     columns:
       - name: BLOCK_NUMBER
-        description:
+        description: '{{ doc("opt_block_number") }}'
       - name: BLOCK_TIMESTAMP
-        description:
+        description: '{{ doc("opt_block_timestamp") }}'
       - name: TX_HASH
-        description:
+        description: '{{ doc("opt_tx_hash") }}' 
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description:
+        description: '{{ doc("opt_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_to") }}'
       - name: GAUGE_ADDRESS
-        description:
+        description: 'The address of the gauge in this vote or unvote.'
       - name: EXTERNAL_BRIBE_ADDRESS
-        description:
+        description: 'The external bribe address for the gauge used in the event.'
       - name: INTERNAL_BRIBE_ADDRESS
-        description:
+        description: 'The internal bribe address for the gauge used in the event.'
       - name: POOL_ADDRESS
-        description:
+        description: 'The pool address of the vote or unvote event.'
       - name: POOL_NAME
-        description:
+        description: 'The pool name of the vote or unvote event.'
       - name: FROM_ADDRESS
-        description:
+        description: 'The address voting or unvoting.'
       - name: TOKEN_ID
-        description:
+        description: 'The token ID associated with the vote or unvote event'
       - name: VOTE_AMOUNT
-        description:
+        description: 'The amount of tokens voted.'
       - name: VOTE_ACTION
-        description:
+        description: 'The type of action, either vote or unvote.'

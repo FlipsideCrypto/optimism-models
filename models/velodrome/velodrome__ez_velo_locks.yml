@@ -1,32 +1,32 @@
   - name: velodrome__ez_locks
-    description: ''
+    description: 'This table contains details on locked VELO positions.'
       
     columns:
       - name: BLOCK_NUMBER
-        description:
+        description: '{{ doc("opt_block_number") }}'
       - name: BLOCK_TIMESTAMP
-        description:
+        description: '{{ doc("opt_block_timestamp") }}'
       - name: TX_HASH
-        description:
+        description: '{{ doc("opt_tx_hash") }}' 
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description:
+        description: '{{ doc("opt_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_to") }}'
       - name: CONTRACT_ADDRESS
-        description:
+        description: 'The address of the contract interacted with in the event.'
       - name: EVENT_INDEX
-        description:
+        description: 'The index of the event within the transaction.'
       - name: PROVIDER_ADDRESS
-        description:
+        description: 'The address of the VELO provider.'
       - name: UNLOCK_DATE
-        description:
+        description: 'The date at which the lock expires.'
       - name: TOKEN_ID
-        description:
+        description: 'The token ID of the created lock.'
       - name: VELO_AMOUNT
-        description:
+        description: 'The amount of VELO tokens locked.'
       - name: VELO_AMOUNT_USD
-        description:
+        description: 'The amount of VELO tokens locked, in USD.'
       - name: DEPOSIT_TYPE
-        description:
+        description: 'The type of deposit.'

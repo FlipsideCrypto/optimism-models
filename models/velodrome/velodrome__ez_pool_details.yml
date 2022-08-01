@@ -1,28 +1,28 @@
   - name: velodrome__ez_pool_details
-    description: ''
+    description: 'This table contains metadata details for liquidity pools on Velodrome.'
       
     columns:
       - name: POOL_ADDRESS
-        description:
+        description: 'The address of the liquidity pool.'
       - name: POOL_NAME
-        description:
+        description: 'The name of the liquidity pool.'
       - name: POOL_TYPE
-        description:
+        description: 'The type of liquidity pool, either stable or volatile.'
       - name: TOKEN0_SYMBOL
-        description:
+        description: 'The symbol of token0 in the pool.'
       - name: TOKEN1_SYMBOL
-        description:
+        description: 'The symbol of token1 in the pool.'
       - name: TOKEN0_ADDRESS
-        description:
+        description: 'The address of token0 in the pool.'
       - name: TOKEN1_ADDRESS
-        description:
+        description: 'The address of token1 in the pool.'
       - name: TOKEN0_DECIMALS
-        description:        
+        description: 'The decimals of token0 in the pool.'         
       - name: TOKEN1_DECIMALS
-        description:
+        description: 'The decimals of token1 in the pool.'
       - name: CREATED_TIMESTAMP
-        description:
+        description: 'The timestamp the pool was created.'
       - name: CREATED_BLOCK
-        description:                
+        description: 'The block at which the pool was created.'                
       - name: CREATED_HASH
-        description:
+        description: 'The tx hash in which the pool was created.'

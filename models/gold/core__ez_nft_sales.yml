@@ -1,40 +1,40 @@
 version: 2
 models:
   - name: core__ez_nft_sales
-    description: ''
+    description: 'This table contains NFT sale events on the Optimism blockchain. Currently, only Quixotic sales are supported.'
       
     columns:
       - name: BLOCK_NUMBER
-        description:
+        description: '{{ doc("opt_block_number") }}'
       - name: BLOCK_TIMESTAMP
-        description:
+        description: '{{ doc("opt_block_timestamp") }}'
       - name: TX_HASH
-        description:
+        description: '{{ doc("opt_tx_hash") }}' 
       - name: EVENT_TYPE
-        description:
+        description: 'The type of sale event.'
       - name: PLATFORM_ADDRESS
-        description:
+        description: 'The address of the NFT exchange.'
       - name: PLATFORM_NAME
-        description:
+        description: 'The name of the NFT exchange.'
       - name: SELLER_ADDRESS
-        description:
+        description: 'The seller of the NFT.'
       - name: BUYER_ADDRESS
-        description:
+        description: 'The buyer of the NFT.'
       - name: NFT_ADDRESS
-        description:
+        description: 'The contract address of the NFT.'
       - name: TOKENID
-        description:
+        description: 'The token ID for the NFT address.'
       - name: CURRENCY_SYMBOL
-        description:
+        description: 'The symbol of the payment currency.'
       - name: CURRENCY_ADDRESS
-        description:
+        description: 'The contract address of the payment currency.'
       - name: PRICE
-        description:
+        description: 'The price of the NFT in the payment currency.'
       - name: PRICE_USD
-        description:
-      - name: ORIGIN_FROM_ADDRESS
-        description:
-      - name: ORIGIN_TO_ADDRESS
-        description:
+        description: 'The price of the NFT in USD.'
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description:
+        description: '{{ doc("opt_origin_sig") }}'
+      - name: ORIGIN_FROM_ADDRESS
+        description: '{{ doc("opt_origin_from") }}'
+      - name: ORIGIN_TO_ADDRESS
+        description: '{{ doc("opt_origin_to") }}'

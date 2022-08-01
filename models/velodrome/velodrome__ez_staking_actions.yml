@@ -1,43 +1,43 @@
   - name: velodrome__ez_staking_actions
-    description: ''
+    description: 'This table contains details on liquidity pool staking actions for Velodrome.'
       
     columns:
       - name: BLOCK_NUMBER
-        description:
+        description: '{{ doc("opt_block_number") }}'
       - name: BLOCK_TIMESTAMP
-        description:
+        description: '{{ doc("opt_block_timestamp") }}'
       - name: TX_HASH
-        description:
+        description: '{{ doc("opt_tx_hash") }}' 
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description:
+        description: '{{ doc("opt_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
-        description:
+        description: '{{ doc("opt_origin_to") }}'
       - name: CONTRACT_ADDRESS
-        description:
+        description: 'The contract address interacted with in this event.'
       - name: EVENT_INDEX
-        description:
+        description: 'The index of this event within the transaction.'
       - name: STAKING_ACTION_TYPE
-        description:
+        description: 'The type of staking action, either deposit or withdraw.'
       - name: LP_TOKEN_AMOUNT
-        description:
+        description: 'The amount of LP tokens deposited or withdrawn.'
       - name: LP_PROVIDER_ADDRESS
-        description:
+        description: 'The address of the liquidity provider.'
       - name: GAUGE_ADDRESS
-        description:
+        description: 'The address of the gauge.'
       - name: POOL_ADDRESS
-        description:
+        description: 'The address of the liquidity pool.'
       - name: POOL_NAME
-        description:
+        description: 'The name of the liquidity pool.'
       - name: POOL_TYPE
-        description:
+        description: 'The type of liquidity pool, either stable or volatile.'
       - name: TOKEN0_SYMBOL
-        description:
+        description: 'The symbol of token0.'
       - name: TOKEN1_SYMBOL
-        description:
+        description: ' The symbol of token1.'
       - name: TOKEN0_ADDRESS
-        description:
+        description: '{{ doc("op_token0_address") }}'
       - name: TOKEN1_ADDRESS
-        description:
+        description: '{{ doc("op_token1_address") }}'
      

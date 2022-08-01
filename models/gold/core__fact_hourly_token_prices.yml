@@ -1,16 +1,16 @@
   - name: core__fact_hourly_token_prices
-    description: ''
+    description: 'This table contains the hourly USD prices for tokens on the Optimism blockchain.'
       
     columns:
       - name: HOUR
-        description:
+        description: 'The hour the token price was recorded.'
       - name: TOKEN_ADDRESS
-        description:
+        description: 'The Optimism contract address for this token.'
       - name: SYMBOL
-        description:
+        description: 'The symbol for this token.'
       - name: DECIMALS
-        description:
+        description: 'The decimals for this token.'
       - name: PRICE
-        description:
+        description: 'The average hourly price for this token.'
       - name: IS_IMPUTED
-        description:
+        description: 'This column denotes if we carried forward the last recorded price in order to fill hourly gaps from the source.'
