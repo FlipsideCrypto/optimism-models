@@ -1,0 +1,37 @@
+  - name: velodrome__ez_claimed_rewards
+    description: ''
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description:
+      - name: BLOCK_TIMESTAMP
+        description:
+      - name: TX_HASH
+        description:
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description:
+      - name: ORIGIN_FROM_ADDRESS
+        description:
+      - name: ORIGIN_TO_ADDRESS
+        description:
+      - name: CONTRACT_ADDRESS
+        description:
+      - name: EVENT_INDEX
+        description:
+      - name: REWARD_TYPE
+        description:
+      - name: TOKEN_ID
+        description:
+      - name: CLAIMED_AMOUNT
+        description:
+      - name: CLAIMED_AMOUNT_USD
+        description:
+      - name: TOKEN_SYMBOL
+        description:
+      - name: TOKEN_ADDRESS
+        description:
+      - name: CLAIM_EPOCH
+        description:
+      - name: MAX_EPOCH
+        description:
+     

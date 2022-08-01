@@ -1,0 +1,16 @@
+  - name: core__fact_hourly_token_prices
+    description: ''
+      
+    columns:
+      - name: HOUR
+        description:
+      - name: TOKEN_ADDRESS
+        description:
+      - name: SYMBOL
+        description:
+      - name: DECIMALS
+        description:
+      - name: PRICE
+        description:
+      - name: IS_IMPUTED
+        description:

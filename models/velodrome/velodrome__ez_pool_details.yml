@@ -1,0 +1,28 @@
+  - name: velodrome__ez_pool_details
+    description: ''
+      
+    columns:
+      - name: POOL_ADDRESS
+        description:
+      - name: POOL_NAME
+        description:
+      - name: POOL_TYPE
+        description:
+      - name: TOKEN0_SYMBOL
+        description:
+      - name: TOKEN1_SYMBOL
+        description:
+      - name: TOKEN0_ADDRESS
+        description:
+      - name: TOKEN1_ADDRESS
+        description:
+      - name: TOKEN0_DECIMALS
+        description:        
+      - name: TOKEN1_DECIMALS
+        description:
+      - name: CREATED_TIMESTAMP
+        description:
+      - name: CREATED_BLOCK
+        description:                
+      - name: CREATED_HASH
+        description:

@@ -1,0 +1,59 @@
+  - name: velodrome__ez_swaps
+    description: ''
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description:
+      - name: BLOCK_TIMESTAMP
+        description:
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description:
+      - name: ORIGIN_FROM_ADDRESS
+        description:
+      - name: ORIGIN_TO_ADDRESS
+        description:
+      - name: TX_HASH
+        description:
+      - name: EVENT_INDEX
+        description:
+      - name: PLATFORM
+        description:
+      - name: CONTRACT_ADDRESS
+        description:
+      - name: POOL_ADDRESS
+        description:
+      - name: POOL_NAME
+        description:
+      - name: SENDER_ADDRESS
+        description:
+      - name: TO_ADDRESS
+        description:
+      - name: AMOUNT_IN
+        description:
+      - name: AMOUNT_IN_USD
+        description:
+      - name: AMOUNT_OUT
+        description:
+      - name: AMOUNT_OUT_USD
+        description:
+      - name: TOKEN_ADDRESS_IN
+        description:
+      - name: TOKEN_ADDRESS_OUT
+        description:
+      - name: SYMBOL_IN
+        description:
+      - name: SYMBOL_OUT
+        description:
+      - name: TOKEN0_SYMBOL
+        description:   
+      - name: TOKEN1_SYMBOL
+        description:
+      - name: LP_FEE
+        description:
+      - name: LP_FEE_USD
+        description:
+      - name: LP_FEE_SYMBOL
+        description:
+      - name: LP_FEE_TOKEN_ADDRESS
+        description:
+     

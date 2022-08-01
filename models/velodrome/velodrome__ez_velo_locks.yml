@@ -1,0 +1,32 @@
+  - name: velodrome__ez_locks
+    description: ''
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description:
+      - name: BLOCK_TIMESTAMP
+        description:
+      - name: TX_HASH
+        description:
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description:
+      - name: ORIGIN_FROM_ADDRESS
+        description:
+      - name: ORIGIN_TO_ADDRESS
+        description:
+      - name: CONTRACT_ADDRESS
+        description:
+      - name: EVENT_INDEX
+        description:
+      - name: PROVIDER_ADDRESS
+        description:
+      - name: UNLOCK_DATE
+        description:
+      - name: TOKEN_ID
+        description:
+      - name: VELO_AMOUNT
+        description:
+      - name: VELO_AMOUNT_USD
+        description:
+      - name: DEPOSIT_TYPE
+        description:

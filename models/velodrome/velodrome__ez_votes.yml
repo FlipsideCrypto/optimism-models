@@ -1,0 +1,34 @@
+  - name: velodrome__ez_votes
+    description: ''
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description:
+      - name: BLOCK_TIMESTAMP
+        description:
+      - name: TX_HASH
+        description:
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description:
+      - name: ORIGIN_FROM_ADDRESS
+        description:
+      - name: ORIGIN_TO_ADDRESS
+        description:
+      - name: GAUGE_ADDRESS
+        description:
+      - name: EXTERNAL_BRIBE_ADDRESS
+        description:
+      - name: INTERNAL_BRIBE_ADDRESS
+        description:
+      - name: POOL_ADDRESS
+        description:
+      - name: POOL_NAME
+        description:
+      - name: FROM_ADDRESS
+        description:
+      - name: TOKEN_ID
+        description:
+      - name: VOTE_AMOUNT
+        description:
+      - name: VOTE_ACTION
+        description:

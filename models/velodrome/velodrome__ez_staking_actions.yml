@@ -1,0 +1,43 @@
+  - name: velodrome__ez_staking_actions
+    description: ''
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description:
+      - name: BLOCK_TIMESTAMP
+        description:
+      - name: TX_HASH
+        description:
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description:
+      - name: ORIGIN_FROM_ADDRESS
+        description:
+      - name: ORIGIN_TO_ADDRESS
+        description:
+      - name: CONTRACT_ADDRESS
+        description:
+      - name: EVENT_INDEX
+        description:
+      - name: STAKING_ACTION_TYPE
+        description:
+      - name: LP_TOKEN_AMOUNT
+        description:
+      - name: LP_PROVIDER_ADDRESS
+        description:
+      - name: GAUGE_ADDRESS
+        description:
+      - name: POOL_ADDRESS
+        description:
+      - name: POOL_NAME
+        description:
+      - name: POOL_TYPE
+        description:
+      - name: TOKEN0_SYMBOL
+        description:
+      - name: TOKEN1_SYMBOL
+        description:
+      - name: TOKEN0_ADDRESS
+        description:
+      - name: TOKEN1_ADDRESS
+        description:
+     

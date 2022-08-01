@@ -1,0 +1,40 @@
+version: 2
+models:
+  - name: core__ez_nft_sales
+    description: ''
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description:
+      - name: BLOCK_TIMESTAMP
+        description:
+      - name: TX_HASH
+        description:
+      - name: EVENT_TYPE
+        description:
+      - name: PLATFORM_ADDRESS
+        description:
+      - name: PLATFORM_NAME
+        description:
+      - name: SELLER_ADDRESS
+        description:
+      - name: BUYER_ADDRESS
+        description:
+      - name: NFT_ADDRESS
+        description:
+      - name: TOKENID
+        description:
+      - name: CURRENCY_SYMBOL
+        description:
+      - name: CURRENCY_ADDRESS
+        description:
+      - name: PRICE
+        description:
+      - name: PRICE_USD
+        description:
+      - name: ORIGIN_FROM_ADDRESS
+        description:
+      - name: ORIGIN_TO_ADDRESS
+        description:
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description:

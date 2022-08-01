@@ -1,0 +1,54 @@
+  - name: velodrome__ez_lp_actions
+    description: ''
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description:
+      - name: BLOCK_TIMESTAMP
+        description:
+      - name: TX_HASH
+        description:
+      - name: DECIMALS
+        description:
+      - name: PRICE
+        description:
+      - name: EVENT_INDEX
+        description:
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description:
+      - name: ORIGIN_FROM_ADDRESS
+        description:
+      - name: ORIGIN_TO_ADDRESS
+        description:
+      - name: POOL_ADDRESS
+        description:
+      - name: POOL_NAME
+        description:
+      - name: POOL_TYPE
+        description:
+      - name: SENDER_ADDRESS
+        description:
+      - name: LP_ACTION
+        description:
+      - name: TOKEN0_SYMBOL
+        description:
+      - name: TOKEN1_SYMBOL
+        description:
+      - name: TOKEN0_AMOUNT
+        description:
+      - name: TOKEN1_AMOUNT
+        description:
+      - name: TOKEN0_AMOUNT_USD
+        description:
+      - name: TOKEN1_AMOUNT_USD
+        description:
+      - name: TOKEN0_ADDRESS
+        description:
+      - name: TOKEN1_ADDRESS
+        description:
+      - name: LP_TOKEN_ACTION
+        description:
+      - name: LP_TOKEN_AMOUNT
+        description:
+      - name: LP_TOKEN_AMOUNT_USD
+        description:
