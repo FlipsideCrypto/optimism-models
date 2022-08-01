@@ -1,0 +1,52 @@
+version: 2
+models:
+  - name: velodrome__ez_lp_actions
+    description: 'This table contains details about deposits and withdraws into Velodrome liquidity pools.'
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("opt_block_number") }}'
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("opt_block_timestamp") }}'
+      - name: TX_HASH
+        description: '{{ doc("opt_tx_hash") }}'
+      - name: EVENT_INDEX
+        description: '{{ doc("opt_event_index") }}'
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description: '{{ doc("opt_origin_sig") }}'
+      - name: ORIGIN_FROM_ADDRESS
+        description: '{{ doc("opt_origin_from") }}'
+      - name: ORIGIN_TO_ADDRESS
+        description: '{{ doc("opt_origin_to") }}'
+      - name: POOL_ADDRESS
+        description: '{{ doc("op_pool_address") }}'
+      - name: POOL_NAME
+        description: '{{ doc("op_pool_name") }}'
+      - name: POOL_TYPE
+        description: '{{ doc("op_pool_type") }}'
+      - name: SENDER_ADDRESS
+        description: 'The sender of the liquidity action.'
+      - name: LP_ACTION
+        description: 'The liquidity action, either deposit or withdraw.'
+      - name: TOKEN0_SYMBOL
+        description: '{{ doc("op_token0_symbol") }}'
+      - name: TOKEN1_SYMBOL
+        description: '{{ doc("op_token1_symbol") }}'
+      - name: TOKEN0_AMOUNT
+        description: 'The amount of token0 deposited or withdrawn.'
+      - name: TOKEN1_AMOUNT
+        description: 'The amount of token1 deposited or withdrawn.'
+      - name: TOKEN0_AMOUNT_USD
+        description: 'The amount of token0 in USD deposited or withdrawn.'
+      - name: TOKEN1_AMOUNT_USD
+        description: 'The amount of token1 in USD deposited or withdrawn.'
+      - name: TOKEN0_ADDRESS
+        description: '{{ doc("op_token0_address") }}'
+      - name: TOKEN1_ADDRESS
+        description: '{{ doc("op_token1_address") }}'
+      - name: LP_TOKEN_ACTION
+        description: 'The LP token action, either mint or burn.'
+      - name: LP_TOKEN_AMOUNT
+        description: 'The amount of LP tokens minted or burned.'
+      - name: LP_TOKEN_AMOUNT_USD
+        description: 'The amount of LP tokens minted or burned in USD.'

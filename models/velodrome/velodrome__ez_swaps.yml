@@ -1,0 +1,61 @@
+version: 2
+models:  
+  - name: velodrome__ez_swaps
+    description: 'This table contains details on swaps executed on Velodrome.'
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("opt_block_number") }}'
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("opt_block_timestamp") }}'
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description: '{{ doc("opt_origin_sig") }}'
+      - name: ORIGIN_FROM_ADDRESS
+        description: '{{ doc("opt_origin_from") }}'
+      - name: ORIGIN_TO_ADDRESS
+        description: '{{ doc("opt_origin_to") }}'
+      - name: TX_HASH
+        description: '{{ doc("opt_tx_hash") }}' 
+      - name: EVENT_INDEX
+        description: 'The index of this event within this transcation.'
+      - name: PLATFORM
+        description: 'The name of the dex. In this case, Velodrome.'
+      - name: CONTRACT_ADDRESS
+        description: 'The address of the contract interacted with in the swap.'
+      - name: POOL_ADDRESS
+        description: 'The address of the liquidity pool used for the swap.'
+      - name: POOL_NAME
+        description: 'The name of the liquidity pool used for the swap.'
+      - name: SENDER_ADDRESS
+        description: 'The sender of the swap event.'
+      - name: TO_ADDRESS
+        description: 'The receiver of the swap event.'
+      - name: AMOUNT_IN
+        description: 'The amount of tokens in.'
+      - name: AMOUNT_IN_USD
+        description: 'The amount of tokens in, in USD.'
+      - name: AMOUNT_OUT
+        description: 'The amount of tokens out.'
+      - name: AMOUNT_OUT_USD
+        description: 'The amount of tokens out, in USD.'
+      - name: TOKEN_ADDRESS_IN
+        description: 'The contract address of the token in.'
+      - name: TOKEN_ADDRESS_OUT
+        description: 'The contract address of the token out.'
+      - name: SYMBOL_IN
+        description: 'The symbol of the token in.'
+      - name: SYMBOL_OUT
+        description: 'The symbol of the token out.'
+      - name: TOKEN0_SYMBOL
+        description:  'The symbol of token0 in the LP.'
+      - name: TOKEN1_SYMBOL
+        description: 'The symbol of token1 in the LP.'
+      - name: LP_FEE
+        description: 'The amount of tokens paid to the LP as a fee.'
+      - name: LP_FEE_USD
+        description: 'The amount of tokens paid to the LP as a fee, in USD.'
+      - name: LP_FEE_SYMBOL
+        description: 'The symbol of the LP token fees.'
+      - name: LP_FEE_TOKEN_ADDRESS
+        description: 'The contract address of the LP token fees.'
+     
