@@ -29,4 +29,11 @@ sources:
       - name: hours
       - name: market_asset_metadata
       - name: prices_v2
+  - name: optimism_pools
+    database: optimism
+    schema: bronze
+    tables:
+      - name: SUSHI_DIM_DEX_POOLS
+
+  
   
