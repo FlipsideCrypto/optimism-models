@@ -27,8 +27,6 @@ SELECT
     token_address_out,
     symbol_in,
     symbol_out,
-    token0_symbol,
-    token1_symbol,
     lp_fee,
     lp_fee_usd,
     lp_fee_symbol,

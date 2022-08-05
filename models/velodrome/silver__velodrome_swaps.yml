@@ -157,14 +157,16 @@ models:
                 - FLOAT 
       - name: LP_FEE_SYMBOL
         tests:
-          - not_null
+          - not_null:
+              where: LP_FEE <> 0
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING    
                 - VARCHAR 
       - name: LP_FEE_TOKEN_ADDRESS
         tests:
-          - not_null
+          - not_null:
+              where: LP_FEE <> 0
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: _INSERTED_TIMESTAMP

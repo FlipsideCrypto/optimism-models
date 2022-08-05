@@ -46,10 +46,6 @@ models:
         description: 'The symbol of the token in.'
       - name: SYMBOL_OUT
         description: 'The symbol of the token out.'
-      - name: TOKEN0_SYMBOL
-        description:  'The symbol of token0 in the LP.'
-      - name: TOKEN1_SYMBOL
-        description: 'The symbol of token1 in the LP.'
       - name: LP_FEE
         description: 'The amount of tokens paid to the LP as a fee.'
       - name: LP_FEE_USD
