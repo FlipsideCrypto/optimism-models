@@ -100,7 +100,10 @@ currency_type AS (
 hourly_prices AS (
     SELECT
         HOUR,
-        symbol,
+        CASE
+            WHEN symbol = 'WETH' THEN 'ETH'
+            ELSE symbol
+        END AS symbol,
         token_address,
         price AS token_price
     FROM
@@ -114,7 +117,7 @@ hourly_prices AS (
         )
         AND symbol IN (
             'OP',
-            'ETH'
+            'WETH'
         )
 )
 SELECT
@@ -150,6 +153,10 @@ FROM
         'HOUR',
         block_timestamp
     ) = HOUR
-    AND symbol = currency_symbol qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    AND symbol = currency_symbol
+WHERE
+    nft_address <> '0xbe81eabdbd437cba43e4c1c330c63022772c2520' -- funky address throwing sales off with some weird events - ideally this is filtered to
+    -- specific exchange addresses but i cant find common ones
+    qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY
     _inserted_timestamp DESC) = 1)
