@@ -102,9 +102,6 @@ models:
               column_type_list:
                 - NUMBER    
                 - FLOAT 
-      - name: _LOG_ID
-        tests:
-          - not_null
       - name: _INSERTED_TIMESTAMP
         tests:
           - not_null
