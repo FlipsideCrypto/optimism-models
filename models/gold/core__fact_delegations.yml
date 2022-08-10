@@ -35,23 +35,3 @@ models:
         description: '{{ doc("delegation_delegation_type") }}'
         tests: 
           - dbt_expectations.expect_column_to_exist
-      - name: ETH_VALUE
-        description: '{{ doc("opt_value") }}' 
-        tests: 
-          - dbt_expectations.expect_column_to_exist
-      - name: GAS_PRICE
-        description: '{{ doc("opt_tx_gas_price") }}' 
-        tests: 
-          - dbt_expectations.expect_column_to_exist
-      - name: GAS_USED
-        description: '{{ doc("opt_tx_gas_used") }}'
-        tests: 
-          - dbt_expectations.expect_column_to_exist
-      - name: GAS_LIMIT
-        description: '{{ doc("opt_tx_gas_limit") }}' 
-        tests: 
-          - dbt_expectations.expect_column_to_exist
-      - name: TX_FEE
-        description: '{{ doc("opt_tx_fee") }}' 
-        tests: 
-          - not_null

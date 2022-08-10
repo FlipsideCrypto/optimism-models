@@ -29,11 +29,6 @@ SELECT
     ELSE 
         NULL 
     END AS from_delegate, 
-    eth_value, 
-    gas_price,
-    gas_used, 
-    gas_limit, 
-    tx_fee, 
     _inserted_timestamp
   FROM 
     {{ ref('silver__transactions') }}

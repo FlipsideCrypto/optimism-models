@@ -12,11 +12,6 @@ SELECT
     delegator, 
     to_delegate, 
     from_delegate, 
-    delegation_type, 
-    eth_value, 
-    gas_price, 
-    gas_used, 
-    gas_limit, 
-    tx_fee
+    delegation_type
 FROM 
     {{ ref('silver__delegations') }}
