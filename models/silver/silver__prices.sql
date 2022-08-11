@@ -239,7 +239,10 @@ SELECT
     is_imputed,
     CONCAT(
         HOUR,
-        token_address
+        COALESCE(
+            token_address,
+            'ETH'
+        )
     ) AS price_id
 FROM
     all_prices qualify(ROW_NUMBER() over(PARTITION BY price_id
