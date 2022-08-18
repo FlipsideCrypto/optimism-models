@@ -38,7 +38,7 @@ WITH base AS (
                     '0x',
                     SUBSTR(
                         segmented_data [0] :: STRING :: STRING,
-                        27,
+                        25,
                         40
                     )
                 )
