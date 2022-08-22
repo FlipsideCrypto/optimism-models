@@ -34,6 +34,13 @@ sources:
     schema: bronze
     tables:
       - name: SUSHI_DIM_DEX_POOLS
+  - name: prices
+    database: FLIPSIDE_PROD_DB
+    schema: SILVER
+    tables:
+      - name: prices_v2
+
+
 
   
   
