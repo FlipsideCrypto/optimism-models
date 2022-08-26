@@ -60,7 +60,11 @@ models:
                 - FLOAT  
       - name: POOL_NAME
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">500"  
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING    
@@ -98,42 +102,66 @@ models:
                 - VARCHAR 
       - name: SYMBOL_IN
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">500"  
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING    
                 - VARCHAR 
       - name: SYMBOL_OUT
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">500"  
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING    
                 - VARCHAR 
       - name: DECIMALS_IN
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">500"  
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
                 - FLOAT 
       - name: DECIMALS_OUT
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">500"  
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
                 - FLOAT 
       - name: TOKEN0_SYMBOL
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">500"  
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING    
                 - VARCHAR 
       - name: TOKEN1_SYMBOL
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">500"  
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING    
@@ -157,8 +185,6 @@ models:
                 - FLOAT 
       - name: LP_FEE_SYMBOL
         tests:
-          - not_null:
-              where: LP_FEE <> 0
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING    
