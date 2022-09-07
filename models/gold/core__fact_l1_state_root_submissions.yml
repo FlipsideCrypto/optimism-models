@@ -1,0 +1,24 @@
+version: 2
+models:
+  - name: core__fact_l1_state_root_submissions
+    description: 'Contains details on the state root batch submission to L1.'  
+
+    columns:
+      - name: L1_STATE_ROOT_TX_HASH 
+        description: '{{ doc("op_l1_state_tx_hash") }}'   
+      - name: L1_BLOCK_NUMBER 
+        description: '{{ doc("op_l1_block_no") }}'   
+      - name: L1_BLOCK_TIMESTAMP
+        description: '{{ doc("op_l1_block_time") }}'   
+      - name: L1_STATE_ROOT_BATCH_INDEX 
+        description: '{{ doc("op_l1_state_batch") }}'   
+      - name: BATCH_ROOT 
+        description: '{{ doc("op_batch_root") }}'   
+      - name: BATCH_SIZE
+        description: '{{ doc("op_batch_size") }}'    
+      - name: PREV_TOTAL_ELEMENTS
+        description: '{{ doc("op_prev_total_elements") }}'   
+      - name: OP_MIN_BLOCK 
+        description: '{{ doc("op_min_block") }}'   
+      - name: OP_MAX_BLOCK 
+        description: '{{ doc("op_max_block") }}'   

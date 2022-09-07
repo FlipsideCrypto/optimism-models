@@ -28,9 +28,6 @@ WITH base_table AS (
         (
             udf_hex_to_int(
                 tx :gasPrice :: STRING
-            ) / pow(
-                10,
-                9
             )
         ) :: FLOAT AS gas_price,
         udf_hex_to_int(
@@ -50,25 +47,58 @@ WITH base_table AS (
         udf_hex_to_int(
             tx :receipt :effectiveGasPrice :: STRING
         ) :: INTEGER AS effective_Gas_Price,
-        (gas_price * gas_used) / pow(10,9) As tx_fee,
         ingested_at :: TIMESTAMP AS ingested_at,
-        _inserted_timestamp :: TIMESTAMP as _inserted_timestamp,
+        _inserted_timestamp :: TIMESTAMP AS _inserted_timestamp,
         OBJECT_DELETE(
             tx,
             'traces'
-        ) AS tx_json
+        ) AS tx_json,
+        COALESCE(
+            udf_hex_to_int(
+                tx :receipt :l1Fee :: STRING
+            ) :: FLOAT,
+            0
+        ) AS l1_fee,
+        COALESCE(
+            tx :receipt :l1FeeScalar :: INTEGER,
+            0
+        ) :: FLOAT AS l1_fee_scalar,
+        COALESCE(
+            udf_hex_to_int(
+                tx :receipt :l1GasPrice :: STRING
+            ) :: FLOAT,
+            0
+        ) AS l1_gas_price,
+        COALESCE(
+            udf_hex_to_int(
+                tx :receipt :l1GasUsed :: STRING
+            ) :: FLOAT,
+            0
+        ) AS l1_gas_used,
+        ((gas_used * gas_price) + (l1_gas_price * l1_gas_used * l1_fee_scalar)) / pow(
+            10,
+            18
+        ) AS tx_fee
     FROM
         {{ ref('bronze__transactions') }}
 
 {% if is_incremental() %}
 WHERE
-    ingested_at >= (
+    _inserted_timestamp >= (
         SELECT
             MAX(
-                ingested_at
+                _inserted_timestamp
             )
         FROM
             {{ this }}
+    )
+    OR block_id IN (
+        SELECT
+            block_number
+        FROM
+            {{ this }}
+        WHERE
+            state_tx_hash IS NULL
     )
 {% endif %}
 )
@@ -87,18 +117,37 @@ SELECT
     to_address,
     eth_value,
     block_hash,
-    gas_price,
+    gas_price / pow(
+        10,
+        9
+    ) AS gas_price,
     gas_limit,
     DATA AS input_data,
     status,
     gas_used,
     cumulative_Gas_Used,
     effective_Gas_Price,
+    l1_gas_price / pow(
+        10,
+        9
+    ) AS l1_gas_price,
+    l1_gas_used,
+    l1_fee_scalar,
     tx_fee,
     ingested_at,
-    _inserted_timestamp,
-    tx_json
+    base_table._inserted_timestamp AS _inserted_timestamp,
+    tx_json,
+    state_tx_hash AS l1_state_root_tx_hash,
+    state_batch_index AS l1_state_root_batch_index,
+    l1_submission_tx_hash,
+    l1_submission_batch_index AS l1_submission_batch_index
 FROM
-    base_table qualify(ROW_NUMBER() over(PARTITION BY tx_hash
+    base_table
+    LEFT JOIN {{ ref('bronze__state_hashes') }}
+    ON block_number BETWEEN state_min_block
+    AND state_max_block
+    LEFT JOIN {{ ref('bronze__submission_hashes') }}
+    ON block_number BETWEEN sub_min_block
+    AND sub_max_block qualify(ROW_NUMBER() over(PARTITION BY tx_hash
 ORDER BY
-    _inserted_timestamp DESC)) = 1
+    base_table._inserted_timestamp DESC)) = 1

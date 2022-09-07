@@ -38,3 +38,11 @@ models:
         description: '{{ doc("opt_uncle_blocks") }}' 
       - name: BLOCK_HEADER_JSON
         description: '{{ doc("opt_block_header_json") }}'
+      - name: L1_STATE_ROOT_TX_HASH
+        description: '{{ doc("op_l1_state_tx_hash") }}'
+      - name: L1_STATE_ROOT_BATCH_INDEX
+        description: '{{ doc("op_l1_state_batch") }}'
+      - name: L1_SUBMISSION_TX_HASH
+        description: '{{ doc("op_l1_sub_tx_hash") }}'
+      - name: L1_SUBMISSION_BATCH_INDEX
+        description: '{{ doc("op_l1_sub_batch") }}'
