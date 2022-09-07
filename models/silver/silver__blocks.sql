@@ -30,6 +30,14 @@ WHERE
         FROM
             {{ this }}
     )
+    OR block_id IN (
+        SELECT
+            block_number
+        FROM
+            {{ this }}
+        WHERE
+            l1_state_root_tx_hash IS NULL
+    )
 {% endif %}
 )
 SELECT

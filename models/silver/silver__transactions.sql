@@ -98,7 +98,7 @@ WHERE
         FROM
             {{ this }}
         WHERE
-            state_tx_hash IS NULL
+            l1_state_root_tx_hash IS NULL
     )
 {% endif %}
 )
