@@ -21,6 +21,10 @@ SELECT
     sha3_uncles,
     SIZE,
     uncle_blocks,
-    block_header_json
+    block_header_json,
+    l1_state_root_tx_hash,
+    l1_state_root_batch_index,
+    l1_submission_tx_hash,
+    l1_submission_batch_index
 FROM
     {{ ref('silver__blocks') }}

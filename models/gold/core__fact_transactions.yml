@@ -30,6 +30,20 @@ models:
         description: '{{ doc("opt_tx_gas_limit") }}' 
       - name: GAS_USED
         description: '{{ doc("opt_tx_gas_used") }}'
+      - name: L1_GAS_PRICE
+        description: '{{ doc("op_l1_gas_price") }}'
+      - name: L1_GAS_USED
+        description: '{{ doc("op_l1_gas_used") }}'
+      - name: L1_FEE_SCALAR
+        description: '{{ doc("op_l1_fee_scalar") }}'
+      - name: L1_STATE_ROOT_TX_HASH
+        description: '{{ doc("op_l1_state_tx_hash") }}'
+      - name: L1_STATE_ROOT_BATCH_INDEX
+        description: '{{ doc("op_l1_state_batch") }}'
+      - name: L1_SUBMISSION_TX_HASH
+        description: '{{ doc("op_l1_sub_tx_hash") }}'
+      - name: L1_SUBMISSION_BATCH_INDEX
+        description: '{{ doc("op_l1_sub_batch") }}'        
       - name: CUMULATIVE_GAS_USED
         description: '{{ doc("opt_cumulative_gas_used") }}' 
       - name: STATUS

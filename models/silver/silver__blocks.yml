@@ -109,5 +109,20 @@ models:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - OBJECT
-
+      - name: L1_STATE_ROOT_TX_HASH
+        tests:
+          - not_null:
+              where: BLOCK_TIMESTAMP < CURRENT_DATE
+      - name: L1_STATE_ROOT_BATCH_INDEX
+        tests:
+          - not_null:
+              where: BLOCK_TIMESTAMP < CURRENT_DATE
+      - name: L1_SUBMISSION_BATCH_INDEX
+        tests:
+          - not_null:
+              where: BLOCK_TIMESTAMP < CURRENT_DATE
+      - name: L1_SUBMISSION_TX_HASH
+        tests:
+          - not_null:
+              where: BLOCK_TIMESTAMP < CURRENT_DATE
 
