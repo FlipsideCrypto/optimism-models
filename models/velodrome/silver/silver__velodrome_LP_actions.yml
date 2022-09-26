@@ -43,11 +43,7 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: POOL_ADDRESS
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
+
       - name: EVENT_INDEX
         tests:
           - not_null    
@@ -55,29 +51,6 @@ models:
               column_type_list:
                 - NUMBER    
                 - FLOAT  
-      - name: POOL_NAME
-        tests:
-          - not_null:
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">50"
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: POOL_TYPE
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: SENDER_ADDRESS
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
       - name: LP_ACTION
         tests:
           - not_null
@@ -85,52 +58,20 @@ models:
               column_type_list:
                 - STRING    
                 - VARCHAR 
-      - name: TOKEN0_SYMBOL
-        tests:
-          - not_null:
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">50"
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: TOKEN1_SYMBOL
-        tests:
-          - not_null:
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">50"
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: TOKEN0_AMOUNT
+      - name: AMOUNT0_UNADJ
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
                 - FLOAT 
-      - name: TOKEN1_AMOUNT
+      - name: AMOUNT1_UNADJ
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
                 - FLOAT 
-      - name: TOKEN0_ADDRESS
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: TOKEN1_ADDRESS
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
       - name: LP_TOKEN_ACTION
         tests:
           - not_null
@@ -138,13 +79,6 @@ models:
               column_type_list:
                 - STRING    
                 - VARCHAR 
-      - name: LP_TOKEN_AMOUNT
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER    
-                - FLOAT 
       - name: _INSERTED_TIMESTAMP
         tests:
           - not_null
