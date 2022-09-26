@@ -99,6 +99,8 @@ WHERE
             {{ this }}
         WHERE
             l1_state_root_tx_hash IS NULL
+            OR l1_submission_batch_index IS NULL
+            OR l1_state_root_batch_index
     )
 {% endif %}
 )
