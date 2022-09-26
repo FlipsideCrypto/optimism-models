@@ -34,7 +34,8 @@ WITH velo_distributions AS (
         ) :: INTEGER AS max_epoch,
         'venft_distribution' AS reward_type,
         _log_id,
-        _inserted_timestamp
+        _inserted_timestamp,
+        '0x3c8b650257cfb5f272f799f5e2b4e65093a11a05' AS token_address
     FROM
         {{ ref('silver__logs') }}
     WHERE
@@ -67,7 +68,7 @@ staking_rewards AS (
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         PUBLIC.udf_hex_to_int(
             segmented_data [0] :: STRING
-        ) :: INTEGER AS amount_unadj,
+        ) :: INTEGER AS claimed_amount,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS from_address,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS reward_token,
         CASE
@@ -94,126 +95,6 @@ AND _inserted_timestamp >= (
 )
 {% endif %}
 ),
-token_prices AS (
-    SELECT
-        HOUR,
-        symbol,
-        token_address,
-        price
-    FROM
-        {{ ref('silver__prices') }}
-    WHERE
-        HOUR :: DATE IN (
-            SELECT
-                DISTINCT block_timestamp :: DATE
-            FROM
-                velo_distributions
-        )
-        OR HOUR :: DATE IN (
-            SELECT
-                DISTINCT block_timestamp :: DATE
-            FROM
-                staking_rewards
-        )
-),
-venft_distrbutions AS (
-    SELECT
-        block_number,
-        block_timestamp,
-        tx_hash,
-        origin_function_signature,
-        origin_from_address,
-        origin_to_address,
-        contract_address,
-        event_index,
-        token_id,
-        reward_type,
-        claimed_amount,
-        ROUND(
-            price * claimed_amount,
-            2
-        ) AS claimed_amount_usd,
-        symbol AS token_symbol,
-        token_address,
-        claim_epoch,
-        max_epoch,
-        _log_id,
-        _inserted_timestamp
-    FROM
-        velo_distributions
-        LEFT JOIN token_prices
-        ON HOUR = DATE_TRUNC(
-            'hour',
-            block_timestamp
-        )
-    WHERE
-        symbol = 'VELO'
-),
-velo_pools AS (
-    SELECT
-        pool_address,
-        pool_name,
-        pool_type,
-        token0_symbol,
-        token1_symbol,
-        token0_address,
-        token1_address,
-        token0_decimals,
-        token1_decimals
-    FROM
-        {{ ref('silver__velodrome_pools') }}
-),
-lp_fees_meta AS (
-    SELECT
-        block_number,
-        block_timestamp,
-        tx_hash,
-        origin_function_signature,
-        origin_from_address,
-        origin_to_address,
-        contract_address,
-        event_index,
-        amount_unadj,
-        COALESCE(
-            p0.token0_decimals,
-            p1.token1_decimals
-        ) AS decimals,
-        COALESCE(
-            p0.token0_symbol,
-            p1.token1_symbol
-        ) AS token_symbol,
-        CASE
-            WHEN decimals IS NOT NULL THEN amount_unadj / pow(
-                10,
-                decimals
-            )
-            ELSE amount_unadj
-        END AS claimed_amount,
-        CASE
-            WHEN decimals IS NOT NULL THEN ROUND(
-                claimed_amount * price,
-                2
-            )
-            ELSE NULL
-        END AS claimed_amount_usd,
-        from_address,
-        reward_token,
-        reward_type,
-        _log_id,
-        _inserted_timestamp
-    FROM
-        staking_rewards
-        LEFT JOIN velo_pools p0
-        ON p0.token0_address = reward_token
-        LEFT JOIN velo_pools p1
-        ON p1.token1_address = reward_token
-        LEFT JOIN token_prices
-        ON HOUR = DATE_TRUNC(
-            'hour',
-            block_timestamp
-        )
-        AND token_address = reward_token
-),
 FINAL AS (
     SELECT
         block_number,
@@ -227,15 +108,13 @@ FINAL AS (
         reward_type,
         token_id,
         claimed_amount,
-        claimed_amount_usd,
-        token_symbol,
         token_address,
         claim_epoch,
         max_epoch,
         _log_id,
         _inserted_timestamp
     FROM
-        venft_distrbutions
+        velo_distributions
     UNION ALL
     SELECT
         block_number,
@@ -249,15 +128,13 @@ FINAL AS (
         reward_type,
         NULL AS token_id,
         claimed_amount,
-        claimed_amount_usd,
-        token_symbol,
         reward_token AS token_address,
         NULL AS claim_epoch,
         NULL AS max_epoch,
         _log_id,
         _inserted_timestamp
     FROM
-        lp_fees_meta
+        staking_rewards
 )
 SELECT
     block_number,
@@ -271,8 +148,6 @@ SELECT
     reward_type,
     token_id,
     claimed_amount,
-    claimed_amount_usd,
-    token_symbol,
     token_address,
     claim_epoch,
     max_epoch,

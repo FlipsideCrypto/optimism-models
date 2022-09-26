@@ -31,6 +31,8 @@ models:
         description: 'The amount of tokens claimed, in USD.'
       - name: TOKEN_SYMBOL
         description: 'The symbol of the claimed tokens.'
+        tests:
+          - not_null
       - name: TOKEN_ADDRESS
         description: 'The contract address of the claimed tokens'
       - name: CLAIM_EPOCH

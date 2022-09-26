@@ -75,12 +75,6 @@ models:
               column_type_list:
                 - NUMBER    
                 - FLOAT 
-      - name: TOKEN_SYMBOL
-        tests:   
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
       - name: TOKEN_ADDRESS
         tests:
           - not_null

@@ -69,21 +69,6 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% endif %}
-),
-velo_price AS (
-    SELECT
-        HOUR,
-        price AS velo_price
-    FROM
-        {{ ref('silver__prices') }}
-    WHERE
-        HOUR :: DATE IN (
-            SELECT
-                DISTINCT block_timestamp :: DATE
-            FROM
-                new_locks
-        )
-        AND symbol = 'VELO'
 )
 SELECT
     block_number,
@@ -99,19 +84,10 @@ SELECT
     velo_action,
     token_id :: NUMBER AS token_id,
     velo_value AS velo_amount,
-    ROUND(
-        velo_price * velo_value,
-        2
-    ) AS velo_amount_usd,
     deposit_type,
     _log_id,
     _inserted_timestamp
 FROM
-    new_locks
-    LEFT JOIN velo_price
-    ON HOUR = DATE_TRUNC(
-        'hour',
-        block_timestamp
-    ) qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    new_locks qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY
     _inserted_timestamp DESC) = 1)
