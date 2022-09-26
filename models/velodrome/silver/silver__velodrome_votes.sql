@@ -28,7 +28,7 @@ WITH votes_base AS (
                 10,
                 18
             )
-        ) AS amount,
+        ) AS vote_amount,
         CASE
             WHEN topics [0] :: STRING = '0xf279e6a1f5e320cca91135676d9cb6e44ca8a08c0b88342bcdb1144f6511b568' THEN 'unvote'
             WHEN topics [0] :: STRING = '0x90890809c654f11d6e72a28fa60149770a0d11ec6c92319d6ceb2bb0a4ea1a15' THEN 'vote'
@@ -51,7 +51,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 2
+        )
     FROM
         {{ this }}
 )
@@ -62,8 +62,7 @@ gauges AS (
         gauge_address,
         external_bribe_address,
         internal_bribe_address,
-        pool_address,
-        pool_name
+        pool_address
     FROM
         {{ ref('silver__velodrome_gauges') }}
 ),
@@ -75,33 +74,17 @@ FINAL AS (
         origin_function_signature,
         origin_from_address,
         origin_to_address,
-        COALESCE(
-            g1.gauge_address,
-            g0.gauge_address
-        ) AS gauge_address,
-        COALESCE(
-            g1.external_bribe_address,
-            g0.external_bribe_address
-        ) AS external_bribe_address,
-        COALESCE(
-            g1.internal_bribe_address,
-            g0.internal_bribe_address
-        ) AS internal_bribe_address,
         votes_base.contract_address AS contract_address,
+        from_address,
+        token_id :: INTEGER AS token_id,
+        vote_amount,
+        vote_action,
+        _log_id,
+        _inserted_timestamp,
         COALESCE(
             g1.pool_address,
             g0.pool_address
-        ) AS pool_address,
-        COALESCE(
-            g1.pool_name,
-            g0.pool_name
-        ) AS pool_name,
-        from_address,
-        token_id :: INTEGER AS token_id,
-        amount AS vote_amount,
-        vote_action,
-        _log_id,
-        _inserted_timestamp
+        ) AS pool_address
     FROM
         votes_base
         LEFT JOIN gauges g1
@@ -124,11 +107,8 @@ SELECT
     origin_function_signature,
     origin_from_address,
     origin_to_address,
-    gauge_address,
-    external_bribe_address,
-    internal_bribe_address,
+    contract_address,
     pool_address,
-    pool_name,
     from_address,
     token_id,
     vote_amount,

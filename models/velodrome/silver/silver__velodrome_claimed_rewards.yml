@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver__velodrome_LP_actions
+  - name: silver__velodrome_claimed_rewards
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -43,7 +43,7 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: POOL_ADDRESS
+      - name: CONTRACT_ADDRESS
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
@@ -55,92 +55,43 @@ models:
               column_type_list:
                 - NUMBER    
                 - FLOAT  
-      - name: POOL_NAME
+      - name: REWARD_TYPE
+        tests:
+          - not_null  
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ['venft_distribution', 'lp_reward','voter_reward']
+      - name: TOKEN_ID
         tests:
           - not_null:
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">50"
+              where: REWARD_TYPE = 'venft_distribution'   
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: POOL_TYPE
+                - NUMBER    
+                - FLOAT  
+      - name: CLAIMED_AMOUNT
         tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: SENDER_ADDRESS
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: LP_ACTION
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: TOKEN0_SYMBOL
-        tests:
-          - not_null:
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">50"
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: TOKEN1_SYMBOL
-        tests:
-          - not_null:
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">50"
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: TOKEN0_AMOUNT
-        tests:
-          - not_null
+          - not_null    
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
                 - FLOAT 
-      - name: TOKEN1_AMOUNT
+      - name: TOKEN_ADDRESS
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
+      - name: CLAIM_EPOCH
+        tests:
+          - not_null:
+              where: REWARD_TYPE = 'venft_distribution'   
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
                 - FLOAT 
-      - name: TOKEN0_ADDRESS
+      - name: MAX_EPOCH
         tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: TOKEN1_ADDRESS
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: LP_TOKEN_ACTION
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: LP_TOKEN_AMOUNT
-        tests:
-          - not_null
+          - not_null:
+              where: REWARD_TYPE = 'venft_distribution'   
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    

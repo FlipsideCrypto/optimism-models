@@ -19,7 +19,18 @@ SELECT
     unlock_date,
     token_id,
     velo_amount,
-    velo_amount_usd,
+    ROUND(
+        velo_amount * price,
+        2
+    ) AS velo_amount_usd,
     deposit_type
 FROM
     {{ ref('silver__velodrome_locks') }}
+    LEFT JOIN {{ ref('silver__prices') }}
+    prices
+    ON HOUR = DATE_TRUNC(
+        'hour',
+        block_timestamp
+    )
+WHERE
+    symbol = 'VELO'

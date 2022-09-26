@@ -6,19 +6,16 @@
 ) }}
 
 SELECT
-    block_number,
     block_timestamp,
+    block_number,
     tx_hash,
-    origin_function_signature,
-    origin_from_address,
-    origin_to_address,
-    contract_address,
     event_index,
-    staking_action_type,
-    lp_token_amount,
-    lp_provider_address,
+    contract_address,
     gauge_address,
-    pool_address,
+    external_bribe_address,
+    internal_bribe_address,
+    creator_address,
+    A.pool_address AS pool_address,
     pool_name,
     pool_type,
     token0_symbol,
@@ -26,4 +23,7 @@ SELECT
     token0_address,
     token1_address
 FROM
-    {{ ref('silver__velodrome_staking_actions') }}
+    {{ ref('silver__velodrome_gauges') }} A
+    LEFT JOIN {{ ref('silver__velodrome_pools') }}
+    b
+    ON A.pool_address = b.pool_address

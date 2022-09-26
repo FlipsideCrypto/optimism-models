@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver__velodrome_staking_actions
+  - name: silver__velodrome_swaps
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -31,8 +31,6 @@ models:
       - name: ORIGIN_FUNCTION_SIGNATURE
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
       - name: ORIGIN_FROM_ADDRESS
         tests:
           - not_null
@@ -48,11 +46,6 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: POOL_ADDRESS
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
       - name: EVENT_INDEX
         tests:
           - not_null    
@@ -60,80 +53,23 @@ models:
               column_type_list:
                 - NUMBER    
                 - FLOAT  
-      - name: POOL_NAME
-        tests:
-          - not_null:
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">500"  
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: STAKING_ACTION_TYPE
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: GAUGE_ADDRESS
+      - name: SENDER_ADDRESS
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: LP_PROVIDER_ADDRESS
+      - name: TO_ADDRESS
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: POOL_TYPE
+      - name: PLATFORM
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING    
                 - VARCHAR 
-      - name: TOKEN0_SYMBOL
-        tests:
-          - not_null:
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">500"  
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: TOKEN1_SYMBOL
-        tests:
-          - not_null:
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">500"  
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING    
-                - VARCHAR 
-      - name: TOKEN0_ADDRESS
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: TOKEN1_ADDRESS
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: LP_TOKEN_AMOUNT
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER    
-                - FLOAT 
       - name: _INSERTED_TIMESTAMP
         tests:
           - not_null

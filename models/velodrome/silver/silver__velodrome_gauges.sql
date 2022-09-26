@@ -46,7 +46,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 2
+        )
     FROM
         {{ this }}
 )
@@ -82,38 +82,6 @@ all_gauges AS (
         _inserted_timestamp
     FROM
         new_gauges
-),
-gauges AS (
-    SELECT
-        block_timestamp,
-        block_number,
-        tx_hash,
-        event_index,
-        contract_address,
-        gauge_address,
-        external_bribe_address,
-        internal_bribe_address,
-        pool_address,
-        creator_address,
-        _inserted_timestamp
-    FROM
-        all_gauges qualify(ROW_NUMBER() over(PARTITION BY gauge_address
-    ORDER BY
-        _inserted_timestamp DESC) = 1)
-),
-velo_pools AS (
-    SELECT
-        pool_address,
-        pool_name,
-        pool_type,
-        token0_symbol,
-        token1_symbol,
-        token0_address,
-        token1_address,
-        token0_decimals,
-        token1_decimals
-    FROM
-        {{ ref('silver__velodrome_pools') }}
 )
 SELECT
     block_timestamp,
@@ -124,16 +92,10 @@ SELECT
     gauge_address,
     external_bribe_address,
     internal_bribe_address,
+    pool_address,
     creator_address,
-    A.pool_address AS pool_address,
-    pool_name,
-    pool_type,
-    token0_symbol,
-    token1_symbol,
-    token0_address,
-    token1_address,
     _inserted_timestamp
 FROM
-    gauges A
-    LEFT JOIN velo_pools b
-    ON A.pool_address = b.pool_address
+    all_gauges qualify(ROW_NUMBER() over(PARTITION BY gauge_address
+ORDER BY
+    _inserted_timestamp DESC) = 1)

@@ -24,34 +24,104 @@ models:
         description: 'The address of the contract interacted with in the swap.'
       - name: POOL_ADDRESS
         description: 'The address of the liquidity pool used for the swap.'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
       - name: POOL_NAME
         description: 'The name of the liquidity pool used for the swap.'
+        tests:
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">500"  
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - STRING    
+                - VARCHAR 
       - name: SENDER_ADDRESS
         description: 'The sender of the swap event.'
       - name: TO_ADDRESS
         description: 'The receiver of the swap event.'
       - name: AMOUNT_IN
         description: 'The amount of tokens in.'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - FLOAT    
+                - NUMBER 
       - name: AMOUNT_IN_USD
         description: 'The amount of tokens in, in USD.'
       - name: AMOUNT_OUT
         description: 'The amount of tokens out.'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - FLOAT    
+                - NUMBER 
       - name: AMOUNT_OUT_USD
         description: 'The amount of tokens out, in USD.'
       - name: TOKEN_ADDRESS_IN
         description: 'The contract address of the token in.'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
       - name: TOKEN_ADDRESS_OUT
         description: 'The contract address of the token out.'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
       - name: SYMBOL_IN
         description: 'The symbol of the token in.'
+        tests:
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">500"  
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - STRING    
+                - VARCHAR 
       - name: SYMBOL_OUT
         description: 'The symbol of the token out.'
+        tests:
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">500"  
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - STRING    
+                - VARCHAR 
       - name: LP_FEE
         description: 'The amount of tokens paid to the LP as a fee.'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - NUMBER    
+                - FLOAT 
       - name: LP_FEE_USD
         description: 'The amount of tokens paid to the LP as a fee, in USD.'
       - name: LP_FEE_SYMBOL
         description: 'The symbol of the LP token fees.'
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - STRING    
+                - VARCHAR 
       - name: LP_FEE_TOKEN_ADDRESS
         description: 'The contract address of the LP token fees.'
+        tests:
+          - not_null:
+              where: LP_FEE <> 0
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
      

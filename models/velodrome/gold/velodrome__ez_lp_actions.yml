@@ -26,6 +26,8 @@ models:
         description: '{{ doc("op_pool_type") }}'
       - name: SENDER_ADDRESS
         description: 'The sender of the liquidity action.'
+        tests:
+          - not_null
       - name: LP_ACTION
         description: 'The liquidity action, either deposit or withdraw.'
       - name: TOKEN0_SYMBOL
@@ -48,5 +50,7 @@ models:
         description: 'The LP token action, either mint or burn.'
       - name: LP_TOKEN_AMOUNT
         description: 'The amount of LP tokens minted or burned.'
+        tests:
+          - not_null
       - name: LP_TOKEN_AMOUNT_USD
         description: 'The amount of LP tokens minted or burned in USD.'

@@ -70,6 +70,55 @@ AND _inserted_timestamp >= (
 )
 {% endif %}
 ),
+
+{% if is_incremental() %}
+missing_pools AS (
+    SELECT
+        created_timestamp,
+        created_block,
+        created_hash,
+        token0_address,
+        token1_address,
+        pool_address,
+        pool_type,
+        _inserted_timestamp
+    FROM
+        {{ this }}
+    WHERE
+        pool_name IS NULL
+        OR token0_decimals IS NULL
+        OR token1_decimals IS NULL
+),
+{% endif %}
+
+heal_pools AS (
+    SELECT
+        created_timestamp,
+        created_block,
+        created_hash,
+        token0_address,
+        token1_address,
+        pool_address,
+        pool_type,
+        _inserted_timestamp
+    FROM
+        new_pools
+
+{% if is_incremental() %}
+UNION
+SELECT
+    created_timestamp,
+    created_block,
+    created_hash,
+    token0_address,
+    token1_address,
+    pool_address,
+    pool_type,
+    _inserted_timestamp
+FROM
+    missing_pools
+{% endif %}
+),
 add_meta AS (
     SELECT
         created_timestamp,
@@ -97,7 +146,7 @@ add_meta AS (
         pool_type,
         _inserted_timestamp
     FROM
-        new_pools
+        heal_pools
         LEFT JOIN token_backfill AS tb0
         ON token0_address = tb0.contract_address
         LEFT JOIN contracts AS c0
