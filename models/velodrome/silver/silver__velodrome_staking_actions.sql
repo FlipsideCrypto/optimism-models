@@ -51,7 +51,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 2
+        )
     FROM
         {{ this }}
 )
@@ -95,25 +95,11 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 2
+        )
     FROM
         {{ this }}
 )
 {% endif %}
-),
-velo_pools AS (
-    SELECT
-        pool_address,
-        pool_name,
-        pool_type,
-        token0_symbol,
-        token1_symbol,
-        token0_address,
-        token1_address,
-        token0_decimals,
-        token1_decimals
-    FROM
-        {{ ref('silver__velodrome_pools') }}
 )
 SELECT
     block_number,
@@ -129,12 +115,6 @@ SELECT
     A.lp_provider_address AS lp_provider_address,
     A.gauge_address AS gauge_address,
     b.pool_address AS pool_address,
-    pool_name,
-    pool_type,
-    token0_symbol,
-    token1_symbol,
-    token0_address,
-    token1_address,
     _inserted_timestamp,
     _log_id
 FROM
@@ -142,7 +122,7 @@ FROM
     LEFT JOIN token_transfer b
     ON A.tx_hash = b.tx_hash
     AND A.amount = b.amount
-    INNER JOIN velo_pools C
-    ON b.pool_address = C.pool_address qualify(ROW_NUMBER() over(PARTITION BY _log_id
+WHERE
+    b.pool_address IS NOT NULL qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY
     _inserted_timestamp DESC) = 1)

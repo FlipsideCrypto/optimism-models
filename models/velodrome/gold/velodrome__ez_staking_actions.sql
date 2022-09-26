@@ -18,7 +18,7 @@ SELECT
     lp_token_amount,
     lp_provider_address,
     gauge_address,
-    pool_address,
+    base.pool_address,
     pool_name,
     pool_type,
     token0_symbol,
@@ -27,3 +27,7 @@ SELECT
     token1_address
 FROM
     {{ ref('silver__velodrome_staking_actions') }}
+    base
+    INNER JOIN {{ ref('silver__velodrome_pools') }}
+    pools
+    ON base.pool_address = pools.pool_address
