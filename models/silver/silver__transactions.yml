@@ -117,21 +117,5 @@ models:
       - name: ORIGIN_FUNCTION_SIGNATURE
         tests:
           - not_null
-      - name: L1_STATE_ROOT_TX_HASH
-        tests:
-          - not_null:
-              where: BLOCK_TIMESTAMP < CURRENT_DATE
-      - name: L1_STATE_ROOT_BATCH_INDEX
-        tests:
-          - not_null:
-              where: BLOCK_TIMESTAMP < CURRENT_DATE
-      - name: L1_SUBMISSION_BATCH_INDEX
-        tests:
-          - not_null:
-              where: BLOCK_TIMESTAMP < CURRENT_DATE
-      - name: L1_SUBMISSION_TX_HASH
-        tests:
-          - not_null:
-              where: BLOCK_TIMESTAMP < CURRENT_DATE
 
 

@@ -92,16 +92,6 @@ WHERE
         FROM
             {{ this }}
     )
-    OR block_id IN (
-        SELECT
-            block_number
-        FROM
-            {{ this }}
-        WHERE
-            l1_state_root_tx_hash IS NULL
-            OR l1_submission_batch_index IS NULL
-            OR l1_state_root_batch_index
-    )
 {% endif %}
 )
 SELECT
@@ -138,18 +128,8 @@ SELECT
     tx_fee,
     ingested_at,
     base_table._inserted_timestamp AS _inserted_timestamp,
-    tx_json,
-    state_tx_hash AS l1_state_root_tx_hash,
-    state_batch_index AS l1_state_root_batch_index,
-    l1_submission_tx_hash,
-    l1_submission_batch_index AS l1_submission_batch_index
+    tx_json
 FROM
-    base_table
-    LEFT JOIN {{ ref('bronze__state_hashes') }}
-    ON block_number BETWEEN state_min_block
-    AND state_max_block
-    LEFT JOIN {{ ref('bronze__submission_hashes') }}
-    ON block_number BETWEEN sub_min_block
-    AND sub_max_block qualify(ROW_NUMBER() over(PARTITION BY tx_hash
+    base_table qualify(ROW_NUMBER() over(PARTITION BY tx_hash
 ORDER BY
     base_table._inserted_timestamp DESC)) = 1
