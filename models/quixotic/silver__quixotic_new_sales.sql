@@ -28,8 +28,9 @@ select
      '0xb3a34c4c' 
         ,'0xfb0f3ee1'
         ,'0x87201b41' 
+        ,'0x6e650cd4'
      ) 
-    and origin_to_address = '0x998ef16ea4111094eb5ee72fc2c6f4e6e8647666'
+    and origin_to_address in ('0x998ef16ea4111094eb5ee72fc2c6f4e6e8647666', '0xc78a09d6a4badecc7614a339fd264b7290361ef1')
     and block_timestamp >= '2021-01-01' 
     and event_name = 'Transfer'
     and event_inputs:tokenId is not null 
