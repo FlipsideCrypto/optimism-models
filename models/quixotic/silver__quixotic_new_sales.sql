@@ -9,7 +9,7 @@ select
     block_number,
     block_timestamp,
     tx_hash,
-    'sale' as event_type, 
+    'sale' as event_type,
     origin_to_address as platform_address, 
     'quixotic' as platform_name, 
     
