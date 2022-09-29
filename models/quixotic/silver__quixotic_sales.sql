@@ -134,7 +134,8 @@ SELECT
     currency_symbol,
     CASE
         WHEN currency_symbol = 'ETH' THEN 'ETH'
-        WHEN currency_symbol = 'OP' THEN token_address
+        WHEN currency_symbol = 'OP' THEN '0x4200000000000000000000000000000000000042'
+        ELSE token_address
     END AS currency_address,
     price,
     ROUND(
