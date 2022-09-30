@@ -94,7 +94,7 @@ eth_sales as (
     f._log_id,
     f._inserted_timestamp
         
-    from OPTIMISM.SILVER.TRACES t 
+    from {{ ref('silver__traces') }} t 
     inner join fulfilbasic_three_tx f on t.tx_hash = f.tx_hash and t.to_address = f.seller_address 
     where t.block_timestamp >= '2021-01-01'
     and seller_address is not null 
@@ -125,7 +125,7 @@ op_sales as (
     f._log_id,
     f._inserted_timestamp 
     
-    FROM optimism.silver.logs t 
+    FROM {{ ref('silver__logs') }} t 
     
     inner join fulfilbasic_three_tx f on t.tx_hash = f.tx_hash and f.seller_address = t.event_inputs:to 
     where t.block_timestamp >= '2021-01-01'
@@ -159,7 +159,7 @@ other_eth_sales as (
     f._log_id,
     f._inserted_timestamp 
     
-    FROM optimism.silver.logs t 
+    FROM {{ ref('silver__logs') }} t 
     
     inner join fulfilbasic_three_tx f on t.tx_hash = f.tx_hash and f.seller_address = t.event_inputs:to 
     where t.block_timestamp >= '2021-01-01'
