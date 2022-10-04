@@ -12,6 +12,8 @@ SELECT
     delegator, 
     to_delegate, 
     from_delegate, 
-    delegation_type
+    delegation_type,
+    raw_new_balance, 
+    raw_previous_balance
 FROM 
     {{ ref('silver__delegations') }}
