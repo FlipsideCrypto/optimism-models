@@ -176,7 +176,7 @@ AND _inserted_timestamp >= (
         )
         AND symbol IN (
             'OP',
-            'WETH'
+            'ETH'
         )
     ),
 
@@ -215,6 +215,7 @@ eth_sales_raw as (
     and nft_address is not null 
     and t.eth_value > 0 
     and identifier != 'CALL_ORIGIN'
+    and from_address != '0xc78a09d6a4badecc7614a339fd264b7290361ef1'
     ),
     
     eth_sales as (
