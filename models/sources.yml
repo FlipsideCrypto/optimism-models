@@ -8,10 +8,10 @@ sources:
       - name: optimism_blocks
       - name: optimism_txs
   - name: crosschain
-    database: flipside_prod_db
-    schema: crosschain
+    database: crosschain
+    schema: core
     tables:
-      - name: address_labels
+      - name: crosschain__address_labels
   - name: ethereum
     database: ethereum
     schema: core

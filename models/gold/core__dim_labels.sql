@@ -15,7 +15,7 @@ SELECT
 FROM
     {{ source(
         'crosschain',
-        'address_labels'
+        'crosschain__address_labels'
     ) }}
 WHERE
     blockchain = 'optimism'
