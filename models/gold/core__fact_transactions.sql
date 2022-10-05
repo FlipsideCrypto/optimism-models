@@ -5,7 +5,7 @@
 ) }}
 
 SELECT
-    block_number,
+    A.block_number AS block_number,
     block_timestamp,
     block_hash,
     tx_hash,
@@ -31,10 +31,9 @@ SELECT
     status,
     tx_json
 FROM
-    {{ ref('silver__transactions') }}
-    LEFT JOIN {{ ref('bronze__state_hashes') }}
-    ON block_number BETWEEN state_min_block
-    AND state_max_block
-    LEFT JOIN {{ ref('bronze__submission_hashes') }}
-    ON block_number BETWEEN sub_min_block
-    AND sub_max_block
+    {{ ref('silver__transactions') }} A
+    LEFT JOIN {{ ref('silver__state_hashes') }}
+    b
+    ON A.block_number = b.block_number
+    LEFT JOIN {{ ref('silver__submission_hashes') }} C
+    ON A.block_number = C.block_number

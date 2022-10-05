@@ -5,7 +5,7 @@
 ) }}
 
 SELECT
-    block_number,
+    A.block_number AS block_number,
     block_timestamp,
     network,
     blockchain,
@@ -27,10 +27,9 @@ SELECT
     l1_submission_tx_hash,
     l1_submission_batch_index AS l1_submission_batch_index
 FROM
-    {{ ref('silver__blocks') }}
-    LEFT JOIN {{ ref('bronze__state_hashes') }}
-    ON block_number BETWEEN state_min_block
-    AND state_max_block
-    LEFT JOIN {{ ref('bronze__submission_hashes') }}
-    ON block_number BETWEEN sub_min_block
-    AND sub_max_block
+    {{ ref('silver__blocks') }} A
+    LEFT JOIN {{ ref('silver__state_hashes') }}
+    b
+    ON A.block_number = b.block_number
+    LEFT JOIN {{ ref('silver__submission_hashes') }} C
+    ON A.block_number = C.block_number
