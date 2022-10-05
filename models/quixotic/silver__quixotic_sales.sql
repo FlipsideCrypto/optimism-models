@@ -131,6 +131,7 @@ SELECT
     buyer_address,
     nft_address,
     tokenId,
+    null as erc1155_value, 
     currency_symbol,
     CASE
         WHEN currency_symbol = 'ETH' THEN 'ETH'
