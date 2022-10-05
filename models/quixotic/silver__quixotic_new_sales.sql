@@ -4,13 +4,6 @@
     cluster_by = ['block_timestamp::DATE']
 ) }}
 
-
-
--- goal: change all prices to reflect prices + royalty and marketplace fees 
--- issue 1: to account for current optimism contract that accepts nfts 
--- 
--- issue 2: there are erc1155 token sales 
- 
 with fulfilbasic_three_tx as (
 select 
     block_number,
@@ -33,7 +26,7 @@ select
     _log_id,
     _inserted_timestamp
     
-    from OPTIMISM_DEV.silver.logs
+    from {{ ref('silver__logs') }}
     where origin_function_signature in (
      '0xb3a34c4c' 
         ,'0xfb0f3ee1'
@@ -82,7 +75,7 @@ AND _inserted_timestamp >= (
     case when origin_from_address = seller_address then 'bid_won'
         else 'sale' end as event_type 
     
-    from OPTIMISM_DEV.silver.logs
+    from {{ ref('silver__logs') }}
     where origin_function_signature in (
         '0x6e650cd4'
      ) 
@@ -114,7 +107,7 @@ AND _inserted_timestamp >= (
     contract_address as nft_address, 
     coalesce (event_inputs:_id ::string , event_inputs:tokenId ::string) as tokenId
      
-    from OPTIMISM_DEV.silver.logs
+    from {{ ref('silver__logs') }}
     where origin_function_signature in (
         '0x6e650cd4'
      ) 
@@ -166,7 +159,7 @@ AND _inserted_timestamp >= (
         END AS symbol,
         token_address,
         price AS token_price
-    from OPTIMISM_DEV.silver.prices
+    from {{ ref('silver__prices') }}
     WHERE
         HOUR :: DATE IN (
             SELECT
@@ -208,7 +201,7 @@ eth_sales_raw as (
     f._log_id,
     f._inserted_timestamp
         
-    from OPTIMISM_DEV.silver.traces t 
+    from {{ ref('silver__traces') }} t 
     inner join agg_sales_tx f on t.tx_hash = f.tx_hash 
     where t.block_timestamp >= '2021-01-01'
     and seller_address is not null 
@@ -291,7 +284,7 @@ op_sales_raw as (
     f._log_id,
     f._inserted_timestamp 
     
-    FROM OPTIMISM_DEV.silver.logs t 
+    FROM {{ ref('silver__logs') }} t 
     
     inner join agg_sales_tx f on t.tx_hash = f.tx_hash 
     where t.block_timestamp >= '2021-01-01'
@@ -376,7 +369,7 @@ other_eth_raw as (
     f._log_id,
     f._inserted_timestamp 
     
-    FROM OPTIMISM_DEV.silver.logs t 
+    FROM {{ ref('silver__logs') }} t 
     
     inner join agg_sales_tx f on t.tx_hash = f.tx_hash 
     where t.block_timestamp >= '2021-01-01'
