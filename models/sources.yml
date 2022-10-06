@@ -11,7 +11,7 @@ sources:
     database: crosschain
     schema: core
     tables:
-      - name: crosschain__address_labels
+      - name: address_labels
   - name: ethereum
     database: ethereum
     schema: core
