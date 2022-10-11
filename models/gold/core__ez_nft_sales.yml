@@ -16,6 +16,8 @@ models:
         description: 'The address of the NFT exchange.'
       - name: PLATFORM_NAME
         description: 'The name of the NFT exchange.'
+      - name: PLATFORM_EXCHANGE_VERSION
+        description: 'The version of the exchange contract used for the transaction.'
       - name: SELLER_ADDRESS
         description: 'The seller of the NFT.'
       - name: BUYER_ADDRESS

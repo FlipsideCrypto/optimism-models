@@ -11,6 +11,7 @@ SELECT
     event_type,
     platform_address,
     platform_name,
+    platform_exchange_version,
     seller_address,
     buyer_address,
     nft_address,
@@ -24,7 +25,7 @@ SELECT
     origin_to_address,
     origin_function_signature
 FROM
-    {{ ref('silver__quixotic_sales') }}
+    {{ ref('silver__quixotic_revamped_sales') }}
 
     union all 
 
@@ -35,6 +36,7 @@ SELECT
     event_type,
     platform_address,
     platform_name,
+    platform_exchange_version,
     seller_address,
     buyer_address,
     nft_address,
@@ -48,4 +50,4 @@ SELECT
     origin_to_address,
     origin_function_signature
 FROM
-    {{ ref('silver__quixotic_new_sales') }}
+    {{ ref('silver__quixotic_seaport') }}
