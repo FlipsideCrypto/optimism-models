@@ -328,7 +328,14 @@ select
     currency_address, 
     total_transaction_price as price,
     total_transaction_price_usd as price_usd,
-        
+
+    total_fees_adj as total_fees,
+    platform_fee_adj as platform_fee,
+    creator_fee_adj as creator_fee,
+    total_fees_usd,
+    platform_fee_usd,
+    creator_fee_usd,
+
     origin_from_address, 
     origin_to_address,
     origin_function_signature, 
