@@ -20,7 +20,20 @@ and origin_function_signature not in (
 and event_name in ('Transfer', 'TransferSingle')
 and coalesce (event_inputs:_id ::string , event_inputs:tokenId ::string) is not null 
 and tx_status = 'SUCCESS'
-    group by tx_hash 
+    
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
+
+group by tx_hash 
     ), 
     
 base_sales as (            
@@ -55,9 +68,83 @@ from {{ ref('silver__logs') }}
     )
     and (event_inputs:_id is not null or event_inputs:tokenId is not null)
     and seller_address != '0x0000000000000000000000000000000000000000'
-    
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
     ),
+
+base_sales_without_inserted_timestamp as (            
+select 
+    block_number,
+    block_timestamp,
+    tx_hash, 
+    origin_function_signature, 
+    origin_from_address, 
+    origin_to_address,
+    nft_address,
+    seller_address,
+    buyer_address,
+    tokenId,
+    erc1155_value, 
+    event_type,
+    _log_id
     
+from base_sales
+),
+
+
+eth_sales_raw as (
+    select 
+    b.block_number,
+    b.block_timestamp,
+    b._log_id,
+    _inserted_timestamp,
+    t.tx_hash, 
+    b.origin_function_signature, 
+    b.origin_from_address, 
+    b.origin_to_address,
+    b.nft_address,
+    seller_address,
+    buyer_address,
+    tokenId,
+    erc1155_value, 
+    event_type,
+        
+    coalesce (case when to_address = lower('0x0000a26b00c1F0DF003000390027140000fAa719')
+              then eth_value end , 0) as platform_fee_raw,
+    coalesce (case when to_address = seller_address then eth_value end , 0) as price_raw,
+    coalesce (case when to_address != seller_address 
+            and to_address != lower('0x0000a26b00c1F0DF003000390027140000fAa719') 
+            then eth_value end , 0) as creator_fee_raw 
+    
+    from {{ ref('silver__traces') }} t 
+    inner join base_sales_without_inserted_timestamp b on t.tx_hash = b.tx_hash 
+    
+    where t.block_timestamp >= '2022-06-28'
+    and t.eth_value > 0
+    and identifier != 'CALL_ORIGIN'
+
+    {% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
+
+        ),
+
 eth_sales as (
     
     select 
@@ -81,38 +168,7 @@ eth_sales as (
     sum(creator_fee_raw) as creator_fee,
     platform_fee + creator_fee as total_fees
     
-    from ( 
-    select 
-    b.block_number,
-    b.block_timestamp,
-    b._log_id,
-    b._inserted_timestamp,
-    t.tx_hash, 
-    b.origin_function_signature, 
-    b.origin_from_address, 
-    b.origin_to_address,
-    b.nft_address,
-    seller_address,
-    buyer_address,
-    tokenId,
-    erc1155_value, 
-    event_type,
-        
-    coalesce (case when to_address = lower('0x0000a26b00c1F0DF003000390027140000fAa719')
-              then eth_value end , 0) as platform_fee_raw,
-    coalesce (case when to_address = seller_address then eth_value end , 0) as price_raw,
-    coalesce (case when to_address != seller_address 
-            and to_address != lower('0x0000a26b00c1F0DF003000390027140000fAa719') 
-            then eth_value end , 0) as creator_fee_raw 
-    
-    from {{ ref('silver__traces') }} t 
-    inner join base_sales b on t.tx_hash = b.tx_hash 
-    
-    where t.block_timestamp >= '2022-06-28'
-    and t.eth_value > 0
-    and identifier != 'CALL_ORIGIN'
-
-        )
+    from eth_sales_raw
     
     group by tx_hash, 
     origin_function_signature, 
@@ -128,6 +184,48 @@ eth_sales as (
     _inserted_timestamp
     
     ),
+
+token_sales_raw as (
+    select 
+    b.block_number, 
+    b._log_id, 
+    _inserted_timestamp,
+    b.block_timestamp,
+    t.tx_hash, 
+    b.origin_function_signature, 
+    b.origin_from_address, 
+    b.origin_to_address,
+    b.nft_address,
+    seller_address,
+    buyer_address,
+    tokenId,
+    erc1155_value, 
+    event_type,
+    lower(t.contract_address) as currency_address,
+    coalesce (case when event_inputs:to = lower('0x0000a26b00c1F0DF003000390027140000fAa719') 
+              then event_inputs:value end /1e18, 0) as platform_fee_raw,
+    coalesce (case when event_inputs:to = seller_address then event_inputs:value end /1e18 , 0) as price_raw,
+    coalesce (case when event_inputs:to != seller_address 
+            and event_inputs:to != lower('0x0000a26b00c1F0DF003000390027140000fAa719') 
+            then event_inputs:value end /1e18 , 0) as creator_fee_raw
+    from {{ ref('silver__logs') }} t 
+    inner join base_sales_without_inserted_timestamp b on t.tx_hash = b.tx_hash 
+    
+    where t.block_timestamp >= '2022-06-28'
+    and event_inputs:value is not null 
+    and event_name = 'Transfer'
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
+        ),
     
 token_sales as (
     
@@ -152,38 +250,8 @@ token_sales as (
     sum(creator_fee_raw) as creator_fee,
     platform_fee + creator_fee as total_fees
     
-    from ( 
-    select 
-    b.block_number, 
-    b._log_id, 
-    b._inserted_timestamp,
-    b.block_timestamp,
-    t.tx_hash, 
-    b.origin_function_signature, 
-    b.origin_from_address, 
-    b.origin_to_address,
-    b.nft_address,
-    seller_address,
-    buyer_address,
-    tokenId,
-    erc1155_value, 
-    event_type,
-    lower(t.contract_address) as currency_address,
-    coalesce (case when event_inputs:to = lower('0x0000a26b00c1F0DF003000390027140000fAa719') 
-              then event_inputs:value end /1e18, 0) as platform_fee_raw,
-    coalesce (case when event_inputs:to = seller_address then event_inputs:value end /1e18 , 0) as price_raw,
-    coalesce (case when event_inputs:to != seller_address 
-            and event_inputs:to != lower('0x0000a26b00c1F0DF003000390027140000fAa719') 
-            then event_inputs:value end /1e18 , 0) as creator_fee_raw
-    from {{ ref('silver__logs') }} t 
-    inner join base_sales b on t.tx_hash = b.tx_hash 
-    
-    where t.block_timestamp >= '2022-06-28'
-    and event_inputs:value is not null 
-    and event_name = 'Transfer'
+    from token_sales_raw
 
-        )
-    
     group by tx_hash, 
     origin_function_signature, 
     origin_from_address, 
@@ -233,6 +301,7 @@ token_sales as (
             FROM
                 base_sales
         )
+
     GROUP BY
         HOUR, decimals, 
         symbol,

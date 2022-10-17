@@ -121,6 +121,7 @@ AND _inserted_timestamp >= (
     optimism_campaign_tx_buyer as (
     select 
     tx_hash,
+    _inserted_timestamp,
     coalesce (event_inputs:_to ::string , event_inputs:to :: string) as buyer_address,    
     
     contract_address as nft_address, 
@@ -136,6 +137,18 @@ AND _inserted_timestamp >= (
     and tokenId is not null 
     and tx_status = 'SUCCESS'
     and coalesce (event_inputs:_from ::string , event_inputs:from ::string) = '0xc78a09d6a4badecc7614a339fd264b7290361ef1'
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
+
     ),
     
     optimism_campaign_tx as (
@@ -156,7 +169,7 @@ AND _inserted_timestamp >= (
     origin_to_address,
     origin_function_signature,
     _log_id,
-    _inserted_timestamp
+    s._inserted_timestamp 
         from optimism_campaign_tx_seller s 
         inner join optimism_campaign_tx_buyer b on s.tx_hash = b.tx_hash 
                                                 and s.tokenId = b.tokenId 
@@ -164,9 +177,45 @@ AND _inserted_timestamp >= (
     ),
     
     agg_sales_tx as (
-    select * from base_sales 
+    select 
+    block_number,
+    block_timestamp,
+    tx_hash,
+    event_type,
+    platform_address,
+        
+    seller_address,
+    buyer_address,
+    nft_address, 
+    tokenId,
+    erc1155_value,
+     
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    _log_id
+    from base_sales 
+
     union all 
-    select * from optimism_campaign_tx
+
+    select 
+    block_number,
+    block_timestamp,
+    tx_hash,
+    event_type,
+    platform_address,
+        
+    seller_address,
+    buyer_address,
+    nft_address, 
+    tokenId,
+    erc1155_value,
+     
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    _log_id
+     from optimism_campaign_tx
     ),
 
 
@@ -194,7 +243,7 @@ eth_sales_raw as (
     f.origin_to_address,
     f.origin_function_signature,
     f._log_id,
-    f._inserted_timestamp
+    _inserted_timestamp
         
     from {{ ref('silver__traces') }} t 
     inner join agg_sales_tx f on t.tx_hash = f.tx_hash 
@@ -205,7 +254,16 @@ eth_sales_raw as (
     and identifier != 'CALL_ORIGIN'
     and from_address != '0xc78a09d6a4badecc7614a339fd264b7290361ef1'
 
-
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
     ),
     
     eth_sales as (
@@ -248,7 +306,10 @@ eth_sales_raw as (
     origin_function_signature,
     _log_id,
     _inserted_timestamp
+
     ),
+
+
     
 token_sales_raw as ( 
     select
@@ -275,7 +336,7 @@ token_sales_raw as (
     f.origin_to_address,
     f.origin_function_signature,
     f._log_id,
-    f._inserted_timestamp 
+    _inserted_timestamp 
     
     FROM {{ ref('silver__logs') }} t 
     
@@ -287,6 +348,17 @@ token_sales_raw as (
     and t.event_inputs:value is not null 
     and nft_address is not null
     and event_name = 'Transfer'
+
+    {% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
 
     ),
     
@@ -331,6 +403,7 @@ token_sales_raw as (
     origin_function_signature,
     _log_id,
     _inserted_timestamp
+
     ),
     
     
