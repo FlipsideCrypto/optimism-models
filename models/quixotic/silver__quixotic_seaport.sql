@@ -364,10 +364,6 @@ all_prices AS (
                 base_sales
         )
 
-    GROUP BY
-        HOUR, decimals, 
-        symbol,
-        token_address
 ),
 
 
@@ -393,7 +389,8 @@ select
     p.symbol as currency_symbol,
     s.currency_address, 
     
-    case when s.currency_address = 'ETH' then s.price/ n.nft_count
+    case when s.currency_address = 'ETH' or s.currency_address = '0x4200000000000000000000000000000000000006'
+        then s.price/ n.nft_count
         when s.currency_address != 'ETH' and p.currency_address is not null 
                 then (s.price / pow(10, decimals)) / n.nft_count
         when p.currency_address is null then s.price / n.nft_count
@@ -401,19 +398,22 @@ select
     
     round (prices * p.price , 2) as price_usd,
     
-    case when s.currency_address = 'ETH' then total_fees / n.nft_count
+    case when s.currency_address = 'ETH' or s.currency_address = '0x4200000000000000000000000000000000000006'
+        then total_fees / n.nft_count
         when s.currency_address != 'ETH' and p.currency_address is not null
             then (total_fees / pow(10, decimals)) / n.nft_count
         when p.currency_address is null then total_fees / n.nft_count
             end as total_fees_adj,
     
-    case when s.currency_address = 'ETH' then platform_fee / n.nft_count
+    case when s.currency_address = 'ETH' or s.currency_address = '0x4200000000000000000000000000000000000006'
+        then platform_fee / n.nft_count
         when s.currency_address != 'ETH' and p.currency_address is not null
             then (platform_fee / pow(10, decimals)) / n.nft_count
         when p.currency_address is null then platform_fee / n.nft_count
             end as platform_fee_adj,
     
-    case when s.currency_address = 'ETH' then creator_fee / n.nft_count
+    case when s.currency_address = 'ETH' or s.currency_address = '0x4200000000000000000000000000000000000006'
+        then creator_fee / n.nft_count
         when s.currency_address != 'ETH' and p.currency_address is not null
             then (creator_fee / pow(10, decimals))/ n.nft_count
         when p.currency_address is null then creator_fee / n.nft_count
