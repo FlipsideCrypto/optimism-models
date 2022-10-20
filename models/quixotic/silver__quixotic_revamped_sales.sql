@@ -546,6 +546,7 @@ SELECT
     erc1155_value,
     CASE
         WHEN currency_address = '0x4200000000000000000000000000000000000042' THEN 'OP'
+        WHEN currency_address = 'ETH' THEN 'ETH'
         ELSE currency_symbol
     END AS currency_symbol,
     currency_address,
