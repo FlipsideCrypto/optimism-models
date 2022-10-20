@@ -455,8 +455,9 @@ SELECT
     tokenId,
     erc1155_value,
     CASE 
-        WHEN currency_address = '0x4200000000000000000000000000000000000006' THEN currency_symbol
-        ELSE 'ETH'
+        WHEN currency_address = '0x4200000000000000000000000000000000000006' THEN 'WETH'
+        WHEN currency_address = 'ETH' THEN 'ETH'
+        ELSE currency_symbol
         END AS currency_symbol,
     currency_address,
     total_transaction_price AS price,
