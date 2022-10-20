@@ -454,7 +454,10 @@ SELECT
     nft_address,
     tokenId,
     erc1155_value,
-    currency_symbol,
+    CASE 
+        WHEN currency_address = '0x4200000000000000000000000000000000000006' THEN currency_symbol
+        ELSE 'ETH'
+        END AS currency_symbol,
     currency_address,
     total_transaction_price AS price,
     total_transaction_price_usd AS price_usd,
