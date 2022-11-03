@@ -12,7 +12,8 @@ SELECT
     tx_count,
     header,
     ingested_at,
-    _inserted_timestamp
+    _inserted_timestamp,
+    'hello' as world
 FROM
     {{ source(
         'prod',
