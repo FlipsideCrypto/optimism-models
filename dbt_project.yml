@@ -40,3 +40,4 @@ on-run-start:
 
 vars:
   "dbt_date:time_zone": GMT
+  UPDATE_UDFS_AND_SPS: False
