@@ -121,7 +121,7 @@ models:
         description: 'The contract address of the LP token fees.'
         tests:
           - not_null:
-              where: LP_FEE <> 0
+              where: LP_FEE <> 0 and POOL_ADDRESS <> '0xce9accfbb25eddce91845c3a7c3d1613d1d7081f'
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
      
