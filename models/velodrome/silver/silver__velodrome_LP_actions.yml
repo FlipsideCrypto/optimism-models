@@ -33,6 +33,7 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
+              where: "ORIGIN_FUNCTION_SIGNATURE <> '0x'"
       - name: ORIGIN_FROM_ADDRESS
         tests:
           - not_null
