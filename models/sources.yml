@@ -45,7 +45,12 @@ sources:
     tables:
       - name: optimism_state_hashes
       - name: optimism_submission_hashes
-
+  - name: bronze_api
+    database: optimism
+    schema: bronze_api
+    tables:
+      - name: contract_abis
+      - name: token_reads
 
 
   

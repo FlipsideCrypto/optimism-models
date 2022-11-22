@@ -1,12 +1,16 @@
 version: 2
 models:
   - name: core__dim_contracts
-    description: '{{ doc("op_contracts_table_doc") }}'
+    description: 'This table contains the contract addresses and their associated metadata. Includes ERC20 and ERC721 tokens. Metadata is read directly from contracts on the blockchain.'   
 
     columns:
-      - name: ADDRESS
-        description: '{{ doc("op_contracts_contract_address") }}'    
+      - name: CONTRACT_ADDRESS
+        description: 'The address of the contract.'
       - name: SYMBOL
-        description: '{{ doc("op_contracts_symbol") }}'
+        description: 'The symbol of the contract.'
+      - name: NAME
+        description: 'The name of the contract.'
       - name: DECIMALS
-        description: '{{ doc("opt_decimals") }}'  
+        description: 'The number of decimals used to adjust amount for this contract.'
+      - name: ADDRESS
+        description: 'This column is deprecated. Use CONTRACT_ADDRESS instead.'
