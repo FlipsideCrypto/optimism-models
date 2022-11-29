@@ -5,10 +5,9 @@
 ) }}
 
 SELECT
-    contract_address,
+    contract_address as address,
     token_symbol AS symbol,
     token_name AS NAME,
-    token_decimals AS decimals,
-    contract_address AS address
+    token_decimals AS decimals
 FROM
     {{ ref('silver__contracts') }}
