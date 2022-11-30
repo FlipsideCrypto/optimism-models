@@ -21,7 +21,7 @@ price_provider_metadata AS (
             SELECT
                 id,
                 token_address,
-                1 AS priority
+                2 AS priority
             FROM
                 {{ source(
                     'silver_crosschain',
@@ -33,7 +33,7 @@ price_provider_metadata AS (
             SELECT
                 id,
                 token_address,
-                2 AS priority
+                1 AS priority
             FROM
                 {{ source(
                     'silver_crosschain',
