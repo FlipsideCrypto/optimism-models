@@ -13,77 +13,109 @@ WITH full_decimals AS (
     FROM
         {{ ref('core__dim_contracts') }}
 ),
-op_token_metadata AS (
-    SELECT
-        asset_id,
-        NAME,
-        b.symbol AS symbol,
-        LOWER(token_address) AS token_address,
-        decimals
-    FROM
-        {{ source(
-            'legacy_silver',
-            'market_asset_metadata'
-        ) }} A
-        LEFT JOIN full_decimals b
-        ON LOWER(
-            A.token_address
-        ) = LOWER(
-            b.contract_address
-        )
-    WHERE
-        platform = 'optimism-ethereum'
-        AND token_address IS NOT NULL
-        AND b.symbol IS NOT NULL
-),
-hourly_prices AS (
-    SELECT
-        DATE_TRUNC(
-            'hour',
-            recorded_at
-        ) AS HOUR,
-        b.name AS NAME,
-        b.symbol AS symbol,
-        b.decimals AS decimals,
-        token_address,
-        AVG(price) AS price,
-        AVG(total_supply) AS total_supply
-    FROM
-        {{ source(
-            'legacy_silver',
-            'prices_v2'
-        ) }} A
-        INNER JOIN op_token_metadata b
-        ON A.asset_id = b.asset_id
-    WHERE
-        provider = 'coinmarketcap'
-
-{% if is_incremental() %}
-AND recorded_at >= CURRENT_DATE - 3
-{% else %}
-    AND recorded_at >= '2020-05-05' -- first date with valid prices data
-{% endif %}
-GROUP BY
-    1,
-    2,
-    3,
-    4,
-    5
-),
-hour_token_addresses_pair AS (
+price_provider_metadata AS (
     SELECT
         *
     FROM
+        (
+            SELECT
+                id,
+                token_address,
+                2 AS priority
+            FROM
+                {{ source(
+                    'silver_crosschain',
+                    'asset_metadata_coin_market_cap'
+                ) }}
+            WHERE
+                platform = 'Optimism'
+            UNION ALL
+            SELECT
+                id,
+                token_address,
+                1 AS priority
+            FROM
+                {{ source(
+                    'silver_crosschain',
+                    'asset_metadata_coin_gecko'
+                ) }}
+            WHERE
+                platform = 'optimistic-ethereum'
+        ) qualify(ROW_NUMBER() over(PARTITION BY token_address
+    ORDER BY
+        priority ASC) = 1)
+),
+hourly_prices AS (
+    SELECT
+        p0.id :: STRING AS id,
+        token_address,
+        CLOSE AS price,
+        recorded_hour AS HOUR,
+        _inserted_timestamp
+    FROM
         {{ source(
-            'legacy_silver',
-            'hours'
+            'silver_crosschain',
+            'hourly_prices_coin_market_cap'
         ) }}
+        p0
+        INNER JOIN price_provider_metadata
+        ON p0.id :: STRING = price_provider_metadata.id :: STRING
+
+{% if is_incremental() %}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(
+                _inserted_timestamp
+            )
+        FROM
+            {{ this }}
+    )
+{% endif %}
+UNION ALL
+SELECT
+    p1.id :: STRING AS id,
+    token_address,
+    CLOSE AS price,
+    recorded_hour AS HOUR,
+    _inserted_timestamp
+FROM
+    {{ source(
+        'silver_crosschain',
+        'hourly_prices_coin_gecko'
+    ) }}
+    p1
+    INNER JOIN price_provider_metadata
+    ON p1.id :: STRING = price_provider_metadata.id :: STRING
+
+{% if is_incremental() %}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(
+                _inserted_timestamp
+            )
+        FROM
+            {{ this }}
+    )
+{% endif %}
+),
+hour_token_addresses_pair AS (
+    SELECT
+        DISTINCT p.hour,
+        hp.token_address
+    FROM
+        {{ source(
+            'ethereum',
+            'fact_hourly_token_prices'
+        ) }}
+        p
         CROSS JOIN (
             SELECT
                 DISTINCT token_address
             FROM
                 hourly_prices
-        )
+        ) hp
 
 {% if is_incremental() %}
 WHERE
@@ -98,30 +130,22 @@ imputed AS (
     SELECT
         h.hour,
         h.token_address,
-        p.symbol,
-        p.decimals,
         p.price AS avg_price,
-        LAG(
-            p.symbol
-        ) ignore nulls over (
-            PARTITION BY h.token_address
-            ORDER BY
-                h.hour
-        ) AS lag_symbol,
-        LAG(
-            p.decimals
-        ) ignore nulls over (
-            PARTITION BY h.token_address
-            ORDER BY
-                h.hour
-        ) AS lag_decimals,
         LAG(
             p.price
         ) ignore nulls over (
             PARTITION BY h.token_address
             ORDER BY
                 h.hour
-        ) AS imputed_price
+        ) AS imputed_price,
+        LAG(
+            p._inserted_timestamp
+        ) ignore nulls over (
+            PARTITION BY h.token_address
+            ORDER BY
+                h.hour
+        ) AS lag_inserted_timestamp,
+        p._inserted_timestamp
     FROM
         hour_token_addresses_pair h
         LEFT OUTER JOIN hourly_prices p
@@ -134,24 +158,28 @@ FINAL AS (
     SELECT
         p.hour AS HOUR,
         p.token_address,
-        CASE
-            WHEN decimals IS NOT NULL THEN decimals
-            ELSE lag_decimals
-        END AS decimals,
+        decimals,
         CASE
             WHEN avg_price IS NOT NULL THEN avg_price
             ELSE imputed_price
         END AS price,
-        CASE
-            WHEN symbol IS NOT NULL THEN symbol
-            ELSE lag_symbol
-        END AS symbol,
+        symbol,
         CASE
             WHEN avg_price IS NULL THEN TRUE
             ELSE FALSE
-        END AS is_imputed
+        END AS is_imputed,
+        CASE
+            WHEN _inserted_timestamp IS NOT NULL THEN _inserted_timestamp
+            ELSE lag_inserted_timestamp
+        END AS _inserted_timestamp
     FROM
         imputed p
+        LEFT JOIN full_decimals
+        ON LOWER(
+            p.token_address
+        ) = LOWER(
+            full_decimals.contract_address
+        )
     WHERE
         price IS NOT NULL
 ),
@@ -178,7 +206,7 @@ eth_token_prices AS (
                 FROM
                     eth_tokens
             )
-            OR token_address IS NULL
+            OR token_address = LOWER('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2')
         )
 
 {% if is_incremental() %}
@@ -197,6 +225,8 @@ adj_eth_prices AS (
             AND op_token_address = '0x296f55f8fb28e498b858d0bcda06d955b2cb3f97' THEN 'STG'
             WHEN symbol IS NULL
             AND op_token_address = '0x5029c236320b8f15ef0a657054b84d90bfbeded3' THEN 'BitANT'
+            WHEN symbol IS NULL
+            AND op_token_address = '0x9e5aac1ba1a2e6aed6b32689dfcf62a509ca96f3' THEN 'DF'
             WHEN token_address IS NULL
             AND symbol IS NULL THEN 'ETH'
             ELSE symbol
@@ -216,7 +246,8 @@ all_prices AS (
         symbol,
         decimals,
         price,
-        is_imputed
+        is_imputed,
+        _inserted_timestamp
     FROM
         FINAL
     UNION ALL
@@ -226,7 +257,8 @@ all_prices AS (
         symbol,
         decimals,
         price,
-        is_imputed
+        is_imputed,
+        HOUR AS _inserted_timestamp
     FROM
         adj_eth_prices
 )
@@ -243,8 +275,9 @@ SELECT
             token_address,
             'ETH'
         )
-    ) AS price_id
+    ) AS price_id,
+    _inserted_timestamp
 FROM
     all_prices qualify(ROW_NUMBER() over(PARTITION BY price_id
 ORDER BY
-    decimals DESC) = 1)
+    _inserted_timestamp DESC) = 1)
