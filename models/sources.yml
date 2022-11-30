@@ -45,6 +45,14 @@ sources:
     tables:
       - name: optimism_state_hashes
       - name: optimism_submission_hashes
+  - name: silver_crosschain
+    database: crosschain
+    schema: silver
+    tables:
+      - name: asset_metadata_coin_gecko
+      - name: asset_metadata_coin_market_cap
+      - name: hourly_prices_coin_gecko
+      - name: hourly_prices_coin_market_cap
 
 
 

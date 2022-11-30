@@ -13,28 +13,53 @@ WITH full_decimals AS (
     FROM
         {{ ref('core__dim_contracts') }}
 ),
+price_provider_metadata AS (
+    SELECT
+        *
+    FROM
+        (
+            SELECT
+                id,
+                token_address,
+                1 AS priority
+            FROM
+                {{ source(
+                    'silver_crosschain',
+                    'asset_metadata_coin_market_cap'
+                ) }}
+            WHERE
+                platform = 'Optimism'
+            UNION ALL
+            SELECT
+                id,
+                token_address,
+                2 AS priority
+            FROM
+                {{ source(
+                    'silver_crosschain',
+                    'asset_metadata_coin_gecko'
+                ) }}
+            WHERE
+                platform = 'optimistic-ethereum'
+        ) qualify(ROW_NUMBER() over(PARTITION BY token_address
+    ORDER BY
+        priority ASC) = 1)
+),
 op_token_metadata AS (
     SELECT
-        asset_id,
-        NAME,
-        b.symbol AS symbol,
+        id,
         LOWER(token_address) AS token_address,
-        decimals
+        b.symbol AS symbol,
+        decimals,
+        NAME
     FROM
-        {{ source(
-            'legacy_silver',
-            'market_asset_metadata'
-        ) }} A
+        price_provider_metadata A
         LEFT JOIN full_decimals b
         ON LOWER(
             A.token_address
         ) = LOWER(
             b.contract_address
         )
-    WHERE
-        platform = 'optimism-ethereum'
-        AND token_address IS NOT NULL
-        AND b.symbol IS NOT NULL
 ),
 hourly_prices AS (
     SELECT
