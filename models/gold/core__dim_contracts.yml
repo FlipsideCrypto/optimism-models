@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: core__dim_contracts
-    description: 'This table contains the contract addresses and their associated metadata. Includes ERC20 and ERC721 tokens. Metadata is read directly from contracts on the blockchain.'   
+    description: 'This table contains the contract addresses and their associated metadata. Includes all contracts with more than 25 total events. Metadata is read directly from contracts on the blockchain.'   
 
     columns:
       - name: ADDRESS
