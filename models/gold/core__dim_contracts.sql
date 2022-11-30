@@ -5,8 +5,9 @@
 ) }}
 
 SELECT
-    LOWER(address) :: STRING AS address,
-    symbol :: STRING AS symbol,
-    decimals :: INTEGER AS decimals
+    contract_address as address,
+    token_symbol AS symbol,
+    token_name AS NAME,
+    token_decimals AS decimals
 FROM
-    {{ ref('silver__contracts_backfill') }}
+    {{ ref('silver__contracts') }}

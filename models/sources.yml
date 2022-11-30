@@ -54,6 +54,12 @@ sources:
       - name: hourly_prices_coin_gecko
       - name: hourly_prices_coin_market_cap
 
+  - name: bronze_api
+    database: optimism
+    schema: bronze_api
+    tables:
+      - name: contract_abis
+      - name: token_reads
 
 
   
