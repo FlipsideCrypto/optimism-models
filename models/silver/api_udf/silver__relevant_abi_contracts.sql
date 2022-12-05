@@ -6,16 +6,9 @@
 WITH base AS (
 
     SELECT
-        contract_address,
-        COUNT(*) AS total_events
-    FROM
-        {{ ref('silver__logs') }}
-    WHERE
-        tx_status = 'SUCCESS'
-    GROUP BY
         contract_address
-    HAVING
-        total_events >= 25
+    FROM
+        {{ ref('silver__relevant_token_contracts') }}
 ),
 proxies AS (
     SELECT
