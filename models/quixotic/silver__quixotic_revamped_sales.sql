@@ -112,7 +112,8 @@ optimism_campaign_tx_seller AS (
         {{ ref('silver__logs') }}
     WHERE
         origin_function_signature IN (
-            '0x6e650cd4'
+            '0x6e650cd4',
+            '0xac6e389e'
         )
         AND origin_to_address IN ('0xc78a09d6a4badecc7614a339fd264b7290361ef1')
         AND block_timestamp >= '2021-01-01'
@@ -155,7 +156,8 @@ optimism_campaign_tx_buyer AS (
         {{ ref('silver__logs') }}
     WHERE
         origin_function_signature IN (
-            '0x6e650cd4'
+            '0x6e650cd4',
+            '0xac6e389e'
         )
         AND origin_to_address IN ('0xc78a09d6a4badecc7614a339fd264b7290361ef1')
         AND block_timestamp >= '2021-01-01'
@@ -483,18 +485,25 @@ hourly_prices AS (
             FROM
                 agg_sales_tx
         )
-        AND currency_address IN (
+        AND (currency_address IN (
             SELECT
                 DISTINCT currency_address
             FROM
                 agg_sales
-        )
+        ) or currency_address = '0x4200000000000000000000000000000000000006')
+),
+nfts_per as (
+select 
+tx_hash,
+count(*) as nfts_per_tx
+from agg_sales
+group by tx_hash
 ),
 agg_sales_prices AS (
     SELECT
         block_number,
         block_timestamp,
-        tx_hash,
+        s.tx_hash,
         event_type,
         platform_address,
         'quixotic' AS platform_name,
@@ -506,16 +515,16 @@ agg_sales_prices AS (
         erc1155_value,
         symbol AS currency_symbol,
         s.currency_address,
-        price,
+        s.price / nfts_per_tx as price,
         ROUND(
-            h.token_price * price,
+            h.token_price * (s.price / nfts_per_tx),
             2
         ) AS price_usd,
-        platform_fee,
-        creator_fee,
-        platform_fee + creator_fee AS total_fees,
-        platform_fee * h.token_price AS platform_fee_usd,
-        creator_fee * h.token_price AS creator_fee_usd,
+        platform_fee / nfts_per_tx as platform_fee,
+        creator_fee / nfts_per_tx as creator_fee,
+        (platform_fee / nfts_per_tx) + (creator_fee / nfts_per_tx) AS total_fees,
+        (platform_fee / nfts_per_tx) * h.token_price AS platform_fee_usd,
+        (creator_fee / nfts_per_tx) * h.token_price AS creator_fee_usd,
         total_fees * h.token_price AS total_fees_usd,
         origin_from_address,
         origin_to_address,
@@ -529,7 +538,9 @@ agg_sales_prices AS (
             'hour',
             s.block_timestamp
         )
-        AND h.currency_address = s.currency_address
+        AND h.currency_address = (case when s.currency_address = 'ETH' then '0x4200000000000000000000000000000000000006' else s.currency_address end)
+        left join nfts_per
+        on nfts_per.tx_hash = s.tx_hash
 )
 SELECT
     block_number,
