@@ -1,13 +1,15 @@
-name: dbt_run_optimism_dev_db_refresh
-run-name: dbt_run_optimism_dev_db_refresh
+name: dbt_run_adhoc
+run-name: dbt_run_adhoc
 
 on:
-  push:
+  workflow_dispatch:
     branches:
       - main
-  schedule:
-    # Runs "at 9:00 UTC" (see https://crontab.guru)
-    - cron: '0 9 * * *'
+    inputs:
+      dbt_command:
+        type: string
+        description: 'DBT Run Command'
+        required: true
     
 env:
   DBT_PROFILES_DIR: ./
@@ -28,8 +30,6 @@ jobs:
   called_workflow_template:
     uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
     with:
-      dbt_command: '["dbt run-operation run_sp_create_prod_clone"]'
-    secrets: inherit # pass all secrets
+      dbt_command: ${{ inputs.dbt_command }}
+    secrets: inherit 
   
-
-

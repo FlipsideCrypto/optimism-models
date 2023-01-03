@@ -1,13 +1,13 @@
-name: dbt_run_optimism_tests
-run-name: dbt_run_optimism_tests
+name: dbt_run_incremental
+run-name: dbt_run_incremental
 
 on:
   push:
     branches:
       - main
   schedule:
-    # Runs "at 9:00 UTC" (see https://crontab.guru)
-    - cron: '0 9 * * *'
+    # Runs "every 2 hours" (see https://crontab.guru)
+    - cron: '0 */2 * * *'
     
 env:
   DBT_PROFILES_DIR: ./
@@ -28,7 +28,7 @@ jobs:
   called_workflow_template:
     uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
     with:
-      dbt_command: '["dbt test"]'
+      dbt_command: '["dbt run --exclude models/silver/api_udf"]'
     secrets: inherit # pass all secrets
   
 
