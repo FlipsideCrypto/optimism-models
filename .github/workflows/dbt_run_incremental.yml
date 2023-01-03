@@ -1,5 +1,5 @@
-name: dbt_run_incremental
-run-name: dbt_run_incremental
+name: dbt_run_scheduled
+run-name: dbt_run_scheduled
 
 on:
   push:
