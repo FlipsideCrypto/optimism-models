@@ -8,8 +8,8 @@ optimism:
       user: "{{ env_var('USER') }}"
       password: "{{ env_var('PASSWORD') }}"
       region: "{{ env_var('REGION') }}"
-      database: "{{ env_var('DATABASE_DEV') }}"
-      warehouse: "{{ env_var('WAREHOUSE_DEV') }}"
+      database: "{{ env_var('DATABASE') }}"
+      warehouse: "{{ env_var('WAREHOUSE') }}"
       schema: SILVER
       threads: 4
       client_session_keep_alive: False
@@ -21,8 +21,8 @@ optimism:
       user: "{{ env_var('USER') }}"
       password: "{{ env_var('PASSWORD') }}"
       region: "{{ env_var('REGION') }}"
-      database: "{{ env_var('DATABASE_PROD') }}"
-      warehouse: "{{ env_var('WAREHOUSE_PROD') }}"
+      database: "{{ env_var('DATABASE') }}"
+      warehouse: "{{ env_var('WAREHOUSE') }}"
       schema: SILVER
       threads: 4
       client_session_keep_alive: False
