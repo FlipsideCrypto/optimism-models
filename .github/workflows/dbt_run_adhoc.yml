@@ -5,7 +5,16 @@ on:
   workflow_dispatch:
     branches:
       - main
+      - update-profiles-env-settings
     inputs:
+      environment:
+        description: 'Environment to run the DBT command'
+        required: true
+        default: 'prod' 
+        type: choice
+        options:
+        - dev
+        - prod
       dbt_command:
         type: string
         description: 'DBT Run Command'
@@ -19,10 +28,8 @@ env:
   USER: "${{ secrets.USER }}"
   PASSWORD: "${{ secrets.PASSWORD }}"
   REGION: "${{ secrets.REGION }}"
-  DATABASE_DEV: "${{ secrets.DATABASE_DEV }}"
-  DATABASE_PROD: "${{ secrets.DATABASE_PROD }}"
-  WAREHOUSE_DEV: "${{ secrets.WAREHOUSE_DEV }}"
-  WAREHOUSE_PROD: "${{ secrets.WAREHOUSE_PROD }}"
+  DATABASE: "${{ secrets.DATABASE }}"
+  WAREHOUSE: "${{ secrets.WAREHOUSE }}"
   SCHEMA: "${{ secrets.SCHEMA }}"
 
 
@@ -30,6 +37,7 @@ jobs:
   called_workflow_template:
     uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
     with:
+      environment: ${{ inputs.environment }}
       dbt_command: ${{ inputs.dbt_command }}
     secrets: inherit 
   
