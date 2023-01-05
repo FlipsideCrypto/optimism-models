@@ -62,4 +62,4 @@ SELECT
     origin_to_address,
     origin_function_signature
 FROM
-    {{ ref('silver__quixotic_seaport') }}
+    {{ ref('silver__opensea_seaport') }}

@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: core__ez_nft_sales
-    description: 'This table contains NFT sale events on the Optimism blockchain. Currently, only Quixotic sales are supported.'
+    description: 'This table contains NFT sale events on the Optimism blockchain which includes Quixotic and Opensea.'
       
     columns:
       - name: BLOCK_NUMBER
