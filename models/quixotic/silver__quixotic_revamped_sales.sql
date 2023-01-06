@@ -14,6 +14,18 @@ WITH seaport_tx as (
     AND 
         topics[0] ::string = '0x9d9af8e38d66c62e2c12f0225249fd9d721c54b83f48d9352c97c6cacdcb6f31'
     AND origin_to_address != LOWER('0x00000000006c3852cbEf3e08E8dF289169EdE581')
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
+
 ), 
 
     quixotic_tx as (
@@ -45,6 +57,17 @@ WITH seaport_tx as (
             '0x065e8a87b8f11aed6facf9447abe5e8c5d7502b6',
             '0x3f9da045b0f77d707ea4061110339c4ea8ecfa70'
         )
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
 
 ),
 
