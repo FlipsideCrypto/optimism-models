@@ -4,7 +4,61 @@
     cluster_by = ['block_timestamp::DATE']
 ) }}
 
-WITH base_sales AS (
+WITH seaport_tx as (
+    SELECT 
+        tx_hash 
+    FROM
+        {{ ref('silver__logs') }}
+    WHERE
+        block_timestamp >= '2021-01-01'
+    AND 
+        topics[0] ::string = '0x9d9af8e38d66c62e2c12f0225249fd9d721c54b83f48d9352c97c6cacdcb6f31'
+    AND origin_to_address != LOWER('0x00000000006c3852cbEf3e08E8dF289169EdE581')
+), 
+
+    quixotic_tx as (
+    SELECT 
+        tx_hash 
+    from {{ ref('silver__logs') }}
+    WHERE
+        block_timestamp >= '2021-01-01'
+    AND origin_function_signature IN (
+            '0xb3a34c4c',
+            '0xfb0f3ee1',
+            '0x87201b41',
+            '0x6e650cd4',
+            '0x60f46aee',
+            '0x12d0aa73',
+            '0xbfc5e222',
+            '0x2047d4d4',
+            '0x55e4a3fa',
+            '0xedf8301b',
+            '0xad6c8c5f',
+            '0xf8056016',
+            '0x75eeb98a',
+            '0x912d97fc'
+        )
+        AND origin_to_address IN (
+            '0xe5c7b4865d7f2b08faadf3f6d392e6d6fa7b903c',
+            '0x829b1c7b9d024a3915215b8abf5244a4bfc28db4',
+            '0x20975da6eb930d592b9d78f451a9156db5e4c77b',
+            '0x065e8a87b8f11aed6facf9447abe5e8c5d7502b6',
+            '0x3f9da045b0f77d707ea4061110339c4ea8ecfa70'
+        )
+
+),
+
+seaport_indirect_contract_tx as (
+    select 
+        tx_hash from seaport_tx
+    
+    union 
+
+    select 
+        tx_hash from quixotic_tx
+),
+
+base_sales AS (
 
     SELECT
         block_number,
@@ -40,31 +94,13 @@ WITH base_sales AS (
     FROM
         {{ ref('silver__logs') }}
     WHERE
-        origin_function_signature IN (
-            '0xb3a34c4c',
-            '0xfb0f3ee1',
-            '0x87201b41',
-            '0x6e650cd4',
-            '0x60f46aee',
-            '0x12d0aa73',
-            '0xbfc5e222',
-            '0x2047d4d4',
-            '0x55e4a3fa',
-            '0xedf8301b',
-            '0xad6c8c5f',
-            '0xf8056016',
-            '0x75eeb98a',
-            '0x912d97fc'
-        )
-        AND origin_to_address IN (
-            '0x998ef16ea4111094eb5ee72fc2c6f4e6e8647666',
-            '0xe5c7b4865d7f2b08faadf3f6d392e6d6fa7b903c',
-            '0x829b1c7b9d024a3915215b8abf5244a4bfc28db4',
-            '0x20975da6eb930d592b9d78f451a9156db5e4c77b',
-            '0x065e8a87b8f11aed6facf9447abe5e8c5d7502b6',
-            '0x3f9da045b0f77d707ea4061110339c4ea8ecfa70'
-        )
-        AND block_timestamp >= '2021-01-01'
+        block_timestamp >= '2021-01-01'
+    
+        AND tx_hash in 
+            (select 
+                tx_hash 
+            from seaport_indirect_contract_tx
+            )
         AND event_name IN (
             'Transfer',
             'TransferSingle'
@@ -507,7 +543,6 @@ agg_sales_prices AS (
         event_type,
         platform_address,
         'quixotic' AS platform_name,
-        'quixotic' AS platform_exchange_version,
         seller_address,
         buyer_address,
         nft_address,
@@ -549,7 +584,12 @@ SELECT
     event_type,
     platform_address,
     platform_name,
-    platform_exchange_version,
+    case 
+        when tx_hash in 
+            (select tx_hash from seaport_tx) 
+            then 'seaport_1_1'
+        else 'quixotic'
+        end as platform_exchange_version,
     seller_address,
     buyer_address,
     nft_address,
