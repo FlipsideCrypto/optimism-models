@@ -155,7 +155,10 @@ SELECT
         )
     END AS lp_fee_usd,
     tokens.token_symbol AS lp_fee_symbol,
-    fee_currency AS lp_fee_token_address
+    CASE
+        WHEN fee_currency IS NULL AND lp_fee <> 0 AND pool_address <> '0xce9accfbb25eddce91845c3a7c3d1613d1d7081f' THEN token_address_in
+        ELSE fee_currency
+    END AS lp_fee_token_address
 FROM
     {{ ref('silver__velodrome_swaps') }}
     base

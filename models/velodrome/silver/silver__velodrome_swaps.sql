@@ -185,3 +185,4 @@ FROM
     ON b.contract_address = l.contract_address
     AND b.tx_hash = l.tx_hash
     AND b.agg_id = l.agg_id
+    
