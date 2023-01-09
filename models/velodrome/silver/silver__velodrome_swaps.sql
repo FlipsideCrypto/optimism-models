@@ -115,20 +115,12 @@ lp_fees AS (
         base A
         LEFT JOIN transfers b
         ON A.tx_hash = b.tx_hash
-        AND ((
-            SUBSTRING(TO_CHAR(CASE
-                WHEN fees0_adj = 0 THEN fees1_adj :: INTEGER
-                WHEN fees1_adj = 0 THEN fees0_adj :: INTEGER
-            END),1,12)
-        ) = SUBSTRING(TO_CHAR(b.fee_amount :: INTEGER),1,12)
-        --accounts for discrepancies in the amount of decimals/trailing zeros after the DATA column is decoded
-        OR 
-         (
+        AND (
             CASE
                 WHEN fees0_adj = 0 THEN fees1_adj :: FLOAT
                 WHEN fees1_adj = 0 THEN fees0_adj :: FLOAT
             END
-        ) = b.fee_amount)
+        ) = b.fee_amount
     WHERE
         function_type = '0x112c256902bf554b6ed882d2936687aaeb4225e8cd5b51303c90ca6cf43a8602'
 ),
