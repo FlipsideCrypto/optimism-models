@@ -4,8 +4,8 @@ run-name: dbt_temp_test
 on:
   workflow_dispatch:
   schedule:
-    # Runs "every 5 minutes" (see https://crontab.guru)
-    - cron: '*/5 * * * *'
+    # Runs "every hour" (see https://crontab.guru)
+    - cron: '0 */1 * * *'
     
 env:
   DBT_PROFILES_DIR: ./
