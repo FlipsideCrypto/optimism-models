@@ -136,6 +136,7 @@ SELECT
     END AS amount_out_usd,
     tx_to,
     event_index,
+    event_name,
     token_in,
     token_out,
     symbol_in,

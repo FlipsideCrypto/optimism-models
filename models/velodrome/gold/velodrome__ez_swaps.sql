@@ -43,6 +43,7 @@ SELECT
     origin_to_address,
     tx_hash,
     event_index,
+    event_name,
     platform,
     contract_address,
     pool_address,
@@ -155,7 +156,8 @@ SELECT
         )
     END AS lp_fee_usd,
     tokens.token_symbol AS lp_fee_symbol,
-    fee_currency AS lp_fee_token_address
+    fee_currency AS lp_fee_token_address,
+    _log_id
 FROM
     {{ ref('silver__velodrome_swaps') }}
     base

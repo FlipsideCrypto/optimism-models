@@ -60,6 +60,7 @@ WITH base AS (
         _log_id,
         _inserted_timestamp,
         event_index,
+        event_name,
         'velodrome' AS platform,
         topics [0] :: STRING AS function_type
     FROM
@@ -142,6 +143,7 @@ swaps AS (
         _log_id,
         _inserted_timestamp,
         event_index,
+        event_name,
         platform,
         ROW_NUMBER() over (
             PARTITION BY tx_hash,
@@ -173,6 +175,7 @@ SELECT
     _log_id,
     _inserted_timestamp,
     event_index,
+    event_name,
     platform,
     COALESCE(
         fees_adj,

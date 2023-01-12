@@ -9,7 +9,7 @@ models:
             - _LOG_ID
     columns:
       - name: BLOCK_NUMBER
-        description: '{{ doc("eth_block_number") }}'
+        description: '{{ doc("opt_block_number") }}'
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
@@ -17,7 +17,7 @@ models:
                 - NUMBER
                 - FLOAT
       - name: BLOCK_TIMESTAMP
-        description: '{{ doc("eth_block_timestamp") }}'
+        description: '{{ doc("opt_block_timestamp") }}'
         tests:
           - not_null
           - dbt_expectations.expect_row_values_to_have_recent_data:
@@ -27,19 +27,19 @@ models:
               column_type_list:
                 - TIMESTAMP_NTZ
       - name: TX_HASH
-        description: '{{ doc("eth_logs_tx_hash") }}'
+        description: '{{ doc("opt_logs_tx_hash") }}'
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: CONTRACT_ADDRESS
-        description: '{{ doc("eth_logs_contract_address") }}'
+        description: '{{ doc("opt_logs_contract_address") }}'
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: EVENT_NAME
-        description: '{{ doc("eth_event_name") }}'
+        description: '{{ doc("opt_event_name") }}'
         tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
@@ -123,28 +123,28 @@ models:
                 - STRING
                 - VARCHAR
       - name: EVENT_INDEX
-        description: '{{ doc("eth_event_index") }}'
+        description: '{{ doc("opt_event_index") }}'
         tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER
                 - FLOAT
       - name: _LOG_ID
-        description: '{{ doc("eth_log_id_events") }}'
+        description: '{{ doc("opt_log_id_events") }}'
         tests:
           - not_null
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description: '{{ doc("eth_nft_origin_sig") }}'
+        description: '{{ doc("opt_tx_origin_sig") }}'
         tests:
           - not_null
       - name: ORIGIN_FROM_ADDRESS
-        description: '{{ doc("eth_origin_from") }}'
+        description: '{{ doc("opt_origin_from") }}'
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: ORIGIN_TO_ADDRESS
-        description: '{{ doc("eth_origin_to") }}'
+        description: '{{ doc("opt_origin_to") }}'
         tests:
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
