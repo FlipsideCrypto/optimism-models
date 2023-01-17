@@ -242,7 +242,7 @@ adj_eth_prices AS (
 all_prices AS (
     SELECT
         HOUR,
-        token_address,
+        LOWER(token_address) AS token_address,
         symbol,
         decimals,
         price,
@@ -253,7 +253,7 @@ all_prices AS (
     UNION ALL
     SELECT
         HOUR,
-        token_address,
+        LOWER(token_address) AS token_address,
         symbol,
         decimals,
         price,
