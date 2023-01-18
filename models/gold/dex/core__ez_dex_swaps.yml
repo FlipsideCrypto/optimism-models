@@ -45,6 +45,7 @@ models:
               column_type_list:
                 - STRING
                 - VARCHAR
+          - not_null
       - name: AMOUNT_IN
         description: '{{ doc("eth_dex_swaps_amount_in") }}'
         tests:
