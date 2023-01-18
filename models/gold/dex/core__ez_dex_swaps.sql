@@ -96,7 +96,10 @@ SELECT
   origin_to_address,
   contract_address,
   pool_name,
-  event_name,
+  CASE 
+    WHEN event_name IS NULL THEN 'Swap' 
+    ELSE event_name 
+  END AS event_name,
   amount_in,
   amount_in_usd,
   amount_out,
@@ -122,7 +125,10 @@ SELECT
   origin_to_address,
   contract_address,
   pool_name,
-  event_name,
+  CASE 
+    WHEN event_name IS NULL THEN 'Swap' 
+    ELSE event_name 
+  END AS event_name,
   amount_in,
   amount_in_usd,
   amount_out,
