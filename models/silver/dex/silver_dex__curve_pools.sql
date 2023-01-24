@@ -17,9 +17,18 @@ FROM
 INNER JOIN {{ ref('silver__logs') }} b USING(tx_hash)
 WHERE 
     -- these are the curve contract deployers, we may need to add here in the future
+    -- missing 2-3 pools
     a.from_address IN ( '0x2db0e83599a91b508ac268a6197b8b14f5e72840','0x7eeac6cddbd1d0b8af061742d41877d7f707289a')
     AND TYPE ilike 'create%'
     AND topics[0] IN ('0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef','0x5b4a28c940282b5bf183df6a046b8119cf6edeb62859f75e835eb7ba834cce8d')
+{% if is_incremental() %}
+AND a.to_address NOT IN (
+    SELECT
+        DISTINCT pool_address
+    FROM
+        {{ this }}
+)
+{% endif %}
 QUALIFY(ROW_NUMBER() OVER(PARTITION BY a.to_address ORDER BY block_timestamp ASC)) = 1
 ),
 
@@ -204,7 +213,8 @@ SELECT
     t.contract_address AS pool_address,
     CONCAT('0x',SUBSTRING(t.segmented_token_address,25,40)) AS token_address,
     MIN(CASE WHEN p.function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(RTRIM(p.segmented_output [2] :: STRING, 0)) END) AS pool_symbol,
-    MIN(CASE WHEN p.function_name = 'name' THEN CONCAT(TRY_HEX_DECODE_STRING(RTRIM(p.segmented_output [2] :: STRING, 0)),TRY_HEX_DECODE_STRING(RTRIM(segmented_output [3] :: STRING, 0))) END) AS pool_name,
+    MIN(CASE WHEN p.function_name = 'name' THEN CONCAT(TRY_HEX_DECODE_STRING(RTRIM(p.segmented_output [2] :: STRING, 0)),
+        TRY_HEX_DECODE_STRING(RTRIM(segmented_output [3] :: STRING, 0))) END) AS pool_name,
     MIN(udf_hex_to_int(p.read_result)) AS pool_decimals,
     CONCAT(
         t.contract_address,
