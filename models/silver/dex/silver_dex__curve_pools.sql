@@ -14,13 +14,14 @@ SELECT
     a._inserted_timestamp AS _inserted_timestamp
 FROM
     {{ ref('silver__traces' )}} a
-INNER JOIN {{ ref('silver__logs') }} b USING(tx_hash)
 WHERE 
-    -- these are the curve contract deployers, we may need to add here in the future
-    -- missing 2-3 pools
-    a.from_address IN ( '0x2db0e83599a91b508ac268a6197b8b14f5e72840','0x7eeac6cddbd1d0b8af061742d41877d7f707289a')
+    -- curve contract deployers
+    a.from_address IN (
+        '0x2db0e83599a91b508ac268a6197b8b14f5e72840',
+        '0x7eeac6cddbd1d0b8af061742d41877d7f707289a',
+        '0x745748bcfd8f9c2de519a71d789be8a63dd7d66c')
     AND TYPE ilike 'create%'
-    AND topics[0] IN ('0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef','0x5b4a28c940282b5bf183df6a046b8119cf6edeb62859f75e835eb7ba834cce8d')
+    AND TX_STATUS ilike 'success'
 {% if is_incremental() %}
 AND a.to_address NOT IN (
     SELECT
@@ -207,15 +208,19 @@ FROM reads_adjusted
 LEFT JOIN function_sigs USING(function_sig)
 WHERE read_result IS NOT NULL
     AND function_name IN ('name','symbol','decimals')
-)
+),
 
+FINAL AS (
 SELECT
     t.contract_address AS pool_address,
     CONCAT('0x',SUBSTRING(t.segmented_token_address,25,40)) AS token_address,
     MIN(CASE WHEN p.function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(RTRIM(p.segmented_output [2] :: STRING, 0)) END) AS pool_symbol,
     MIN(CASE WHEN p.function_name = 'name' THEN CONCAT(TRY_HEX_DECODE_STRING(RTRIM(p.segmented_output [2] :: STRING, 0)),
         TRY_HEX_DECODE_STRING(RTRIM(segmented_output [3] :: STRING, 0))) END) AS pool_name,
-    MIN(udf_hex_to_int(p.read_result::STRING))::INTEGER AS pool_decimals,
+    MIN(CASE 
+            WHEN p.read_result::STRING = '0x' THEN NULL
+            ELSE udf_hex_to_int(p.read_result::STRING)
+        END)::INTEGER  AS pool_decimals,
     CONCAT(
         t.contract_address,
         '-',
@@ -224,4 +229,23 @@ SELECT
     MAX(t._inserted_timestamp) AS _inserted_timestamp
 FROM tokens t
 LEFT JOIN pool_details p ON t.contract_address = p.contract_address
+WHERE token_address IS NOT NULL 
+    AND token_address <> '0x0000000000000000000000000000000000000000'
 GROUP BY 1,2
+)
+
+SELECT
+    pool_address,
+    CASE
+        WHEN token_address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' THEN '0x4200000000000000000000000000000000000006'
+        ELSE token_address
+    END AS token_address,
+    CASE 
+        WHEN token_address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' THEN 'WETH'
+        ELSE pool_symbol
+    END AS pool_symbol,
+    pool_name,
+    pool_decimals,
+    pool_id,
+    _inserted_timestamp
+FROM FINAL

@@ -9,12 +9,14 @@ WITH pool_meta AS (
     SELECT
         DISTINCT pool_address,
         CASE 
-            WHEN pool_name IS NULL THEN pool_symbol
+            WHEN pool_name IS NULL AND pool_symbol IS NULL THEN CONCAT('Curve.fi Pool: ',SUBSTRING(pool_address, 1, 5),'...',SUBSTRING(pool_address, 39, 42))
+            WHEN pool_name IS NULL THEN CONCAT('Curve.fi Pool: ',pool_symbol)
             ELSE pool_name
         END AS pool_name
     FROM
         {{ ref('silver_dex__curve_pools') }}
 ),
+
 curve_base AS (
     SELECT
         block_number,
@@ -51,7 +53,6 @@ curve_base AS (
     WHERE
         topics [0] :: STRING IN (
             '0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140',
-            '0xb2e76ae99761dc136e598d4a629bb347eccb9532a5f8bbd72e18467c3c34cc98',
             '0xd013ca23e77a65003c2c659c5442c00c805371b7fc1ebd4c206c41d1536bd90b'
         )
 
@@ -69,10 +70,11 @@ token_transfers AS (
         tx_hash,
         contract_address AS token_address,
         TRY_TO_NUMBER(
-            PUBLIC.udf_hex_to_int(
-                DATA :: STRING
-            )
-        ) AS amount,
+            CASE
+                WHEN DATA :: STRING = '0x' THEN NULL
+                ELSE PUBLIC.udf_hex_to_int(
+                    DATA :: STRING
+            ) END ) AS amount,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS from_address,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS to_address
     FROM
@@ -134,7 +136,7 @@ pool_info AS (
         tokens_sold,
         COALESCE(
             sold.token_address,
-            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+            '0x4200000000000000000000000000000000000006'
         ) AS token_in,
         c0.symbol symbol_in,
         c0.decimals AS decimals_in,
@@ -149,7 +151,7 @@ pool_info AS (
         tokens_bought,
         COALESCE(
             bought.token_address,
-            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+            '0x4200000000000000000000000000000000000006'
         ) AS token_out,
         c1.symbol AS symbol_out,
         c1.decimals AS decimals_out,
@@ -174,13 +176,13 @@ pool_info AS (
         c0
         ON c0.address = COALESCE(
             sold.token_address,
-            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+            '0x4200000000000000000000000000000000000006'
         )
         LEFT JOIN {{ ref('core__dim_contracts') }}
         c1
         ON c1.address = COALESCE(
             bought.token_address,
-            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+            '0x4200000000000000000000000000000000000006'
         )
     WHERE
         tokens_sold <> 0
