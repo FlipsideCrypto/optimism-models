@@ -215,7 +215,7 @@ SELECT
     MIN(CASE WHEN p.function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(RTRIM(p.segmented_output [2] :: STRING, 0)) END) AS pool_symbol,
     MIN(CASE WHEN p.function_name = 'name' THEN CONCAT(TRY_HEX_DECODE_STRING(RTRIM(p.segmented_output [2] :: STRING, 0)),
         TRY_HEX_DECODE_STRING(RTRIM(segmented_output [3] :: STRING, 0))) END) AS pool_name,
-    MIN(udf_hex_to_int(p.read_result)) AS pool_decimals,
+    MIN(udf_hex_to_int(p.read_result::STRING))::INTEGER AS pool_decimals,
     CONCAT(
         t.contract_address,
         '-',
