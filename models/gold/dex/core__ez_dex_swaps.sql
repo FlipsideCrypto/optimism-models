@@ -1,7 +1,15 @@
 {{ config(
     materialized = 'view',
     persist_docs ={ "relation": true,
-    "columns": true }
+    "columns": true },
+    meta={
+        'database_tags':{
+            'table': {
+                'PROTOCOL': 'SUSHI, UNISWAP, CURVE, SYNTHETIX, VELODROME',
+                'PURPOSE': 'DEX, SWAPS'
+            }
+        }
+    }
 ) }}
 
 WITH velodrome_swaps AS (
