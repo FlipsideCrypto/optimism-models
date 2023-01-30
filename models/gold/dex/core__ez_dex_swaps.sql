@@ -180,6 +180,33 @@ curve_swaps AS (
     _log_id
   FROM
     {{ ref('silver_dex__curve_swaps') }}
+),
+beethovenx_swaps AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    contract_address,
+    pool_name,
+    event_name,
+    amount_in,
+    amount_in_usd,
+    amount_out,
+    amount_out_usd,
+    sender,
+    tx_to,
+    event_index,
+    platform,
+    token_in,
+    token_out,
+    symbol_in,
+    symbol_out,
+    _log_id
+  FROM
+    {{ ref('silver_dex__beethovenx_swaps') }}
 )
 
 SELECT
@@ -311,3 +338,29 @@ SELECT
   _log_id
 FROM
   curve_swaps
+UNION ALL
+SELECT
+  block_number,
+  block_timestamp,
+  tx_hash,
+  origin_function_signature,
+  origin_from_address,
+  origin_to_address,
+  contract_address,
+  pool_name,
+  event_name,
+  amount_in,
+  amount_in_usd,
+  amount_out,
+  amount_out_usd,
+  sender,
+  tx_to,
+  event_index,
+  platform,
+  token_in,
+  token_out,
+  symbol_in,
+  symbol_out,
+  _log_id
+FROM
+  beethovenx_swaps

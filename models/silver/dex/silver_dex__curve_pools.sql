@@ -36,19 +36,19 @@ QUALIFY(ROW_NUMBER() OVER(PARTITION BY a.to_address ORDER BY block_timestamp ASC
 function_sigs AS (
 
 SELECT
-    LEFT(udfs_dev.streamline.udf_hex_signature('coins(uint256)')::STRING,10) AS function_sig, 
+    LEFT(udfs_dev.streamline.udf_hex_encode_function('coins(uint256)')::STRING,10) AS function_sig, 
     'coins' AS function_name
 UNION ALL
 SELECT
-    LEFT(udfs_dev.streamline.udf_hex_signature('name()')::STRING,10) AS function_sig, 
+    LEFT(udfs_dev.streamline.udf_hex_encode_function('name()')::STRING,10) AS function_sig, 
     'name' AS function_name
 UNION ALL
 SELECT
-    LEFT(udfs_dev.streamline.udf_hex_signature('symbol()')::STRING,10) AS function_sig, 
+    LEFT(udfs_dev.streamline.udf_hex_encode_function('symbol()')::STRING,10) AS function_sig, 
     'symbol' AS function_name
 UNION ALL
 SELECT
-    LEFT(udfs_dev.streamline.udf_hex_signature('decimals()')::STRING,10) AS function_sig, 
+    LEFT(udfs_dev.streamline.udf_hex_encode_function('decimals()')::STRING,10) AS function_sig, 
     'decimals' AS function_name
 ),
 

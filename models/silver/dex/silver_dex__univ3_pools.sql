@@ -79,13 +79,13 @@ contracts AS (
 ),
 token_prices AS (
     SELECT
-        HOUR,
-        LOWER(token_address) AS token_address,
+        hour,
+        token_address,
         price
     FROM
         {{ ref('silver__prices') }}
     WHERE
-        HOUR :: DATE IN (
+        hour :: DATE IN (
             SELECT
                 DISTINCT created_time :: DATE
             FROM

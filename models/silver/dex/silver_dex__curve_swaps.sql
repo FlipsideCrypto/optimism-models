@@ -192,35 +192,29 @@ pool_info AS (
 ),
 prices AS (
     SELECT
-        HOUR,
-        LOWER(token_address) AS token_address,
-        AVG(price) AS price
+        hour,
+        token_address,
+        price
     FROM
-        {{ ref('core__fact_hourly_token_prices') }}
+        {{ ref('silver__prices') }}
     WHERE
-        HOUR :: DATE IN (
+        hour :: DATE IN (
             SELECT
                 DISTINCT block_timestamp :: DATE
             FROM
                 curve_base
         )
-        AND (
-            token_address IN (
+        AND LOWER(token_address) IN (
                 SELECT
-                    DISTINCT token_in
+                    DISTINCT token_in AS token_address
+                FROM
+                    pool_info
+                UNION
+                SELECT
+                    DISTINCT token_out AS token_address
                 FROM
                     pool_info
             )
-            OR token_address IN (
-                SELECT
-                    DISTINCT token_out
-                FROM
-                    pool_info
-            )
-        )
-    GROUP BY
-        1,
-        2
 )
 SELECT
     block_number,
