@@ -16,7 +16,7 @@ WITH pool_creation AS (
         block_number,
         _inserted_timestamp
     FROM
-        optimism.silver.logs
+        {{ ref('silver__logs') }}
     WHERE
         event_name = 'PoolRegistered'
         AND contract_address = '0xba12222222228d8ba445958a75a0704d566bf2c8'
@@ -155,3 +155,4 @@ SELECT
     MAX(_inserted_timestamp) AS _inserted_timestamp
 FROM pool_details
 GROUP BY 1
+ 

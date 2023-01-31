@@ -215,8 +215,8 @@ SELECT
     t.contract_address AS pool_address,
     CONCAT('0x',SUBSTRING(t.segmented_token_address,25,40)) AS token_address,
     MIN(CASE WHEN p.function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(RTRIM(p.segmented_output [2] :: STRING, 0)) END) AS pool_symbol,
-    MIN(CASE WHEN p.function_name = 'name' THEN CONCAT(TRY_HEX_DECODE_STRING(RTRIM(p.segmented_output [2] :: STRING, 0)),
-        TRY_HEX_DECODE_STRING(RTRIM(segmented_output [3] :: STRING, 0))) END) AS pool_name,
+    MIN(CASE WHEN p.function_name = 'name' THEN CONCAT(TRY_HEX_DECODE_STRING(p.segmented_output [2] :: STRING),
+        TRY_HEX_DECODE_STRING(segmented_output [3] :: STRING)) END) AS pool_name,
     MIN(CASE 
             WHEN p.read_result::STRING = '0x' THEN NULL
             ELSE udf_hex_to_int(p.read_result::STRING)

@@ -4,42 +4,11 @@
     tags = ['velodrome']
 ) }}
 
-WITH pool_backfill AS (
+WITH pool_creation AS (
 
     SELECT
-        LOWER(pool_address) AS pool_address,
-        pool_name,
-        pool_type,
-        token0_symbol,
-        token1_symbol,
-        LOWER(token0_address) AS token0_address,
-        LOWER(token1_address) AS token1_address,
-        token0_decimals,
-        token1_decimals,
-        '1970-01-01' :: DATE AS _inserted_timestamp
-    FROM
-        {{ ref('silver__velo_pool_backfill') }}
-),
-token_backfill AS (
-    SELECT
-        symbol,
-        op_token_address AS contract_address,
-        decimals
-    FROM
-        {{ ref('silver__velo_tokens_backup') }}
-),
-contracts AS (
-    SELECT
-        address AS contract_address,
-        symbol,
-        decimals
-    FROM
-        {{ ref('core__dim_contracts') }}
-),
-new_pools AS (
-    SELECT
         block_timestamp AS created_timestamp,
-        block_number AS created_block,
+        block_number,
         tx_hash AS created_hash,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS token0_address,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token1_address,
@@ -57,184 +26,219 @@ new_pools AS (
         {{ ref('silver__logs') }}
     WHERE
         topics [0] :: STRING = '0xc4805696c66d7cf352fc1d6bb633ad5ee82f6cb577c453024b6e0eb8306c6fc9' -- pair created
-        AND contract_address = '0x25cbddb98b35ab1ff77413456b31ec81a6b6b746' -- velo depolyer
-
+        AND contract_address = '0x25cbddb98b35ab1ff77413456b31ec81a6b6b746' --velo deployer
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND pool_address NOT IN (
     SELECT
-        MAX(
-            _inserted_timestamp
-        ) :: DATE - 2
+        DISTINCT pool_address
     FROM
         {{ this }}
 )
 {% endif %}
 ),
 
-{% if is_incremental() %}
-missing_pools AS (
-    SELECT
-        created_timestamp,
-        created_block,
-        created_hash,
-        token0_address,
-        token1_address,
-        pool_address,
-        pool_type,
-        _inserted_timestamp
-    FROM
-        {{ this }}
-    WHERE
-        pool_name IS NULL
-        OR token0_decimals IS NULL
-        OR token1_decimals IS NULL
-),
-{% endif %}
+function_sigs AS (
 
-heal_pools AS (
-    SELECT
-        created_timestamp,
-        created_block,
-        created_hash,
-        token0_address,
-        token1_address,
-        pool_address,
-        pool_type,
-        _inserted_timestamp
-    FROM
-        new_pools
-
-{% if is_incremental() %}
-UNION
 SELECT
-    created_timestamp,
-    created_block,
-    created_hash,
-    token0_address,
-    token1_address,
-    pool_address,
-    pool_type,
-    _inserted_timestamp
+    LEFT(udfs_dev.streamline.udf_hex_encode_function('name()')::STRING,10) AS function_sig, 
+    'name' AS function_name
+UNION ALL
+SELECT
+    LEFT(udfs_dev.streamline.udf_hex_encode_function('symbol()')::STRING,10) AS function_sig, 
+    'symbol' AS function_name
+UNION ALL
+SELECT
+    LEFT(udfs_dev.streamline.udf_hex_encode_function('decimals()')::STRING,10) AS function_sig, 
+    'decimals' AS function_name
+),
+
+all_inputs AS (
+
+SELECT
+    pool_address AS contract_address,
+    block_number,
+    function_sig,
+    (ROW_NUMBER() OVER (PARTITION BY pool_address
+        ORDER BY block_number)) - 1 AS function_input,
+    'pool' AS address_label
+FROM pool_creation
+JOIN function_sigs ON 1=1 
+UNION ALL
+SELECT
+    token0_address AS contract_address,
+    block_number,
+    function_sig,
+    (ROW_NUMBER() OVER (PARTITION BY token0_address
+        ORDER BY block_number)) - 1 AS function_input,
+    'token0' AS address_label
+FROM pool_creation
+JOIN function_sigs ON 1=1
+UNION ALL
+SELECT
+    token1_address AS contract_address,
+    block_number,
+    function_sig,
+    (ROW_NUMBER() OVER (PARTITION BY token1_address
+        ORDER BY block_number)) - 1 AS function_input,
+    'token1' AS address_label
+FROM pool_creation
+JOIN function_sigs ON 1=1 
+),
+
+ready_reads_all AS (
+SELECT 
+    contract_address,
+    block_number,
+    function_sig,
+    function_input,
+    CONCAT(
+        '[\'',
+        contract_address,
+        '\',',
+        block_number,
+        ',\'',
+        function_sig,
+        '\',\'',
+        function_input,
+        '\']'
+        ) AS read_input
+FROM all_inputs
+),
+
+batch_reads_all AS (
+    
+SELECT
+    CONCAT('[', LISTAGG(read_input, ','), ']') AS batch_read
 FROM
-    missing_pools
-{% endif %}
+    ready_reads_all
 ),
-add_meta AS (
-    SELECT
-        created_timestamp,
-        created_block,
-        created_hash,
-        token0_address,
-        COALESCE(
-            tb0.symbol,
-            c0.symbol
-        ) AS token0_symbol,
-        COALESCE(
-            tb1.symbol,
-            c1.symbol
-        ) AS token1_symbol,
-        COALESCE(
-            tb0.decimals,
-            c0.decimals
-        ) AS token0_decimals,
-        COALESCE(
-            tb1.decimals,
-            c1.decimals
-        ) AS token1_decimals,
-        token1_address,
-        pool_address,
-        pool_type,
-        _inserted_timestamp
-    FROM
-        heal_pools
-        LEFT JOIN token_backfill AS tb0
-        ON token0_address = tb0.contract_address
-        LEFT JOIN contracts AS c0
-        ON token0_address = c0.contract_address
-        LEFT JOIN token_backfill AS tb1
-        ON token1_address = tb1.contract_address
-        LEFT JOIN contracts AS c1
-        ON token1_address = c1.contract_address
-),
-name_pools AS (
-    SELECT
-        created_timestamp,
-        created_block,
-        created_hash,
-        token0_address,
-        token0_symbol,
-        token1_symbol,
-        token0_decimals,
-        token1_decimals,
-        token1_address,
-        pool_address,
-        pool_type,
-        _inserted_timestamp,
-        CONCAT(
-            LOWER(
-                LEFT(
-                    pool_type,
-                    1
-                )
-            ),
-            'AMM-',
-            token0_symbol,
-            '/',
-            token1_symbol
-        ) AS pool_name
-    FROM
-        add_meta
-),
-combine AS (
-    SELECT
-        pool_address,
-        pool_name,
-        pool_type,
-        token0_symbol,
-        token1_symbol,
-        token0_address,
-        token1_address,
-        token0_decimals,
-        token1_decimals,
-        created_timestamp,
-        created_block,
-        created_hash,
-        _inserted_timestamp
-    FROM
-        name_pools
-    UNION ALL
-    SELECT
-        pool_address,
-        pool_name,
-        pool_type,
-        token0_symbol,
-        token1_symbol,
-        token0_address,
-        token1_address,
-        token0_decimals,
-        token1_decimals,
-        NULL AS created_timestamp,
-        NULL AS created_block,
-        NULL AS created_hash,
-        _inserted_timestamp
-    FROM
-        pool_backfill
-)
+
+all_reads AS (
+
 SELECT
-    LOWER(pool_address) AS pool_address,
+    ethereum.streamline.udf_json_rpc_read_calls(
+        node_url,
+        headers,
+        PARSE_JSON(batch_read)
+    ) AS read_output,
+    SYSDATE() AS _inserted_timestamp
+FROM
+    batch_reads_all
+JOIN streamline.crosschain.node_mapping ON 1=1 
+    AND chain = 'optimism'
+WHERE
+    EXISTS (
+        SELECT
+            1
+        FROM
+            ready_reads_all
+        LIMIT
+            1
+    ) 
+),
+
+reads_adjusted AS (
+    
+SELECT
+        VALUE :id :: STRING AS read_id,
+        VALUE :result :: STRING AS read_result,
+        SPLIT(
+            read_id,
+            '-'
+        ) AS read_id_object,
+        read_id_object [0] :: STRING AS contract_address,
+        read_id_object [1] :: STRING AS block_number,
+        read_id_object [2] :: STRING AS function_sig,
+        read_id_object [3] :: STRING AS function_input,
+        _inserted_timestamp
+FROM
+    all_reads,
+    LATERAL FLATTEN(
+        input => read_output [0] :data
+    ) 
+),
+
+details AS (
+
+SELECT
+    contract_address,
+    function_sig,
+    function_name,
+    read_result,
+    regexp_substr_all(SUBSTR(read_result, 3, len(read_result)), '.{64}') AS segmented_output,
+    _inserted_timestamp
+FROM reads_adjusted
+LEFT JOIN function_sigs USING(function_sig)
+    ),
+
+pools AS (
+    
+SELECT
+    d.contract_address AS pool_address,
+    MIN(CASE WHEN function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS pool_symbol,
+    MIN(CASE WHEN function_name = 'name' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS pool_name,
+    MIN(CASE 
+            WHEN read_result::STRING = '0x' THEN NULL
+            ELSE udf_hex_to_int(read_result::STRING)
+        END)::INTEGER  AS pool_decimals,
+    MAX(_inserted_timestamp) AS _inserted_timestamp
+FROM details d
+LEFT JOIN all_inputs i ON d.contract_address = i.contract_address
+WHERE address_label = 'pool'
+GROUP BY 1
+),
+
+token0 AS (
+
+SELECT
+    d.contract_address AS token0_address,
+    MIN(CASE WHEN function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token0_symbol,
+    MIN(CASE WHEN function_name = 'name' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token0_name,
+    MIN(CASE 
+            WHEN function_name = 'decimals' AND read_result::STRING <> '0x' THEN udf_hex_to_int(segmented_output [0] :: STRING)
+            ELSE NULL
+        END)::INTEGER AS token0_decimals,
+    MAX(_inserted_timestamp) AS _inserted_timestamp
+FROM details d
+LEFT JOIN all_inputs i ON d.contract_address = i.contract_address
+WHERE address_label = 'token0'
+GROUP BY 1
+),
+
+token1 AS (
+
+SELECT
+    d.contract_address AS token1_address,
+    MIN(CASE WHEN function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token1_symbol,
+    MIN(CASE WHEN function_name = 'name' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token1_name,
+    MIN(CASE 
+            WHEN function_name = 'decimals' AND read_result::STRING <> '0x' THEN udf_hex_to_int(segmented_output [0] :: STRING)
+            ELSE NULL
+        END)::INTEGER AS token1_decimals,
+    MAX(_inserted_timestamp) AS _inserted_timestamp
+FROM details d
+LEFT JOIN all_inputs i ON d.contract_address = i.contract_address
+WHERE address_label = 'token1'
+GROUP BY 1
+)
+
+SELECT
+    pool_address,
     pool_name,
     pool_type,
+    pool_symbol,
+    pool_decimals,
     token0_symbol,
     token1_symbol,
-    LOWER(token0_address) AS token0_address,
-    LOWER(token1_address) AS token1_address,
+    c.token0_address,
+    c.token1_address,
     token0_decimals,
     token1_decimals,
     created_timestamp,
-    created_block,
+    block_number AS created_block,
     created_hash,
-    _inserted_timestamp
-FROM
-    combine qualify(ROW_NUMBER() over(PARTITION BY pool_address
-ORDER BY
-    _inserted_timestamp DESC) = 1)
+    a._inserted_timestamp
+FROM pools a
+LEFT JOIN pool_creation c USING(pool_address)
+LEFT JOIN token0 ON c.token0_address = token0.token0_address
+LEFT JOIN token1 ON c.token1_address = token1.token1_address
