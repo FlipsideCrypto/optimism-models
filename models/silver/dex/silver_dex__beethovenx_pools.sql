@@ -34,15 +34,15 @@ AND pool_address NOT IN (
 function_sigs AS (
 
 SELECT
-    LEFT(udfs_dev.streamline.udf_hex_encode_function('name()')::STRING,10) AS function_sig, 
+    '0x06fdde03' AS function_sig, 
     'name' AS function_name
 UNION ALL
 SELECT
-    LEFT(udfs_dev.streamline.udf_hex_encode_function('symbol()')::STRING,10) AS function_sig, 
+    '0x95d89b41' AS function_sig, 
     'symbol' AS function_name
 UNION ALL
 SELECT
-    LEFT(udfs_dev.streamline.udf_hex_encode_function('decimals()')::STRING,10) AS function_sig, 
+    '0x313ce567' AS function_sig, 
     'decimals' AS function_name
 ),
 
