@@ -10,14 +10,14 @@ WITH base_table AS (
         block_timestamp,
         block_id :: INTEGER AS block_number,
         tx_id :: STRING AS tx_hash,
-        udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             tx :nonce :: STRING
         ) :: INTEGER AS nonce,
         tx_block_index :: INTEGER AS POSITION,
         tx :from :: STRING AS from_address,
         tx :to :: STRING AS to_address,
         (
-            udf_hex_to_int(
+            ethereum.public.udf_hex_to_int(
                 tx :value :: STRING
             ) / pow(
                 10,
@@ -26,11 +26,11 @@ WITH base_table AS (
         ) :: FLOAT AS eth_value,
         tx :blockHash :: STRING AS block_hash,
         (
-            udf_hex_to_int(
+            ethereum.public.udf_hex_to_int(
                 tx :gasPrice :: STRING
             )
         ) :: FLOAT AS gas_price,
-        udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             tx :gas :: STRING
         ) :: INTEGER AS gas_limit,
         tx :input :: STRING AS DATA,
@@ -38,13 +38,13 @@ WITH base_table AS (
             WHEN tx :receipt :status :: STRING = '0x1' THEN 'SUCCESS'
             ELSE 'FAIL'
         END AS status,
-        udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             tx :receipt :gasUsed :: STRING
         ) :: INTEGER AS gas_used,
-        udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             tx :receipt :cumulativeGasUsed :: STRING
         ) :: INTEGER AS cumulative_Gas_Used,
-        udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             tx :receipt :effectiveGasPrice :: STRING
         ) :: INTEGER AS effective_Gas_Price,
         ingested_at :: TIMESTAMP AS ingested_at,
@@ -54,7 +54,7 @@ WITH base_table AS (
             'traces'
         ) AS tx_json,
         COALESCE(
-            udf_hex_to_int(
+            ethereum.public.udf_hex_to_int(
                 tx :receipt :l1Fee :: STRING
             ) :: FLOAT,
             0
@@ -64,13 +64,13 @@ WITH base_table AS (
             0
         ) :: FLOAT AS l1_fee_scalar,
         COALESCE(
-            udf_hex_to_int(
+            ethereum.public.udf_hex_to_int(
                 tx :receipt :l1GasPrice :: STRING
             ) :: FLOAT,
             0
         ) AS l1_gas_price,
         COALESCE(
-            udf_hex_to_int(
+            ethereum.public.udf_hex_to_int(
                 tx :receipt :l1GasUsed :: STRING
             ) :: FLOAT,
             0

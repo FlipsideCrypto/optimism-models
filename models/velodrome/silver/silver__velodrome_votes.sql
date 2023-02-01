@@ -18,11 +18,11 @@ WITH votes_base AS (
         event_index,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS from_address,
-        PUBLIC.udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             segmented_data [0] :: STRING
         ) AS token_id,
         (
-            PUBLIC.udf_hex_to_int(
+            ethereum.public.udf_hex_to_int(
                 segmented_data [1] :: STRING
             ) / pow(
                 10,

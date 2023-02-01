@@ -35,7 +35,7 @@ token_names AS (
         function_signature,
         read_output,
         regexp_substr_all(SUBSTR(read_output, 3, len(read_output)), '.{64}') AS segmented_output,
-        PUBLIC.udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             segmented_output [1] :: STRING
         ) AS sub_len,
         TRY_HEX_DECODE_STRING(
@@ -69,7 +69,7 @@ token_symbols AS (
         function_signature,
         read_output,
         regexp_substr_all(SUBSTR(read_output, 3, len(read_output)), '.{64}') AS segmented_output,
-        PUBLIC.udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             segmented_output [1] :: STRING
         ) AS sub_len,
         TRY_HEX_DECODE_STRING(
@@ -99,7 +99,7 @@ token_symbols AS (
 token_decimals AS (
     SELECT
         contract_address,
-        PUBLIC.udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             read_output :: STRING
         ) AS token_decimals,
         LENGTH(token_decimals) AS dec_length

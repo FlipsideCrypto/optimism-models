@@ -66,7 +66,7 @@ logs AS (
         tx_status,
         ingested_at,
         _inserted_timestamp,
-        udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             VALUE :logIndex :: STRING
         ) :: INTEGER AS event_index,
         VALUE :address :: STRING AS contract_address,

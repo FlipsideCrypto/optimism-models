@@ -17,19 +17,19 @@ WITH velo_distributions AS (
         contract_address,
         event_index,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-        PUBLIC.udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             segmented_data [0] :: STRING
         ) :: INTEGER AS token_id,
-        PUBLIC.udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             segmented_data [1] :: STRING
         ) :: FLOAT / pow(
             10,
             18
         ) :: FLOAT AS claimed_amount,
-        PUBLIC.udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             segmented_data [2] :: STRING
         ) :: INTEGER AS claim_epoch,
-        PUBLIC.udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             segmented_data [3] :: STRING
         ) :: INTEGER AS max_epoch,
         'venft_distribution' AS reward_type,
@@ -66,7 +66,7 @@ staking_rewards AS (
         contract_address,
         event_index,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-        PUBLIC.udf_hex_to_int(
+        ethereum.public.udf_hex_to_int(
             segmented_data [0] :: STRING
         ) :: INTEGER AS claimed_amount,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS from_address,

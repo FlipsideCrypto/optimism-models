@@ -179,7 +179,7 @@ SELECT
     MIN(CASE WHEN function_name = 'name' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS pool_name,
     MIN(CASE 
             WHEN read_result::STRING = '0x' THEN NULL
-            ELSE udf_hex_to_int(read_result::STRING)
+            ELSE ethereum.public.udf_hex_to_int(read_result::STRING)
         END)::INTEGER  AS pool_decimals,
     MAX(_inserted_timestamp) AS _inserted_timestamp
 FROM details d
@@ -195,7 +195,7 @@ SELECT
     MIN(CASE WHEN function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token0_symbol,
     MIN(CASE WHEN function_name = 'name' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token0_name,
     MIN(CASE 
-            WHEN function_name = 'decimals' AND read_result::STRING <> '0x' THEN udf_hex_to_int(segmented_output [0] :: STRING)
+            WHEN function_name = 'decimals' AND read_result::STRING <> '0x' THEN ethereum.public.udf_hex_to_int(segmented_output [0] :: STRING)
             ELSE NULL
         END)::INTEGER AS token0_decimals,
     MAX(_inserted_timestamp) AS _inserted_timestamp
@@ -212,7 +212,7 @@ SELECT
     MIN(CASE WHEN function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token1_symbol,
     MIN(CASE WHEN function_name = 'name' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token1_name,
     MIN(CASE 
-            WHEN function_name = 'decimals' AND read_result::STRING <> '0x' THEN udf_hex_to_int(segmented_output [0] :: STRING)
+            WHEN function_name = 'decimals' AND read_result::STRING <> '0x' THEN ethereum.public.udf_hex_to_int(segmented_output [0] :: STRING)
             ELSE NULL
         END)::INTEGER AS token1_decimals,
     MAX(_inserted_timestamp) AS _inserted_timestamp

@@ -150,7 +150,7 @@ SELECT
     MIN(CASE WHEN function_name = 'name' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS pool_name,
     MIN(CASE 
             WHEN read_result::STRING = '0x' THEN NULL
-            ELSE udf_hex_to_int(read_result::STRING)
+            ELSE ethereum.public.udf_hex_to_int(read_result::STRING)
         END)::INTEGER  AS pool_decimals,
     MAX(_inserted_timestamp) AS _inserted_timestamp
 FROM pool_details

@@ -23,37 +23,37 @@ WITH base AS (
             WHEN topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40))
         END AS to_address,
         CASE
-            WHEN topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN PUBLIC.udf_hex_to_int(
+            WHEN topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN ethereum.public.udf_hex_to_int(
                 segmented_data [0] :: STRING
             ) :: FLOAT
         END AS amount0_in_unadj,
         CASE
-            WHEN topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN PUBLIC.udf_hex_to_int(
+            WHEN topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN ethereum.public.udf_hex_to_int(
                 segmented_data [1] :: STRING
             ) :: FLOAT
         END AS amount1_in_unadj,
         CASE
-            WHEN topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN PUBLIC.udf_hex_to_int(
+            WHEN topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN ethereum.public.udf_hex_to_int(
                 segmented_data [2] :: STRING
             ) :: FLOAT
         END AS amount0_out_unadj,
         CASE
-            WHEN topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN PUBLIC.udf_hex_to_int(
+            WHEN topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN ethereum.public.udf_hex_to_int(
                 segmented_data [3] :: STRING
             ) :: FLOAT
         END AS amount1_out_unadj,
         CASE
-            WHEN topics [0] :: STRING = '0x112c256902bf554b6ed882d2936687aaeb4225e8cd5b51303c90ca6cf43a8602' THEN PUBLIC.udf_hex_to_int(
+            WHEN topics [0] :: STRING = '0x112c256902bf554b6ed882d2936687aaeb4225e8cd5b51303c90ca6cf43a8602' THEN ethereum.public.udf_hex_to_int(
                 segmented_data [0] :: STRING
             ) :: FLOAT
         END AS fees0_adj,
         CASE
-            WHEN topics [0] :: STRING = '0x112c256902bf554b6ed882d2936687aaeb4225e8cd5b51303c90ca6cf43a8602' THEN PUBLIC.udf_hex_to_int(
+            WHEN topics [0] :: STRING = '0x112c256902bf554b6ed882d2936687aaeb4225e8cd5b51303c90ca6cf43a8602' THEN ethereum.public.udf_hex_to_int(
                 segmented_data [1] :: STRING
             ) :: FLOAT
         END AS fees1_adj,
         CASE
-            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' THEN PUBLIC.udf_hex_to_int(
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' THEN ethereum.public.udf_hex_to_int(
                 segmented_data [0] :: STRING
             ) :: FLOAT
         END AS transfer_amount,

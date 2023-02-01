@@ -19,10 +19,10 @@ WITH swap_events AS (
         event_name,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         TRY_TO_NUMBER(
-            public.udf_hex_to_int(segmented_data[0]::string)::integer
+            ethereum.public.udf_hex_to_int(segmented_data[0]::string)::integer
         ) AS amountIn,
         TRY_TO_NUMBER(
-            public.udf_hex_to_int(segmented_data[1]::string)::integer
+            ethereum.public.udf_hex_to_int(segmented_data[1]::string)::integer
         ) AS amountOut,
         CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS token_out, 
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token_in,
