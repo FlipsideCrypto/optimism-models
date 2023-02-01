@@ -24,16 +24,23 @@ swaps_base AS (
         _inserted_timestamp,
         event_name,
         event_index,
-        event_inputs :amountIn :: INTEGER AS amountIn,
-        event_inputs :amountOut :: INTEGER AS amountOut,
-        event_inputs :poolId :: STRING AS poolId,
-        event_inputs :tokenIn :: STRING AS token_in,
-        event_inputs :tokenOut :: STRING AS token_out,
-        SUBSTR(
-            event_inputs :poolId :: STRING,
-            0,
-            42
-        ) AS pool_address,
+        regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
+        (CASE 
+            WHEN segmented_data [0] = '0x' THEN NULL 
+            ELSE ethereum.public.udf_hex_to_int(
+            segmented_data [0] :: STRING
+                )
+            END) :: INTEGER AS amount_in,
+        (CASE 
+            WHEN segmented_data [1] = '0x' THEN NULL 
+            ELSE ethereum.public.udf_hex_to_int(
+            segmented_data [1] :: STRING
+                ) 
+            END) :: INTEGER AS amount_out,
+        topics [1] :: STRING AS pool_id,
+        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token_in,
+        CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS token_out,
+        SUBSTR(topics [1] :: STRING,1,42) AS pool_address,
         _log_id,
         ingested_at,
         'beethoven-x' AS platform,
@@ -42,8 +49,8 @@ swaps_base AS (
     FROM
         {{ ref('silver__logs') }}
     WHERE
-        contract_address = '0xba12222222228d8ba445958a75a0704d566bf2c8'
-        AND topics[0]::STRING = '0x2170c741c41531aec20e7c107c24eecfdd15e69c9bb0a8dd37b1840b9e0b207b'
+        topics[0]::STRING = '0x2170c741c41531aec20e7c107c24eecfdd15e69c9bb0a8dd37b1840b9e0b207b'
+        AND contract_address = '0xba12222222228d8ba445958a75a0704d566bf2c8'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -106,12 +113,12 @@ SELECT
     _inserted_timestamp,
     s.event_name,
     event_index,
-    amountIn AS amountIn_unadj,
+    amount_in AS amount_in_unadj,
     c1.decimals AS decimals_in,
     c1.symbol AS symbol_in,
     CASE
-        WHEN decimals_in IS NULL THEN amountIn_unadj
-        ELSE (amountIn_unadj / pow(10, decimals_in))
+        WHEN decimals_in IS NULL THEN amount_in_unadj
+        ELSE (amount_in_unadj / pow(10, decimals_in))
     END AS amount_in,
     CASE
         WHEN decimals_in IS NOT NULL THEN ROUND(
@@ -119,12 +126,12 @@ SELECT
             2
         )
     END AS amount_in_usd,
-    amountOut AS amountOut_unadj,
+    amount_out AS amount_out_unadj,
     c2.decimals AS decimals_out,
     c2.symbol AS symbol_out,
     CASE
-        WHEN decimals_out IS NULL THEN amountOut_unadj
-        ELSE (amountOut_unadj / pow(10, decimals_out))
+        WHEN decimals_out IS NULL THEN amount_out_unadj
+        ELSE (amount_out_unadj / pow(10, decimals_out))
     END AS amount_out,
     CASE
         WHEN decimals_out IS NOT NULL THEN ROUND(
@@ -132,7 +139,7 @@ SELECT
             2
         )
     END AS amount_out_usd,
-    s.poolId,
+    s.pool_id,
     token_in,
     token_out,
     s.pool_address,

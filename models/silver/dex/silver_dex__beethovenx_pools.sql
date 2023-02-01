@@ -7,18 +7,14 @@ WITH pool_creation AS (
 
     SELECT
         tx_hash,
-        event_inputs :poolId :: STRING AS poolId,
-        SUBSTR(
-            event_inputs :poolId :: STRING,
-            0,
-            42
-        ) AS pool_address,
+        topics [1] :: STRING AS pool_id,
+        SUBSTR(topics [1] :: STRING,1,42) AS pool_address,
         block_number,
         _inserted_timestamp
     FROM
         {{ ref('silver__logs') }}
     WHERE
-        event_name = 'PoolRegistered'
+        topics[0]::STRING = '0x3c13bc30b8e878c53fd2a36b679409c073afd75950be43d8858768e956fbc20e'
         AND contract_address = '0xba12222222228d8ba445958a75a0704d566bf2c8'
 {% if is_incremental() %}
 AND pool_address NOT IN (
