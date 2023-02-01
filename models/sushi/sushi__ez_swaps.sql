@@ -123,15 +123,15 @@ SELECT
     amount_in,
     case
     WHEN amount_in * pIn.price <= 5 * amount_out * pOut.price
-    AND amount_out * pOut.price <= 5 * amount_in * pIn.price THEN amount_in * pIn.price
-    when pOut.price is null then amount_in * pIn.price
+    AND amount_out * pOut.price <= 5 * amount_in * pIn.price THEN ROUND(amount_in * pIn.price,2)
+    when pOut.price is null then ROUND(amount_in * pIn.price,2)
     ELSE NULL
     END AS amount_in_usd,
     amount_out,
     CASE
     WHEN amount_in * pIn.price <= 5 * amount_out * pOut.price
-    AND amount_out * pOut.price <= 5 * amount_in * pIn.price THEN amount_out * pOut.price
-    when pIn.price is null then amount_out * pOut.price
+    AND amount_out * pOut.price <= 5 * amount_in * pIn.price THEN ROUND(amount_out * pOut.price,2)
+    when pIn.price is null then ROUND(amount_out * pOut.price,2)
     ELSE NULL
     END AS amount_out_usd,
     tx_to,

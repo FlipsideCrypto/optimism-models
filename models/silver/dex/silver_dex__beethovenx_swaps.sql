@@ -30,13 +30,13 @@ swaps_base AS (
             ELSE ethereum.public.udf_hex_to_int(
             segmented_data [0] :: STRING
                 )
-            END) :: INTEGER AS amount_in,
+            END) :: INTEGER AS amount_in_unadj,
         (CASE 
             WHEN segmented_data [1] = '0x' THEN NULL 
             ELSE ethereum.public.udf_hex_to_int(
             segmented_data [1] :: STRING
                 ) 
-            END) :: INTEGER AS amount_out,
+            END) :: INTEGER AS amount_out_unadj,
         topics [1] :: STRING AS pool_id,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token_in,
         CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS token_out,
@@ -113,7 +113,7 @@ SELECT
     _inserted_timestamp,
     s.event_name,
     event_index,
-    amount_in AS amount_in_unadj,
+    amount_in_unadj,
     c1.decimals AS decimals_in,
     c1.symbol AS symbol_in,
     CASE
@@ -126,7 +126,7 @@ SELECT
             2
         )
     END AS amount_in_usd,
-    amount_out AS amount_out_unadj,
+    amount_out_unadj,
     c2.decimals AS decimals_out,
     c2.symbol AS symbol_out,
     CASE
