@@ -32,6 +32,7 @@ curve_base AS (
         pool_name,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS sender,
+        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS recipient,
         ethereum.public.udf_hex_to_int(
             segmented_data [0] :: STRING
         ) :: INTEGER AS sold_id,
@@ -125,7 +126,10 @@ pool_info AS (
         s.origin_function_signature,
         s.origin_from_address,
         s.origin_to_address,
-        s.origin_to_address AS tx_to,
+        CASE 
+            WHEN s.recipient IS NULL THEN s.origin_from_address 
+            ELSE s.recipient 
+        END AS tx_to,
         event_index,
         event_name,
         pool_address,
