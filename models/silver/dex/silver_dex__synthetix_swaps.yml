@@ -91,6 +91,7 @@ models:
               column_type_list:
                 - decimal
                 - float
+                - number
       - name: AMOUNT_IN_USD
         description: Approximate Amount of USD entering the swap
         tests:
@@ -106,6 +107,7 @@ models:
               column_type_list:
                 - decimal
                 - float
+                - number
       - name: AMOUNT_OUT_USD
         description: Approximate Amount of USD exiting the swap
         tests:

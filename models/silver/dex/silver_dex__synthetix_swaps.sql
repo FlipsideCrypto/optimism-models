@@ -16,14 +16,25 @@ WITH swaps_base AS (
         contract_address,
         NULL AS pool_name,
         'Swap' AS event_name,
-        event_inputs :fromAmount / 1e18 AS amount_in,
-        event_inputs :toAmount / 1e18 AS amount_out,
-        event_inputs :account ::STRING AS sender,
-        event_inputs :toAddress ::STRING AS tx_to,
+        regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
+        (CASE 
+            WHEN segmented_data [1] = '0x' THEN NULL 
+            ELSE ethereum.public.udf_hex_to_int(
+            segmented_data [1] :: STRING
+                )
+            END) :: INTEGER / 1e18 AS amount_in,
+        (CASE 
+            WHEN segmented_data [3] = '0x' THEN NULL 
+            ELSE ethereum.public.udf_hex_to_int(
+            segmented_data [3] :: STRING
+                ) 
+            END) :: INTEGER / 1e18 AS amount_out,
+        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS sender,
+        CONCAT('0x',SUBSTR(segmented_data [4] :: STRING, 25, 40)) AS tx_to,
         event_index,
         'synthetix' AS platform,
-        REGEXP_REPLACE(HEX_DECODE_STRING(SUBSTR(event_inputs: fromCurrencyKey,3,64)),'[^a-zA-Z0-9]+') AS symbol_in,
-        REGEXP_REPLACE(HEX_DECODE_STRING(SUBSTR(event_inputs: toCurrencyKey,3,64)),'[^a-zA-Z0-9]+') AS symbol_out,
+        REGEXP_REPLACE(HEX_DECODE_STRING(segmented_data [0] :: STRING),'[^a-zA-Z0-9]+') AS symbol_in,
+        REGEXP_REPLACE(HEX_DECODE_STRING(segmented_data [2] :: STRING),'[^a-zA-Z0-9]+') AS symbol_out,
         CONCAT(tx_hash,'-',event_index) AS _log_id,
         event_inputs,
         _inserted_timestamp
