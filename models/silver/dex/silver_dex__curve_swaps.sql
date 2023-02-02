@@ -88,7 +88,7 @@ token_transfers AS (
             FROM
                 curve_base
         )
-        AND CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) <> '0x0000000000000000000000000000000000000000'
+        --AND CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) <> '0x0000000000000000000000000000000000000000'
         AND CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) <> '0x0000000000000000000000000000000000000000'
 
 {% if is_incremental() %}
@@ -138,10 +138,7 @@ pool_info AS (
         sender,
         sold_id,
         tokens_sold,
-        COALESCE(
-            sold.token_address,
-            '0x4200000000000000000000000000000000000006'
-        ) AS token_in,
+        sold.token_address AS token_in,
         c0.symbol symbol_in,
         c0.decimals AS decimals_in,
         CASE
@@ -153,10 +150,7 @@ pool_info AS (
         END AS amount_in,
         bought_id,
         tokens_bought,
-        COALESCE(
-            bought.token_address,
-            '0x4200000000000000000000000000000000000006'
-        ) AS token_out,
+        bought.token_address AS token_out,
         c1.symbol AS symbol_out,
         c1.decimals AS decimals_out,
         CASE
@@ -172,22 +166,16 @@ pool_info AS (
         curve_base s
         LEFT JOIN from_transfers sold
         ON tokens_sold = sold.amount
-        AND s.tx_hash = sold.tx_hash --  AND s.pool_address = sold.from_address
+        AND s.tx_hash = sold.tx_hash 
         LEFT JOIN to_transfers bought
         ON tokens_bought = bought.amount
-        AND s.tx_hash = bought.tx_hash -- AND s.pool_address = bought.to_address
+        AND s.tx_hash = bought.tx_hash 
         LEFT JOIN {{ ref('core__dim_contracts') }}
         c0
-        ON c0.address = COALESCE(
-            sold.token_address,
-            '0x4200000000000000000000000000000000000006'
-        )
+        ON c0.address = sold.token_address
         LEFT JOIN {{ ref('core__dim_contracts') }}
         c1
-        ON c1.address = COALESCE(
-            bought.token_address,
-            '0x4200000000000000000000000000000000000006'
-        )
+        ON c1.address = bought.token_address
     WHERE
         tokens_sold <> 0
         AND symbol_out <> symbol_in qualify(ROW_NUMBER() over(PARTITION BY _log_id
