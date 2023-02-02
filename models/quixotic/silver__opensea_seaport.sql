@@ -376,7 +376,7 @@ select
     s.tx_hash, 
     s.event_type,
     s.origin_to_address as platform_address,
-    'quixotic' as platform_name,
+    'opensea' as platform_name,
     'seaport_1_1' AS platform_exchange_version,
     
     seller_address,

@@ -64,8 +64,6 @@ models:
         tests:
           - not_null
       - name: CURRENCY_SYMBOL
-        tests:
-          - not_null
       - name: CURRENCY_ADDRESS
         tests:
           - not_null

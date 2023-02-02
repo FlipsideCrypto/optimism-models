@@ -2,7 +2,15 @@
     materialized = 'view',
     persist_docs ={ "relation": true,
     "columns": true },
-    tags = ['velodrome']
+    tags = ['velodrome'],
+    meta={
+        'database_tags':{
+            'table': {
+                'PROTOCOL': 'VELODROME',
+                'PURPOSE': 'DEFI, DEX'
+            }
+        }
+    }
 ) }}
 
 SELECT
