@@ -27,10 +27,10 @@ WITH swap_events AS (
         event_name,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         TRY_TO_NUMBER(
-            public.udf_hex_to_int(segmented_data[0]::string)::integer
+            ethereum.public.udf_hex_to_int(segmented_data[0]::string)::integer
         ) AS amountIn,
         TRY_TO_NUMBER(
-            public.udf_hex_to_int(segmented_data[1]::string)::integer
+            ethereum.public.udf_hex_to_int(segmented_data[1]::string)::integer
         ) AS amountOut,
         CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS token_out, 
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token_in,
@@ -131,19 +131,20 @@ SELECT
     amount_in,
     case
     WHEN amount_in * pIn.price <= 5 * amount_out * pOut.price
-    AND amount_out * pOut.price <= 5 * amount_in * pIn.price THEN amount_in * pIn.price
-    when pOut.price is null then amount_in * pIn.price
+    AND amount_out * pOut.price <= 5 * amount_in * pIn.price THEN ROUND(amount_in * pIn.price,2)
+    when pOut.price is null then ROUND(amount_in * pIn.price,2)
     ELSE NULL
     END AS amount_in_usd,
     amount_out,
     CASE
     WHEN amount_in * pIn.price <= 5 * amount_out * pOut.price
-    AND amount_out * pOut.price <= 5 * amount_in * pIn.price THEN amount_out * pOut.price
-    when pIn.price is null then amount_out * pOut.price
+    AND amount_out * pOut.price <= 5 * amount_in * pIn.price THEN ROUND(amount_out * pOut.price,2)
+    when pIn.price is null then ROUND(amount_out * pOut.price,2)
     ELSE NULL
     END AS amount_out_usd,
     tx_to,
     event_index,
+    event_name,
     token_in,
     token_out,
     symbol_in,

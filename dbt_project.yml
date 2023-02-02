@@ -29,7 +29,7 @@ tests:
 
 on-run-start:
   - "{{ create_sps() }}"
-  - "{{ create_udfs() }}"
+  # - "{{ create_udfs() }}"
 
 on-run-end:
   - '{{ apply_meta_as_tags(results) }}'

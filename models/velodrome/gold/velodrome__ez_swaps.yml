@@ -2,7 +2,11 @@ version: 2
 models:  
   - name: velodrome__ez_swaps
     description: 'This table contains details on swaps executed on Velodrome.'
-      
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - _LOG_ID  
     columns:
       - name: BLOCK_NUMBER
         description: '{{ doc("opt_block_number") }}'
@@ -124,4 +128,8 @@ models:
               where: LP_FEE <> 0 and POOL_ADDRESS <> '0xce9accfbb25eddce91845c3a7c3d1613d1d7081f'
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
+      - name: _LOG_ID
+        description: '{{ doc("opt_log_id_events") }}'
+        tests:
+          - not_null
      

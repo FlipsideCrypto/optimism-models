@@ -58,8 +58,6 @@ The dimension tables are sourced from a variety of on-chain and off-chain source
 
 Convenience views (denoted ez_) are a combination of different fact and dimension tables. 
 
-A user-defined-function (UDF) is available to decode hex encoded values to integers in this database. You can call this UDF by using `optimism.public.udf_hex_to_int(FIELD)`.
-
 
 ## **Using dbt docs**
 ### Navigation
