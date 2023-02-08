@@ -7,7 +7,7 @@ SELECT
     contract_address,
     'optimism' AS blockchain,
     COUNT(*) AS transfers,
-    MIN(block_number) + 1 AS created_block
+    MAX(block_number) AS latest_block
 FROM
     {{ ref('silver__logs') }}
 GROUP BY

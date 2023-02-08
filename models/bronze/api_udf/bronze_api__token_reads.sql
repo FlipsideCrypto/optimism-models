@@ -8,9 +8,9 @@ WITH base AS (
 
     SELECT
         contract_address,
-        created_block
+        latest_block
     FROM
-        {{ ref('silver__relevant_token_contracts') }}
+        {{ ref('silver__relevant_contracts') }}
 
 {% if is_incremental() %}
 WHERE
@@ -47,13 +47,13 @@ all_reads AS (
 ready_reads AS (
     SELECT
         contract_address,
-        created_block,
+        latest_block,
         function_sig,
         CONCAT(
             '[\'',
             contract_address,
             '\',',
-            created_block,
+            latest_block,
             ',\'',
             function_sig,
             '\',\'\']'
