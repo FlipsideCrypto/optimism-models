@@ -1,23 +1,23 @@
 version: 2
 models:
   - name: sushi__dim_dex_pools
-    description: '{{ doc("eth_dex_lp_table_doc") }}' 
+    description: Deprecating soon
        
 
-    columns:
-      - name: POOL_ADDRESS
-        description: '{{ doc("eth_dex_pool_address") }}'
-      - name: POOL_NAME
-        description: '{{ doc("eth_dex_pool_name") }}'
-      - name: TOKEN0_ADDRESS
-        description: '{{ doc("eth_dex_token0") }}' 
-      - name: TOKEN1_ADDRESS
-        description: '{{ doc("eth_dex_token1") }}' 
-      - name: TOKEN0_SYMBOL
-        description: '{{ doc("opt_symbol") }}'
-      - name: TOKEN1_SYMBOL
-        description: '{{ doc("opt_symbol") }}'
-      - name: TOKEN0_DECIMALS   
-        description: '{{ doc("opt_decimals") }}'
-      - name: TOKEN1_DECIMALS
-        description: '{{ doc("opt_decimals") }}'
+    # columns:
+    #   - name: POOL_ADDRESS
+    #     description: '{{ doc("eth_dex_pool_address") }}'
+    #   - name: POOL_NAME
+    #     description: '{{ doc("eth_dex_pool_name") }}'
+    #   - name: TOKEN0_ADDRESS
+    #     description: '{{ doc("eth_dex_token0") }}' 
+    #   - name: TOKEN1_ADDRESS
+    #     description: '{{ doc("eth_dex_token1") }}' 
+    #   - name: TOKEN0_SYMBOL
+    #     description: '{{ doc("opt_symbol") }}'
+    #   - name: TOKEN1_SYMBOL
+    #     description: '{{ doc("opt_symbol") }}'
+    #   - name: TOKEN0_DECIMALS   
+    #     description: '{{ doc("opt_decimals") }}'
+    #   - name: TOKEN1_DECIMALS
+    #     description: '{{ doc("opt_decimals") }}'
