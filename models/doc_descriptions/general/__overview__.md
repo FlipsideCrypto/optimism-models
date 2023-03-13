@@ -2,39 +2,41 @@
 
 # Welcome to the Flipside Crypto Optimism Models Documentation!
 
-# NOTE: Data is in 'lite mode' - meaning, historical data have not yet been backfilled. Please see min(block_timestamp)
-
-## **What is Flipside?**
-
-[Flipside Crypto](https://flipsidecrypto.xyz/earn) provides Community Enabled Crypto Analytics, allowing our users to create and share data insights on the crypto projects they care most about.
-
-**Flipside Crypto puts pre-modeled and labeled blockchain data in the hands of communities.**
-
-Through dashboard and visualization tools, as well as auto-generated API endpoints, data analysts can easily create queries that answer any question via a tool called [Velocity](https://app.flipsidecrypto.com/velocity?nav=Discover).
-
-**Community members earn bounties for answering questions with data.**
-
-Bounties provide incentive and direction, so crypto projects can quickly source the data insights they need in order to grow.
-
-**Flipside works directly with leading crypto projects to reward on-demand analytics through structured bounty programs.**
-
-Questions sourced directly from the community provide insight into what communities care about as well as analytics needed to drive ecosystem engagement and growth.
-
 ## **What does this documentation cover?**
-The documentation included here details the design of the Optimism tables and views available via [Flipside Crypto.](https://flipsidecrypto.xyz/earn) For more information on how these models are built, please see [the github repository.](https://github.com/FlipsideCrypto/optimism-models)
+The documentation included here details the design of the Optimism tables and views available via [Flipside Crypto.](https://flipsidecrypto.xyz/) For more information on how these models are built, please see [the github repository.](https://github.com/FlipsideCrypto/optimism-models)
 
-### **Quick Links to Table Documentation**
+## **How do I use these docs?**
+The easiest way to navigate this documentation is to use the Quick Links below. These links will take you to the documentation for each table, which contains a description, a list of the columns, and other helpful information.
 
+If you are experienced with dbt docs, feel free to use the sidebar to navigate the documentation, as well as explore the relationships between tables and the logic building them.
+
+There is more information on how to use dbt docs in the last section of this document.
+
+## **Quick Links to Table Documentation**
+
+**Click on the links below to jump to the documentation for each schema.**
+
+### Core Tables (optimism.core)
+
+**Dimension Tables:**
+- [dim_contracts](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__dim_contracts)
+- [dim_labels](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__dim_labels)
+
+**Fact Tables:**
 - [fact_blocks](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_blocks)
 - [fact_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_event_logs)
+- [fact_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_token_transfers)
 - [fact_traces](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_traces)
 - [fact_transactions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_transactions)
-- [dim_lables](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__dim_labels)
-- [ez_eth_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_eth_transfers)
-- [fact_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_token_transfers)
+- [fact_delegations](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_delegations)
+- [fact_l1_state_root_submissions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_l1_state_root_submissions)
+- [fact_l1_submissions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_l1_submissions)
 - [fact_hourly_token_prices](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_hourly_token_prices)
-- [ez_nft_sales](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_sales)
 
+**Convenience Tables:**
+- [ez_dex_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_dex_swaps)
+- [ez_eth_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_eth_transfers)
+- [ez_nft_sales](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_sales)
 
 **Velodrome**
  - [ez_claimed_rewards](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_claimed_rewards)
@@ -45,19 +47,27 @@ The documentation included here details the design of the Optimism tables and vi
  - [ez_velo_locks](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_velo_locks)
  - [ez_votes](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_votes)
 
+## **Helpful User-Defined Functions (UDFs)**
+
+UDFs are custom functions built by the Flipside team that can be used in your queries to make your life easier.
+
+Helpful UDFs for working with EVM data:
+```sql
+-- Convert a hex encoded value to an integer with ethereum.public.udf_hex_to_int(FIELD::string)
+select '0xFC3C88'::string as hex_value, ethereum.public.udf_hex_to_int('0xFC3C88') as int_value
+```
 
 ## **Data Model Overview**
 
-The Optimism models are built a few different ways, but the core fact table are built using three layers of sql models: **bronze, silver, and gold (or core).**
+The Optimism models are built a few different ways, but the core fact tables are built using three layers of sql models: **bronze, silver, and gold (or core).**
 
 - Bronze: Data is loaded in from the source as a view
 - Silver: All necessary parsing, filtering, de-duping, and other transformations are done here
-- Gold (or core): Final views and tables that are available in Velocity
+- Gold (or core): Final views and tables that are available publicly
 
 The dimension tables are sourced from a variety of on-chain and off-chain sources.
 
-Convenience views (denoted ez_) are a combination of different fact and dimension tables. 
-
+Convenience views (denoted ez_) are a combination of different fact and dimension tables. These views are built to make it easier to query the data.
 
 ## **Using dbt docs**
 ### Navigation
@@ -80,13 +90,10 @@ Note that you can also right-click on models to interactively filter and explore
 
 
 ### **More information**
-- [Flipside](https://flipsidecrypto.xyz/earn)
-- [Velocity](https://app.flipsidecrypto.com/velocity?nav=Discover)
+- [Flipside](https://flipsidecrypto.xyz)
 - [Tutorials](https://docs.flipsidecrypto.com/our-data/tutorials)
 - [Github](https://github.com/FlipsideCrypto/optimism-models)
 - [Query Editor Shortcuts](https://docs.flipsidecrypto.com/velocity/query-editor-shortcuts)
 - [What is dbt?](https://docs.getdbt.com/docs/introduction)
-
-
 
 {% enddocs %}
