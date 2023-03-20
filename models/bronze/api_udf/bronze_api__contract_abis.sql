@@ -32,30 +32,43 @@ WHERE
     abi_data :data :result :: STRING <> 'Max rate limit reached'
 {% endif %}
 LIMIT
-    100
-)
+    300
+), row_nos AS (
+    SELECT
+        contract_address,
+        ROW_NUMBER() over (
+            ORDER BY
+                contract_address
+        ) AS row_no,
+        FLOOR(
+            row_no / 2
+        ) + 1 AS batch_no,
+        api_key
+    FROM
+        base
+        JOIN api_keys
+        ON 1 = 1
+),
+batched AS ({% for item in range(150) %}
+SELECT
+    rn.contract_address, ethereum.streamline.udf_api('GET', CONCAT('https://api-optimistic.etherscan.io/api?module=contract&action=getabi&address=', rn.contract_address, '&apikey=', api_key),{ 'User-Agent': 'FlipsideStreamline' },{}) AS abi_data, SYSDATE() AS _inserted_timestamp
+FROM
+    row_nos rn
+WHERE
+    batch_no = {{ item }} + 1
+    AND EXISTS (
+SELECT
+    1
+FROM
+    row_nos
+LIMIT
+    1) {% if not loop.last %}
+    UNION ALL
+    {% endif %}
+{% endfor %})
 SELECT
     contract_address,
-    ethereum.streamline.udf_api(
-        'GET',
-        CONCAT(
-            'https://api-optimistic.etherscan.io/api?module=contract&action=getabi&address=',
-            contract_address,
-            '&apikey=',
-            api_key
-        ),{},{}
-    ) AS abi_data,
-    SYSDATE() AS _inserted_timestamp
+    abi_data,
+    _inserted_timestamp
 FROM
-    base
-    LEFT JOIN api_keys
-    ON 1 = 1
-WHERE
-    EXISTS (
-        SELECT
-            1
-        FROM
-            base
-        LIMIT
-            1
-    )
+    batched
