@@ -261,6 +261,29 @@ all_prices AS (
         HOUR AS _inserted_timestamp
     FROM
         adj_eth_prices
+
+{% if is_incremental() %}
+UNION ALL
+SELECT
+    t.hour,
+    t.token_address,
+    fd.symbol,
+    fd.decimals,
+    t.price,
+    t.is_imputed,
+    _inserted_timestamp
+FROM
+    {{ this }}
+    t
+    INNER JOIN full_decimals fd
+    ON LOWER(
+        t.token_address
+    ) = LOWER(
+        fd.contract_address
+    )
+WHERE
+    t.symbol IS NULL
+{% endif %}
 )
 SELECT
     HOUR,
