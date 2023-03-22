@@ -3,14 +3,8 @@
     persist_docs ={ "relation": true,
     "columns": true },
     tags = ['velodrome'],
-    meta={
-        'database_tags':{
-            'table': {
-                'PROTOCOL': 'VELODROME',
-                'PURPOSE': 'DEFI, DEX'
-            }
-        }
-    }
+    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'VELODROME',
+    'PURPOSE': 'DEFI, DEX' }} }
 ) }}
 
 WITH velo_pools AS (
@@ -88,7 +82,10 @@ SELECT
         )
         ELSE NULL
     END AS claimed_amount_usd,
-    token_symbol,
+    COALESCE(
+        token_symbol,
+        C.symbol
+    ) AS token_symbol,
     base.token_address AS token_address,
     claim_epoch,
     max_epoch
@@ -104,3 +101,5 @@ FROM
         block_timestamp
     )
     AND prices.token_address = base.token_address
+    LEFT JOIN {{ ref('core__dim_contracts') }} C
+    ON C.address = base.token_address
