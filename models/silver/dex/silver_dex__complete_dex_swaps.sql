@@ -10,8 +10,7 @@ WITH contracts AS (
         address,
         symbol,
         NAME,
-        decimals,
-        contract_metadata
+        decimals
     FROM
         {{ ref('core__dim_contracts') }}
 ),
@@ -128,7 +127,6 @@ WHERE
 ),
 
 velodrome_swaps AS (
-
   SELECT
     block_number,
     block_timestamp,
@@ -156,7 +154,7 @@ velodrome_swaps AS (
     symbol_out,
     _log_id
   FROM
-    {{ ref('velodrome__ez_swaps') }}
+    {{ ref('velodrome__ez_swaps') }} s
 ),
 sushi_swaps AS (
   SELECT
@@ -187,7 +185,7 @@ sushi_swaps AS (
     _log_id,
     _inserted_timestamp
   FROM
-    {{ ref('sushi__ez_swaps') }}
+    {{ ref('sushi__ez_swaps') }} s
 {% if is_incremental() %}
 WHERE
   _inserted_timestamp >= (
@@ -258,7 +256,6 @@ WHERE
   )
 {% endif %}
 ),
-
 curve_swaps AS (
   SELECT
     block_number,
@@ -300,7 +297,7 @@ curve_swaps AS (
     _log_id,
     _inserted_timestamp
   FROM
-    {{ ref('silver_dex__curve_swaps') }}
+    {{ ref('silver_dex__curve_swaps') }} s
   LEFT JOIN contracts c1
     ON c1.address = s.token_in
   LEFT JOIN contracts c2
@@ -351,7 +348,7 @@ beethovenx_swaps AS (
     _log_id,
     _inserted_timestamp
   FROM
-    {{ ref('silver_dex__beethovenx_swaps') }}
+    {{ ref('silver_dex__beethovenx_swaps') }} s
   LEFT JOIN contracts c1
     ON s.token_in = c1.address
   LEFT JOIN contracts c2
@@ -369,6 +366,113 @@ WHERE
 
 --union all standard dex CTEs here (excludes amount_usd)
 all_dex_standard AS (
+SELECT
+  block_number,
+  block_timestamp,
+  tx_hash,
+  origin_function_signature,
+  origin_from_address,
+  origin_to_address,
+  contract_address,
+  pool_name,
+  event_name,
+  amount_in,
+  amount_out,
+  sender,
+  tx_to,
+  event_index,
+  platform,
+  token_in,
+  token_out,
+  symbol_in,
+  symbol_out,
+  decimals_in,
+  decimals_out,
+  _log_id
+FROM
+  sushi_swaps
+UNION ALL
+SELECT
+  block_number,
+  block_timestamp,
+  tx_hash,
+  origin_function_signature,
+  origin_from_address,
+  origin_to_address,
+  contract_address,
+  pool_name,
+  event_name,
+  amount_in,
+  amount_out,
+  sender,
+  tx_to,
+  event_index,
+  platform,
+  token_in,
+  token_out,
+  symbol_in,
+  symbol_out,
+  decimals_in,
+  decimals_out,
+  _log_id
+FROM
+  synthetix_swaps
+UNION ALL
+SELECT
+  block_number,
+  block_timestamp,
+  tx_hash,
+  origin_function_signature,
+  origin_from_address,
+  origin_to_address,
+  contract_address,
+  pool_name,
+  event_name,
+  amount_in,
+  amount_out,
+  sender,
+  tx_to,
+  event_index,
+  platform,
+  token_in,
+  token_out,
+  symbol_in,
+  symbol_out,
+  decimals_in,
+  decimals_out,
+  _log_id
+FROM
+  curve_swaps
+UNION ALL
+SELECT
+  block_number,
+  block_timestamp,
+  tx_hash,
+  origin_function_signature,
+  origin_from_address,
+  origin_to_address,
+  contract_address,
+  pool_name,
+  event_name,
+  amount_in,
+  amount_out,
+  sender,
+  tx_to,
+  event_index,
+  platform,
+  token_in,
+  token_out,
+  symbol_in,
+  symbol_out,
+  decimals_in,
+  decimals_out,
+  _log_id
+FROM
+  beethovenx_swaps
+),
+
+--union all non-standard dex CTEs here (excludes amount_usd)
+all_dex_custom AS (
 SELECT
   block_number,
   block_timestamp,
@@ -419,85 +523,7 @@ SELECT
   symbol_out,
   _log_id
 FROM
-  sushi_swaps
-UNION ALL
-SELECT
-  block_number,
-  block_timestamp,
-  tx_hash,
-  origin_function_signature,
-  origin_from_address,
-  origin_to_address,
-  contract_address,
-  pool_name,
-  event_name,
-  amount_in,
-  amount_in_usd,
-  amount_out,
-  amount_out_usd,
-  sender,
-  tx_to,
-  event_index,
-  platform,
-  token_in,
-  token_out,
-  symbol_in,
-  symbol_out,
-  _log_id
-FROM
-  synthetix_swaps
-UNION ALL
-SELECT
-  block_number,
-  block_timestamp,
-  tx_hash,
-  origin_function_signature,
-  origin_from_address,
-  origin_to_address,
-  contract_address,
-  pool_name,
-  event_name,
-  amount_in,
-  amount_in_usd,
-  amount_out,
-  amount_out_usd,
-  sender,
-  tx_to,
-  event_index,
-  platform,
-  token_in,
-  token_out,
-  symbol_in,
-  symbol_out,
-  _log_id
-FROM
-  curve_swaps
-UNION ALL
-SELECT
-  block_number,
-  block_timestamp,
-  tx_hash,
-  origin_function_signature,
-  origin_from_address,
-  origin_to_address,
-  contract_address,
-  pool_name,
-  event_name,
-  amount_in,
-  amount_in_usd,
-  amount_out,
-  amount_out_usd,
-  sender,
-  tx_to,
-  event_index,
-  platform,
-  token_in,
-  token_out,
-  symbol_in,
-  symbol_out,
-  _log_id
-FROM
-  beethovenx_swaps
+  univ3_swaps
 ),
 
 FINAL AS (
@@ -566,7 +592,7 @@ FINAL AS (
     symbol_out,
     _log_id
   FROM
-    univ3_swaps
+    all_dex_custom c
 )
 
 SELECT
