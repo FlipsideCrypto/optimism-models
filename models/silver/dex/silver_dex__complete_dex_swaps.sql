@@ -31,6 +31,14 @@ prices AS (
             FROM
                 contracts
         )
+{% if is_incremental() %}
+AND hour >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE - 2
+    FROM
+      {{ this }}
+  )  
+{% endif %}
 ), 
 
 univ3_swaps AS (
@@ -94,7 +102,8 @@ univ3_swaps AS (
       WHEN amount0_unadj < 0 THEN c1.symbol
       ELSE c2.symbol
     END AS symbol_out,
-    _log_id
+    _log_id,
+    _inserted_timestamp
   FROM
     {{ ref('silver_dex__univ3_swaps') }}
   LEFT JOIN contracts c1
@@ -107,6 +116,15 @@ univ3_swaps AS (
   LEFT JOIN prices p2
     ON s.token1_address = p2.token_address
       AND DATE_TRUNC('hour', block_timestamp) = p2.hour
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE
+    FROM
+      {{ this }}
+  )
+{% endif %}
 ),
 
 velodrome_swaps AS (
@@ -180,25 +198,55 @@ synthetix_swaps AS (
     origin_to_address,
     contract_address,
     pool_name,
-    CASE 
-      WHEN event_name IS NULL THEN 'Swap'
-      ELSE event_name
-    END AS event_name,
-    amount_in,
-    amount_in_usd,
-    amount_out,
-    amount_out_usd,
-    sender,
-    tx_to,
-    event_index,
-    platform,
+    event_name,
     token_in,
     token_out,
     symbol_in,
     symbol_out,
-    _log_id
-  FROM
-    {{ ref('silver_dex__synthetix_swaps') }}
+    COALESCE(decimals_in,18) AS decimals_in,
+    COALESCE(decimals_out,18) AS decimals_out,
+    CASE
+        WHEN decimals_in IS NOT NULL THEN amount_in_unadj / pow(10,decimals_in)
+        ELSE amount_in_unadj
+    END AS amount_in,
+    CASE
+        WHEN decimals_out IS NOT NULL THEN amount_out_unadj / pow(10,decimals_out)
+        ELSE amount_out_unadj
+    END AS amount_out,
+    sender,
+    tx_to,
+    event_index,
+    platform,
+    _log_id,
+    _inserted_timestamp
+  FROM {{ ref('silver_dex__synthetix_swaps')}} s
+  LEFT JOIN (
+        SELECT
+            synth_symbol AS synth_symbol_in,
+            synth_proxy_address AS token_in,
+            decimals AS decimals_in
+        FROM
+            {{ ref('silver__synthetix_synths_20230404') }}
+    ) synths_in
+    ON synths_in.synth_symbol_in = s.symbol_in
+  LEFT JOIN (
+        SELECT
+            synth_symbol AS synth_symbol_out,
+            synth_proxy_address AS token_out,
+            decimals AS decimals_out
+        FROM
+            {{ ref('silver__synthetix_synths_20230404') }}
+    ) synths_out
+    ON synths_out.synth_symbol_out = s.symbol_out
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE
+    FROM
+      {{ this }}
+  )
+{% endif %}
 ),
 
 curve_swaps AS (
