@@ -152,7 +152,8 @@ velodrome_swaps AS (
     token_address_out AS token_out,
     symbol_in,
     symbol_out,
-    _log_id
+    _log_id,
+    '1970-01-01' :: DATE AS _inserted_timestamp
   FROM
     {{ ref('velodrome__ez_swaps') }} s
 ),
@@ -388,7 +389,8 @@ SELECT
   symbol_out,
   decimals_in,
   decimals_out,
-  _log_id
+  _log_id,
+  _inserted_timestamp
 FROM
   sushi_swaps
 UNION ALL
@@ -414,7 +416,8 @@ SELECT
   symbol_out,
   decimals_in,
   decimals_out,
-  _log_id
+  _log_id,
+  _inserted_timestamp
 FROM
   synthetix_swaps
 UNION ALL
@@ -440,7 +443,8 @@ SELECT
   symbol_out,
   decimals_in,
   decimals_out,
-  _log_id
+  _log_id,
+  _inserted_timestamp
 FROM
   curve_swaps
 UNION ALL
@@ -466,7 +470,8 @@ SELECT
   symbol_out,
   decimals_in,
   decimals_out,
-  _log_id
+  _log_id,
+  _inserted_timestamp
 FROM
   beethovenx_swaps
 ),
@@ -495,7 +500,8 @@ SELECT
   token_out,
   symbol_in,
   symbol_out,
-  _log_id
+  _log_id,
+  _inserted_timestamp
 FROM
   velodrome_swaps
 UNION ALL
@@ -521,7 +527,8 @@ SELECT
   token_out,
   symbol_in,
   symbol_out,
-  _log_id
+  _log_id,
+  _inserted_timestamp
 FROM
   univ3_swaps
 ),
@@ -557,7 +564,8 @@ FINAL AS (
     token_out,
     symbol_in,
     symbol_out,
-    _log_id
+    _log_id,
+    _inserted_timestamp
   FROM all_dex_standard s
   LEFT JOIN prices p1
     ON s.token_in = p1.token_address
@@ -590,7 +598,8 @@ FINAL AS (
     token_out,
     symbol_in,
     symbol_out,
-    _log_id
+    _log_id,
+    _inserted_timestamp
   FROM
     all_dex_custom c
 )
@@ -625,5 +634,6 @@ SELECT
   token_out,
   symbol_in,
   symbol_out,
-  _log_id
+  _log_id,
+  _inserted_timestamp
 FROM FINAL
