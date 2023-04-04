@@ -105,7 +105,7 @@ univ3_swaps AS (
     _log_id,
     _inserted_timestamp
   FROM
-    {{ ref('silver_dex__univ3_swaps') }}
+    {{ ref('silver_dex__univ3_swaps') }} s
   LEFT JOIN contracts c1
     ON c1.address = s.token0_address
   LEFT JOIN contracts c2
@@ -263,21 +263,48 @@ curve_swaps AS (
       WHEN event_name IS NULL THEN 'Swap'
       ELSE event_name
     END AS event_name,
-    amount_in,
-    amount_in_usd,
-    amount_out,
-    amount_out_usd,
+    token_in,
+    token_out,
+    c1.symbol AS symbol_in,
+    c2.symbol AS symbol_out,
+    c1.decimals AS decimals_in,
+    c2.decimals AS decimals_out,
+     CASE
+        WHEN decimals_in IS NOT NULL THEN tokens_sold / pow(
+            10,
+            decimals_in
+        )
+        ELSE tokens_sold
+    END AS amount_in,
+    CASE
+        WHEN decimals_out IS NOT NULL THEN tokens_bought / pow(
+            10,
+            decimals_out
+        )
+        ELSE tokens_bought
+    END AS amount_out,
     sender,
     tx_to,
     event_index,
     platform,
-    token_in,
-    token_out,
-    symbol_in,
-    symbol_out,
-    _log_id
+    _log_id,
+    _inserted_timestamp
   FROM
     {{ ref('silver_dex__curve_swaps') }}
+  LEFT JOIN contracts c1
+    ON c1.address = s.token_in
+  LEFT JOIN contracts c2
+    ON c2.address = s.token_out
+  WHERE symbol_out <> symbol_in
+{% if is_incremental() %}
+AND
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE
+    FROM
+      {{ this }}
+  )
+{% endif %}
 ),
 beethovenx_swaps AS (
   SELECT
@@ -293,21 +320,41 @@ beethovenx_swaps AS (
       WHEN event_name IS NULL THEN 'Swap'
       ELSE event_name
     END AS event_name,
-    amount_in,
-    amount_in_usd,
-    amount_out,
-    amount_out_usd,
+    c1.decimals AS decimals_in,
+    c1.symbol AS symbol_in,
+    CASE
+        WHEN decimals_in IS NULL THEN amount_in_unadj
+        ELSE (amount_in_unadj / pow(10, decimals_in))
+    END AS amount_in,
+    c2.decimals AS decimals_out,
+    c2.symbol AS symbol_out,
+    CASE
+        WHEN decimals_out IS NULL THEN amount_out_unadj
+        ELSE (amount_out_unadj / pow(10, decimals_out))
+    END AS amount_out,
     sender,
     tx_to,
     event_index,
     platform,
     token_in,
     token_out,
-    symbol_in,
-    symbol_out,
-    _log_id
+    _log_id,
+    _inserted_timestamp
   FROM
     {{ ref('silver_dex__beethovenx_swaps') }}
+  LEFT JOIN contracts c1
+    ON s.token_in = c1.address
+  LEFT JOIN contracts c2
+    ON s.token_out = c2.address
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE
+    FROM
+      {{ this }}
+  )
+{% endif %}
 ),
 
 --union all standard dex CTEs here (excludes amount_usd)
@@ -443,35 +490,6 @@ FROM
   beethovenx_swaps
 ),
 
---union all non-standard dex CTEs here (includes pre-determined amount_usd)
-all_dex_custom AS (
-SELECT
-  block_number,
-  block_timestamp,
-  tx_hash,
-  origin_function_signature,
-  origin_from_address,
-  origin_to_address,
-  contract_address,
-  pool_name,
-  event_name,
-  amount_in,
-  amount_in_usd,
-  amount_out,
-  amount_out_usd,
-  sender,
-  tx_to,
-  event_index,
-  platform,
-  token_in,
-  token_out,
-  symbol_in,
-  symbol_out,
-  _log_id
-FROM
-  univ3_swaps
-),
-
 FINAL AS (
   SELECT
     block_number,
@@ -538,7 +556,7 @@ FINAL AS (
     symbol_out,
     _log_id
   FROM
-    all_dex_custom
+    univ3_swaps
 )
 
 SELECT

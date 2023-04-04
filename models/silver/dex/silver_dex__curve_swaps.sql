@@ -88,7 +88,6 @@ token_transfers AS (
             FROM
                 curve_base
         )
-        --AND CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) <> '0x0000000000000000000000000000000000000000'
         AND CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) <> '0x0000000000000000000000000000000000000000'
 
 {% if is_incremental() %}
@@ -139,27 +138,9 @@ pool_info AS (
         sold_id,
         tokens_sold,
         sold.token_address AS token_in,
-        c0.symbol symbol_in,
-        c0.decimals AS decimals_in,
-        CASE
-            WHEN decimals_in IS NOT NULL THEN tokens_sold / pow(
-                10,
-                decimals_in
-            )
-            ELSE tokens_sold
-        END AS amount_in,
         bought_id,
         tokens_bought,
         bought.token_address AS token_out,
-        c1.symbol AS symbol_out,
-        c1.decimals AS decimals_out,
-        CASE
-            WHEN decimals_out IS NOT NULL THEN tokens_bought / pow(
-                10,
-                decimals_out
-            )
-            ELSE tokens_bought
-        END AS amount_out,
         _log_id,
         _inserted_timestamp
     FROM
@@ -170,43 +151,10 @@ pool_info AS (
         LEFT JOIN to_transfers bought
         ON tokens_bought = bought.amount
         AND s.tx_hash = bought.tx_hash 
-        LEFT JOIN {{ ref('core__dim_contracts') }}
-        c0
-        ON c0.address = sold.token_address
-        LEFT JOIN {{ ref('core__dim_contracts') }}
-        c1
-        ON c1.address = bought.token_address
     WHERE
-        tokens_sold <> 0
-        AND symbol_out <> symbol_in qualify(ROW_NUMBER() over(PARTITION BY _log_id
-    ORDER BY
-        _inserted_timestamp DESC)) = 1
-),
-prices AS (
-    SELECT
-        hour,
-        token_address,
-        price
-    FROM
-        {{ ref('silver__prices') }}
-    WHERE
-        hour :: DATE IN (
-            SELECT
-                DISTINCT block_timestamp :: DATE
-            FROM
-                curve_base
-        )
-        AND LOWER(token_address) IN (
-                SELECT
-                    DISTINCT token_in AS token_address
-                FROM
-                    pool_info
-                UNION
-                SELECT
-                    DISTINCT token_out AS token_address
-                FROM
-                    pool_info
-            )
+        tokens_sold <> 0 
+qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    ORDER BY _inserted_timestamp DESC)) = 1
 )
 SELECT
     block_number,
@@ -222,40 +170,12 @@ SELECT
     pool_address,
     pool_name,
     sender,
-    decimals_in,
-    symbol_in,
     token_in,
-    amount_in,
-    decimals_out,
-    symbol_out,
     token_out,
-    amount_out,
-    CASE
-        WHEN decimals_in IS NOT NULL THEN ROUND(
-            amount_in * p0.price,
-            2
-        )
-    END AS amount_in_usd,
-    CASE
-        WHEN decimals_out IS NOT NULL THEN ROUND(
-            amount_out * p1.price,
-            2
-        )
-    END AS amount_out_usd,
+    tokens_sold,
+    tokens_bought,
     _log_id,
     _inserted_timestamp,
     'curve' AS platform
 FROM
     pool_info
-    LEFT JOIN prices p0
-    ON p0.hour = DATE_TRUNC(
-        'hour',
-        block_timestamp
-    )
-    AND p0.token_address = token_in
-    LEFT JOIN prices p1
-    ON p1.hour = DATE_TRUNC(
-        'hour',
-        block_timestamp
-    )
-    AND p1.token_address = token_out
