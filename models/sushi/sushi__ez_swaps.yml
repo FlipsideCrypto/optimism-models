@@ -52,20 +52,6 @@ models:
               column_type_list:
                 - NUMBER
                 - FLOAT
-      - name: AMOUNT_IN_USD
-        description: '{{ doc("eth_dex_swaps_amount_in_usd") }}'
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT
-      - name: AMOUNT_OUT_USD
-        description: '{{ doc("eth_dex_swaps_amount_out_usd") }}'
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT
       - name: TOKEN_IN
         description: '{{ doc("eth_dex_swaps_token_in") }}'
         tests:

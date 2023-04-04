@@ -4,7 +4,7 @@
     "columns": true },
     tags = ['velodrome'],
     meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'VELODROME',
-    'PURPOSE': 'DEFI, DEX' }} }
+    'PURPOSE': 'DEFI, DEX' } } }
 ) }}
 
 WITH velo_pools AS (

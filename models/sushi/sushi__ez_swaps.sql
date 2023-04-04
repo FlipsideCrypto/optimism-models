@@ -27,10 +27,10 @@ WITH swap_events AS (
         event_name,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         TRY_TO_NUMBER(
-            ethereum.public.udf_hex_to_int(segmented_data[0]::string)::integer
+            ethereum.public.udf_hex_to_int(segmented_data[0]::string)::INTEGER
         ) AS amountIn,
         TRY_TO_NUMBER(
-            ethereum.public.udf_hex_to_int(segmented_data[1]::string)::integer
+            ethereum.public.udf_hex_to_int(segmented_data[1]::string)::INTEGER
         ) AS amountOut,
         CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS token_out, 
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token_in,
@@ -69,20 +69,22 @@ FINAL AS (
         tx_hash,
         contract_address,
         event_name,
-        case when token_in = token0_address then amountIn/power( 10, token0_decimals) :: FLOAT 
-             when token_in = token1_address then amountIn/power( 10, token1_decimals) :: FLOAT
+        token0_decimals,
+        token1_decimals,
+        CASE WHEN token_in = token0_address THEN amountIn/power( 10, token0_decimals) :: FLOAT 
+             WHEN token_in = token1_address THEN amountIn/power( 10, token1_decimals) :: FLOAT
              END AS amount_in,
-        case when token_out = token0_address then amountOut/power( 10, token0_decimals) :: FLOAT 
-             when token_out = token1_address then amountOut/power( 10, token1_decimals) :: FLOAT
+        CASE WHEN token_out = token0_address THEN amountOut/power( 10, token0_decimals) :: FLOAT 
+             WHEN token_out = token1_address THEN amountOut/power( 10, token1_decimals) :: FLOAT
              END AS amount_out,
         tx_to,
         event_index,
         _log_id,
-        CASE when token_in = token0_address then token0_symbol
-             when token_in = token1_address then token1_symbol
+        CASE WHEN token_in = token0_address THEN token0_symbol
+             WHEN token_in = token1_address THEN token1_symbol
         END AS symbol_in,
-        CASE when token_out = token0_address then token0_symbol
-             when token_out = token1_address then token1_symbol
+        CASE WHEN token_out = token0_address THEN token0_symbol
+             WHEN token_out = token1_address THEN token1_symbol
         END AS symbol_out,
         token_in,
         token_out,
@@ -92,30 +94,6 @@ FINAL AS (
         swap_events a
         LEFT JOIN {{ ref('sushi__dim_dex_pools') }} bb
         ON a.contract_address = bb.pool_address 
-),
-
- optimism_prices AS (
-    select 
-        symbol,
-        date_trunc('hour',recorded_at) as hour, 
-        avg(price) as price 
-    from 
-        {{ source('prices','prices_v2') }} 
-    where symbol in (select token0_symbol as symbol from {{ ref('sushi__dim_dex_pools') }}
-                     union all 
-                     select token1_symbol as symbol from {{ ref('sushi__dim_dex_pools') }})
-
-{% if is_incremental() %}
-AND hour :: DATE IN (
-    SELECT
-        DISTINCT block_timestamp :: DATE
-    FROM
-        swap_events
-)
-{% else %}
-    AND hour :: DATE >= '2021-09-01'
-{% endif %}
-    group by 1,2
 )
 
 SELECT
@@ -129,39 +107,17 @@ SELECT
     'sushiswap' AS platform,
     pool_name,
     amount_in,
-    case
-    WHEN amount_in * pIn.price <= 5 * amount_out * pOut.price
-    AND amount_out * pOut.price <= 5 * amount_in * pIn.price THEN ROUND(amount_in * pIn.price,2)
-    when pOut.price is null then ROUND(amount_in * pIn.price,2)
-    ELSE NULL
-    END AS amount_in_usd,
     amount_out,
-    CASE
-    WHEN amount_in * pIn.price <= 5 * amount_out * pOut.price
-    AND amount_out * pOut.price <= 5 * amount_in * pIn.price THEN ROUND(amount_out * pOut.price,2)
-    when pIn.price is null then ROUND(amount_out * pOut.price,2)
-    ELSE NULL
-    END AS amount_out_usd,
     tx_to,
     event_index,
     event_name,
     token_in,
     token_out,
+    token0_decimals AS decimals_in,
+    token1_decimals AS decimals_out,
     symbol_in,
     symbol_out,
     _log_id,
     _inserted_timestamp
 FROM
-    FINAL wp
-    LEFT JOIN optimism_prices pIn
-    ON lower(wp.symbol_in) = lower(pIn.symbol)
-    AND DATE_TRUNC(
-        'hour',
-        wp.block_timestamp
-    ) = pIn.hour
-    LEFT JOIN optimism_prices pOut
-    ON lower(wp.symbol_out) = lower(pOut.symbol)
-    AND DATE_TRUNC(
-        'hour',
-        wp.block_timestamp
-    ) = pOut.hour
+    FINAL

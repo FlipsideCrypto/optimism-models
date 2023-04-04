@@ -173,20 +173,30 @@ sushi_swaps AS (
       ELSE event_name 
     END AS event_name,
     amount_in,
-    amount_in_usd,
     amount_out,
-    amount_out_usd,
     origin_from_address AS sender,
     tx_to,
     event_index,
     platform,
     token_in,
     token_out,
+    decimals_in,
+    decimals_out,
     symbol_in,
     symbol_out,
-    _log_id
+    _log_id,
+    _inserted_timestamp
   FROM
     {{ ref('sushi__ez_swaps') }}
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE
+    FROM
+      {{ this }}
+  )
+{% endif %}
 ),
 synthetix_swaps AS (
   SELECT
