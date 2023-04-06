@@ -29,7 +29,7 @@ eth_price AS (
     FROM
         {{ ref('core__fact_hourly_token_prices') }}
     WHERE
-        token_address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        token_address = '0x4200000000000000000000000000000000000006'
 )
 SELECT
     A.tx_hash AS tx_hash,
