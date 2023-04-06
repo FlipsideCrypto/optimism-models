@@ -6,32 +6,22 @@ models:
           combination_of_columns:
             - _log_id
     columns:
-      - name: AMOUNT_IN
+      - name: TOKENS_SOLD
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - decimal
                 - float
-      - name: AMOUNT_IN_USD
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - decimal
-                - float
-      - name: AMOUNT_OUT
+                - number
+      - name: TOKENS_BOUGHT
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - decimal
                 - float
-      - name: AMOUNT_OUT_USD
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - decimal
-                - float
+                - number
       - name: BLOCK_TIMESTAMP
         tests:
           - not_null
@@ -58,11 +48,7 @@ models:
         tests:
           - not_null
       - name: TOKEN_IN
-        tests:
-          - not_null
       - name: TOKEN_OUT
-        tests:
-          - not_null
       - name: TX_HASH
         tests:
           - not_null

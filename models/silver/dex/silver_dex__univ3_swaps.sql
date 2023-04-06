@@ -57,29 +57,9 @@ pool_data AS (
         fee,
         fee_percent,
         tick_spacing,
-        pool_address,
-        token0_symbol,
-        token1_symbol,
-        token0_decimals,
-        token1_decimals,
-        pool_name
+        pool_address
     FROM
         {{ ref('silver_dex__univ3_pools') }}
-),
-token_prices AS (
-    SELECT
-        hour,
-        token_address,
-        price
-    FROM
-        {{ ref('silver__prices') }}
-    WHERE
-        hour :: DATE IN (
-            SELECT
-                DISTINCT block_timestamp :: DATE
-            FROM
-                base_swaps
-        )
 ),
 FINAL AS (
     SELECT
@@ -88,82 +68,26 @@ FINAL AS (
         block_timestamp,
         tx_hash,
         contract_address AS pool_address,
-        pool_name,
         recipient,
         sender,
+        fee,
         tick,
+        tick_spacing,
         liquidity,
-        COALESCE(
-            liquidity / pow(
-                10,
-                (
-                    (
-                        token0_decimals + token1_decimals
-                    ) / 2
-                )
-            ),
-            0
-        ) AS liquidity_adjusted,
         event_index,
-        amount0_unadj / pow(
-            10,
-            COALESCE(
-                token0_decimals,
-                18
-            )
-        ) AS amount0_adjusted,
-        amount1_unadj / pow(
-            10,
-            COALESCE(
-                token1_decimals,
-                18
-            )
-        ) AS amount1_adjusted,
-        COALESCE(div0(ABS(amount1_adjusted), ABS(amount0_adjusted)), 0) AS price_1_0,
-        COALESCE(div0(ABS(amount0_adjusted), ABS(amount1_adjusted)), 0) AS price_0_1,
         token0_address,
         token1_address,
-        token0_symbol,
-        token1_symbol,
-        p0.price AS token0_price,
-        p1.price AS token1_price,
-        CASE
-            WHEN token0_decimals IS NOT NULL THEN ROUND(
-                token0_price * amount0_adjusted,
-                2
-            )
-        END AS amount0_usd,
-        CASE
-            WHEN token1_decimals IS NOT NULL THEN ROUND(
-                token1_price * amount1_adjusted,
-                2
-            )
-        END AS amount1_usd,
         _log_id,
         _inserted_timestamp,
         origin_function_signature,
         origin_from_address,
         origin_to_address,
         amount0_unadj,
-        amount1_unadj,
-        token0_decimals,
-        token1_decimals
+        amount1_unadj
     FROM
         base_swaps
         INNER JOIN pool_data
         ON pool_data.pool_address = base_swaps.contract_address
-        LEFT JOIN token_prices p0
-        ON p0.token_address = token0_address
-        AND p0.hour = DATE_TRUNC(
-            'hour',
-            block_timestamp
-        )
-        LEFT JOIN token_prices p1
-        ON p1.token_address = token1_address
-        AND p1.hour = DATE_TRUNC(
-            'hour',
-            block_timestamp
-        )
 )
 SELECT
     *

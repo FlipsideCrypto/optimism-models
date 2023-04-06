@@ -1,0 +1,14 @@
+version: 2
+models:
+  - name: silver_dex__sushi_pools
+     
+    columns:
+      - name: POOL_ADDRESS
+        tests:
+          - not_null
+      - name: TOKEN0_ADDRESS
+        tests:
+            - not_null
+      - name: TOKEN1_ADDRESS
+        tests:
+            - not_null
