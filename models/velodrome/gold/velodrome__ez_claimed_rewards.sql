@@ -94,7 +94,7 @@ FROM
     base
     LEFT JOIN tokens
     ON tokens.token_address = base.token_address
-    LEFT JOIN {{ ref('silver__prices') }}
+    LEFT JOIN {{ ref('core__fact_hourly_token_prices') }}
     prices
     ON HOUR = DATE_TRUNC(
         'hour',
