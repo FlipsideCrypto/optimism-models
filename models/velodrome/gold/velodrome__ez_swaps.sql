@@ -180,7 +180,7 @@ FROM
     )
     LEFT JOIN tokens
     ON tokens.token_address = fee_currency
-    LEFT JOIN {{ ref('silver__prices') }}
+    LEFT JOIN {{ ref('core__fact_hourly_token_prices') }}
     p0
     ON p0.hour = DATE_TRUNC(
         'hour',
@@ -190,7 +190,7 @@ FROM
         WHEN amount0_in_unadj <> 0 THEN token0_address
         WHEN amount1_in_unadj <> 0 THEN token1_address
     END
-    LEFT JOIN {{ ref('silver__prices') }}
+    LEFT JOIN {{ ref('core__fact_hourly_token_prices') }}
     p1
     ON p1.hour = DATE_TRUNC(
         'hour',
@@ -200,7 +200,7 @@ FROM
         WHEN amount0_out_unadj <> 0 THEN token0_address
         WHEN amount1_out_unadj <> 0 THEN token1_address
     END
-    LEFT JOIN {{ ref('silver__prices') }}
+    LEFT JOIN {{ ref('core__fact_hourly_token_prices') }}
     p2
     ON p2.hour = DATE_TRUNC(
         'hour',
