@@ -186,7 +186,7 @@ sushi_swaps AS (
     _log_id,
     _inserted_timestamp
   FROM
-    {{ ref('sushi__ez_swaps') }} s
+    {{ ref('silver_dex__sushi_swaps') }} s
 {% if is_incremental() %}
 WHERE
   _inserted_timestamp >= (
