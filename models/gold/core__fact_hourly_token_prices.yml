@@ -7,8 +7,12 @@ models:
     columns:
       - name: HOUR
         description: 'The hour the token price was recorded.'
+        tests:
+          - not_null
       - name: TOKEN_ADDRESS
         description: 'The Optimism contract address for this token. This is the column used to join to token contract addresses in the other event tables.'
+        tests:
+          - not_null
       - name: SYMBOL
         description: 'The symbol for this token.'
       - name: DECIMALS

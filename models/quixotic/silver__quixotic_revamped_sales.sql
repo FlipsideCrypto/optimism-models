@@ -529,14 +529,10 @@ hourly_prices AS (
     SELECT
         HOUR,
         symbol,
-        CASE
-            WHEN token_address IS NULL
-            AND symbol = 'ETH' THEN 'ETH'
-            ELSE token_address
-        END AS currency_address,
+        token_address AS currency_address,
         price AS token_price
     FROM
-        {{ ref('silver__prices') }}
+        {{ ref('core__fact_hourly_token_prices') }}
     WHERE
         HOUR :: DATE IN (
             SELECT

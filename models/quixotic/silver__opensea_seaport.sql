@@ -340,14 +340,10 @@ all_prices AS (
         HOUR,
         decimals,
         symbol,
-        CASE
-            WHEN LOWER(token_address) IS NULL
-            AND symbol = 'ETH' THEN 'ETH'
-            ELSE LOWER(token_address)
-        END AS currency_address,
+        token_address AS currency_address,
         price
     FROM
-        {{ ref('silver__prices') }}
+        {{ ref('core__fact_hourly_token_prices') }}
     WHERE
         (
             currency_address IN (

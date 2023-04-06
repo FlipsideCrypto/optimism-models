@@ -12,4 +12,8 @@ SELECT
     price,
     is_imputed
 FROM
-    {{ ref('silver__prices') }}
+    {{ source(
+        'crosschain',
+        'ez_hourly_prices'
+    ) }}
+WHERE blockchain = 'optimism'
