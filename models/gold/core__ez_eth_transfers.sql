@@ -33,12 +33,6 @@ eth_price AS (
         ) }}
     WHERE
         token_address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-        AND HOUR :: DATE IN (
-            SELECT
-                DISTINCT block_timestamp :: DATE
-            FROM
-                eth_base
-        )
 )
 SELECT
     A.tx_hash AS tx_hash,
