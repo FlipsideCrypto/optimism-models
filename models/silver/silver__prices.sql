@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'price_id',
+    enabled = false,
     cluster_by = ['hour::DATE', 'token_address']
 ) }}
 
