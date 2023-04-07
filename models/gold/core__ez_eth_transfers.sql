@@ -20,16 +20,25 @@ WITH eth_base AS (
     WHERE
         eth_value > 0
         AND tx_status = 'SUCCESS'
-        and gas_used is not null
+        AND gas_used IS NOT NULL
 ),
 eth_price AS (
     SELECT
         HOUR,
         price AS eth_price
     FROM
-        {{ ref('core__fact_hourly_token_prices') }}
+        {{ source(
+            'ethereum',
+            'fact_hourly_token_prices'
+        ) }}
     WHERE
-        token_address = '0x4200000000000000000000000000000000000006'
+        token_address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        AND HOUR :: DATE IN (
+            SELECT
+                DISTINCT block_timestamp :: DATE
+            FROM
+                eth_base
+        )
 )
 SELECT
     A.tx_hash AS tx_hash,
