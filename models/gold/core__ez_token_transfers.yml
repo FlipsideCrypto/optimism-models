@@ -1,0 +1,42 @@
+version: 2
+models:
+  - name: core__ez_token_transfers
+    description: '{{ doc("opt_transfer_table_doc") }}'
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("opt_block_number") }}'   
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("opt_block_timestamp") }}'
+      - name: TX_HASH
+        description: '{{ doc("opt_transfer_tx_hash") }}'
+      - name: CONTRACT_ADDRESS
+        description: '{{ doc("opt_transfer_contract_address") }}'
+      - name: FROM_ADDRESS
+        description: '{{ doc("opt_transfer_from_address") }}'
+      - name: TO_ADDRESS
+        description: '{{ doc("opt_transfer_to_address") }}'
+      - name: RAW_AMOUNT
+        description: '{{ doc("opt_transfer_raw_amount") }}'
+      - name: DECIMALS
+        description: 'The number of decimal places this contract needs adjusted where token values exist.'
+      - name: SYMBOL
+        description: 'The symbol belonging to the address of the token.'
+      - name: TOKEN_PRICE
+        description: '{{ doc("opt_transfer_token_price") }}'
+      - name: AMOUNT
+        description: '{{ doc("opt_transfer_amount") }}'
+      - name: AMOUNT_USD
+        description: '{{ doc("opt_transfer_amount_usd") }}'
+      - name: HAS_DECIMAL
+        description: '{{ doc("opt_transfer_has_decimal") }}'
+      - name: HAS_PRICE
+        description: '{{ doc("opt_transfer_has_price") }}'
+      - name: _LOG_ID
+        description: '{{ doc("opt_log_id_transfers") }}'
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description: '{{ doc("opt_origin_sig") }}'
+      - name: ORIGIN_FROM_ADDRESS
+        description: '{{ doc("opt_eth_origin_from") }}'
+      - name: ORIGIN_TO_ADDRESS
+        description: '{{ doc("opt_eth_origin_to") }}'
