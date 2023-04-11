@@ -335,7 +335,7 @@ agg_sales AS (
     FROM
         token_sales
 ),
-all_prices AS (
+token_prices AS (
     SELECT
         HOUR,
         decimals,
@@ -359,83 +359,108 @@ all_prices AS (
             FROM
                 base_sales
         )
-
 ),
-
-
-agg_sales_prices as (
-select 
-    s.block_number, 
-    s.block_timestamp, 
-    s._log_id, 
-    s._inserted_timestamp,
-    s.tx_hash, 
-    s.event_type,
-    s.origin_to_address as platform_address,
-    'opensea' as platform_name,
-    'seaport_1_1' AS platform_exchange_version,
-    
-    seller_address,
-    buyer_address,
-    s.nft_address, 
-    s.tokenId,
-    s.erc1155_value,
-    
-    
-    p.symbol as currency_symbol,
-    s.currency_address, 
-    
-    case when s.currency_address = 'ETH' or s.currency_address = '0x4200000000000000000000000000000000000006'
-        then s.price/ n.nft_count
-        when s.currency_address != 'ETH' and p.currency_address is not null 
-                then (s.price / pow(10, decimals)) / n.nft_count
-        when p.currency_address is null then s.price / n.nft_count
-            end as prices,
-    
-    round (prices * p.price , 2) as price_usd,
-    
-    case when s.currency_address = 'ETH' or s.currency_address = '0x4200000000000000000000000000000000000006'
-        then total_fees / n.nft_count
-        when s.currency_address != 'ETH' and p.currency_address is not null
-            then (total_fees / pow(10, decimals)) / n.nft_count
-        when p.currency_address is null then total_fees / n.nft_count
-            end as total_fees_adj,
-    
-    case when s.currency_address = 'ETH' or s.currency_address = '0x4200000000000000000000000000000000000006'
-        then platform_fee / n.nft_count
-        when s.currency_address != 'ETH' and p.currency_address is not null
-            then (platform_fee / pow(10, decimals)) / n.nft_count
-        when p.currency_address is null then platform_fee / n.nft_count
-            end as platform_fee_adj,
-    
-    case when s.currency_address = 'ETH' or s.currency_address = '0x4200000000000000000000000000000000000006'
-        then creator_fee / n.nft_count
-        when s.currency_address != 'ETH' and p.currency_address is not null
-            then (creator_fee / pow(10, decimals))/ n.nft_count
-        when p.currency_address is null then creator_fee / n.nft_count
-            end as creator_fee_adj,
-    
-    total_fees_adj * p.price as total_fees_usd,
-    platform_fee_adj * p.price as platform_fee_usd,
-    creator_fee_adj * p.price as creator_fee_usd,
-    prices + total_fees_adj as total_transaction_price,
-    price_usd + total_fees_usd as total_transaction_price_usd,
-    
-    
-    s.origin_from_address, 
-    s.origin_to_address,
-    s.origin_function_signature
-    
-    from agg_sales s 
-        inner join nft_count_transaction n on n.tx_hash = s.tx_hash 
-        left join all_prices p on date_trunc('hour', s.block_timestamp) = p.hour 
-                and s.currency_address = p.currency_address
-    
-    where s.block_number is not null 
-    
-    qualify(ROW_NUMBER() over(PARTITION BY _log_id
-                                    ORDER BY _inserted_timestamp DESC)
-           ) = 1
+eth_price AS (
+    SELECT
+        HOUR,
+        decimals,
+        'ETH' AS symbol,
+        'ETH' AS currency_address,
+        price
+    FROM
+        {{ ref('core__fact_hourly_token_prices') }}
+    WHERE
+        token_address = '0x4200000000000000000000000000000000000006'
+        AND HOUR :: DATE IN (
+            SELECT
+                DISTINCT block_timestamp :: DATE
+            FROM
+                base_sales
+        )
+),
+all_prices AS (
+    SELECT
+        *
+    FROM
+        token_prices
+    UNION ALL
+    SELECT
+        *
+    FROM
+        eth_price
+),
+agg_sales_prices AS (
+    SELECT
+        s.block_number,
+        s.block_timestamp,
+        s._log_id,
+        s._inserted_timestamp,
+        s.tx_hash,
+        s.event_type,
+        s.origin_to_address AS platform_address,
+        'opensea' AS platform_name,
+        'seaport_1_1' AS platform_exchange_version,
+        seller_address,
+        buyer_address,
+        s.nft_address,
+        s.tokenId,
+        s.erc1155_value,
+        p.symbol AS currency_symbol,
+        s.currency_address,
+        CASE
+            WHEN s.currency_address = 'ETH'
+            OR s.currency_address = '0x4200000000000000000000000000000000000006' THEN s.price / n.nft_count
+            WHEN s.currency_address != 'ETH'
+            AND p.currency_address IS NOT NULL THEN (s.price / pow(10, decimals)) / n.nft_count
+            WHEN p.currency_address IS NULL THEN s.price / n.nft_count
+        END AS prices,
+        ROUND (
+            prices * p.price,
+            2
+        ) AS price_usd,
+        CASE
+            WHEN s.currency_address = 'ETH'
+            OR s.currency_address = '0x4200000000000000000000000000000000000006' THEN total_fees / n.nft_count
+            WHEN s.currency_address != 'ETH'
+            AND p.currency_address IS NOT NULL THEN (total_fees / pow(10, decimals)) / n.nft_count
+            WHEN p.currency_address IS NULL THEN total_fees / n.nft_count
+        END AS total_fees_adj,
+        CASE
+            WHEN s.currency_address = 'ETH'
+            OR s.currency_address = '0x4200000000000000000000000000000000000006' THEN platform_fee / n.nft_count
+            WHEN s.currency_address != 'ETH'
+            AND p.currency_address IS NOT NULL THEN (platform_fee / pow(10, decimals)) / n.nft_count
+            WHEN p.currency_address IS NULL THEN platform_fee / n.nft_count
+        END AS platform_fee_adj,
+        CASE
+            WHEN s.currency_address = 'ETH'
+            OR s.currency_address = '0x4200000000000000000000000000000000000006' THEN creator_fee / n.nft_count
+            WHEN s.currency_address != 'ETH'
+            AND p.currency_address IS NOT NULL THEN (creator_fee / pow(10, decimals)) / n.nft_count
+            WHEN p.currency_address IS NULL THEN creator_fee / n.nft_count
+        END AS creator_fee_adj,
+        total_fees_adj * p.price AS total_fees_usd,
+        platform_fee_adj * p.price AS platform_fee_usd,
+        creator_fee_adj * p.price AS creator_fee_usd,
+        prices + total_fees_adj AS total_transaction_price,
+        price_usd + total_fees_usd AS total_transaction_price_usd,
+        s.origin_from_address,
+        s.origin_to_address,
+        s.origin_function_signature
+    FROM
+        agg_sales s
+        INNER JOIN nft_count_transaction n
+        ON n.tx_hash = s.tx_hash
+        LEFT JOIN all_prices p
+        ON DATE_TRUNC(
+            'hour',
+            s.block_timestamp
+        ) = p.hour
+        AND s.currency_address = p.currency_address
+    WHERE
+        s.block_number IS NOT NULL qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    ORDER BY
+        _inserted_timestamp DESC)) = 1
 )
 SELECT
     block_number,

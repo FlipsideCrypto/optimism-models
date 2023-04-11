@@ -4,16 +4,16 @@
     cluster_by = ['block_timestamp::DATE']
 ) }}
 
-WITH seaport_tx as (
-    SELECT 
-        tx_hash 
+WITH seaport_tx AS (
+
+    SELECT
+        tx_hash
     FROM
         {{ ref('silver__logs') }}
     WHERE
         block_timestamp >= '2021-01-01'
-    AND 
-        topics[0] ::string = '0x9d9af8e38d66c62e2c12f0225249fd9d721c54b83f48d9352c97c6cacdcb6f31'
-    AND origin_to_address != LOWER('0x00000000006c3852cbEf3e08E8dF289169EdE581')
+        AND topics [0] :: STRING = '0x9d9af8e38d66c62e2c12f0225249fd9d721c54b83f48d9352c97c6cacdcb6f31'
+        AND origin_to_address != LOWER('0x00000000006c3852cbEf3e08E8dF289169EdE581')
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -25,16 +25,15 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% endif %}
-
-), 
-
-    quixotic_tx as (
-    SELECT 
-        tx_hash 
-    from {{ ref('silver__logs') }}
+),
+quixotic_tx AS (
+    SELECT
+        tx_hash
+    FROM
+        {{ ref('silver__logs') }}
     WHERE
         block_timestamp >= '2021-01-01'
-    AND origin_function_signature IN (
+        AND origin_function_signature IN (
             '0xb3a34c4c',
             '0xfb0f3ee1',
             '0x87201b41',
@@ -68,21 +67,19 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% endif %}
-
 ),
-
-seaport_indirect_contract_tx as (
-    select 
-        tx_hash from seaport_tx
-    
-    union 
-
-    select 
-        tx_hash from quixotic_tx
+seaport_indirect_contract_tx AS (
+    SELECT
+        tx_hash
+    FROM
+        seaport_tx
+    UNION
+    SELECT
+        tx_hash
+    FROM
+        quixotic_tx
 ),
-
 base_sales AS (
-
     SELECT
         block_number,
         block_timestamp,
@@ -118,12 +115,12 @@ base_sales AS (
         {{ ref('silver__logs') }}
     WHERE
         block_timestamp >= '2021-01-01'
-    
-        AND tx_hash in 
-            (select 
-                tx_hash 
-            from seaport_indirect_contract_tx
-            )
+        AND tx_hash IN (
+            SELECT
+                tx_hash
+            FROM
+                seaport_indirect_contract_tx
+        )
         AND event_name IN (
             'Transfer',
             'TransferSingle'
@@ -525,7 +522,7 @@ agg_sales AS (
     FROM
         token_sales
 ),
-hourly_prices AS (
+token_prices AS (
     SELECT
         HOUR,
         symbol,
@@ -540,19 +537,52 @@ hourly_prices AS (
             FROM
                 agg_sales_tx
         )
-        AND (currency_address IN (
-            SELECT
-                DISTINCT currency_address
-            FROM
-                agg_sales
-        ) or currency_address = '0x4200000000000000000000000000000000000006')
+        AND (
+            token_address IN (
+                SELECT
+                    DISTINCT currency_address
+                FROM
+                    agg_sales
+            )
+            OR token_address = '0x4200000000000000000000000000000000000006'
+        )
 ),
-nfts_per as (
-select 
-tx_hash,
-count(*) as nfts_per_tx
-from agg_sales
-group by tx_hash
+eth_price AS (
+    SELECT
+        HOUR,
+        'ETH' AS symbol,
+        'ETH' AS currency_address,
+        price AS token_price
+    FROM
+        {{ ref('core__fact_hourly_token_prices') }}
+    WHERE
+        token_address = '0x4200000000000000000000000000000000000006'
+        AND HOUR :: DATE IN (
+            SELECT
+                DISTINCT block_timestamp :: DATE
+            FROM
+                agg_sales_tx
+        )
+),
+hourly_prices AS (
+    SELECT
+        *
+    FROM
+        token_prices
+    UNION ALL
+    SELECT
+        *
+    FROM
+        eth_price
+),
+nfts_per AS (
+    SELECT
+        tx_hash,
+        COUNT(*) AS nfts_per_tx
+    FROM
+        agg_sales
+    GROUP BY
+        tx_hash
 ),
 agg_sales_prices AS (
     SELECT
@@ -569,16 +599,26 @@ agg_sales_prices AS (
         erc1155_value,
         symbol AS currency_symbol,
         s.currency_address,
-        s.price / nfts_per_tx as price,
+        s.price / nfts_per_tx AS price,
         ROUND(
-            h.token_price * (s.price / nfts_per_tx),
+            h.token_price * (
+                s.price / nfts_per_tx
+            ),
             2
         ) AS price_usd,
-        platform_fee / nfts_per_tx as platform_fee,
-        creator_fee / nfts_per_tx as creator_fee,
-        (platform_fee / nfts_per_tx) + (creator_fee / nfts_per_tx) AS total_fees,
-        (platform_fee / nfts_per_tx) * h.token_price AS platform_fee_usd,
-        (creator_fee / nfts_per_tx) * h.token_price AS creator_fee_usd,
+        platform_fee / nfts_per_tx AS platform_fee,
+        creator_fee / nfts_per_tx AS creator_fee,
+        (
+            platform_fee / nfts_per_tx
+        ) + (
+            creator_fee / nfts_per_tx
+        ) AS total_fees,
+        (
+            platform_fee / nfts_per_tx
+        ) * h.token_price AS platform_fee_usd,
+        (
+            creator_fee / nfts_per_tx
+        ) * h.token_price AS creator_fee_usd,
         total_fees * h.token_price AS total_fees_usd,
         origin_from_address,
         origin_to_address,
@@ -592,9 +632,14 @@ agg_sales_prices AS (
             'hour',
             s.block_timestamp
         )
-        AND h.currency_address = (case when s.currency_address = 'ETH' then '0x4200000000000000000000000000000000000006' else s.currency_address end)
-        left join nfts_per
-        on nfts_per.tx_hash = s.tx_hash
+        AND h.currency_address = (
+            CASE
+                WHEN s.currency_address = 'ETH' THEN '0x4200000000000000000000000000000000000006'
+                ELSE s.currency_address
+            END
+        )
+        LEFT JOIN nfts_per
+        ON nfts_per.tx_hash = s.tx_hash
 )
 SELECT
     block_number,
@@ -603,12 +648,15 @@ SELECT
     event_type,
     platform_address,
     platform_name,
-    case 
-        when tx_hash in 
-            (select tx_hash from seaport_tx) 
-            then 'seaport_1_1'
-        else 'quixotic'
-        end as platform_exchange_version,
+    CASE
+        WHEN tx_hash IN (
+            SELECT
+                tx_hash
+            FROM
+                seaport_tx
+        ) THEN 'seaport_1_1'
+        ELSE 'quixotic'
+    END AS platform_exchange_version,
     seller_address,
     buyer_address,
     nft_address,
