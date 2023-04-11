@@ -7,13 +7,17 @@ models:
     columns:
       - name: HOUR
         description: 'The hour the token price was recorded.'
+        tests:
+          - not_null
       - name: TOKEN_ADDRESS
         description: 'The Optimism contract address for this token. This is the column used to join to token contract addresses in the other event tables.'
+        tests:
+          - not_null
       - name: SYMBOL
         description: 'The symbol for this token.'
       - name: DECIMALS
         description: 'The decimals for this token.'
       - name: PRICE
-        description: 'The average hourly price for this token.'
+        description: 'The closing hourly price for this token.'
       - name: IS_IMPUTED
         description: 'This column denotes if we carried forward the last recorded price in order to fill hourly gaps from the source. Either true or false.'

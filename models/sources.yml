@@ -12,6 +12,7 @@ sources:
     schema: core
     tables:
       - name: address_labels
+      - name: ez_hourly_prices
   - name: ethereum
     database: ethereum
     schema: core
