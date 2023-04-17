@@ -107,7 +107,10 @@ SELECT
     A.tx_hash AS tx_hash,
     origin_function_signature,
     origin_from_address,
-    origin_to_address,
+    CASE
+        WHEN origin_to_address IS NULL THEN contract_address
+        ELSE origin_to_address
+    END AS origin_to_address,
     contract_address,
     A.event_index AS event_index,
     staking_action_type,
