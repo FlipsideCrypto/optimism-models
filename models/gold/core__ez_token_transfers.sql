@@ -15,22 +15,23 @@ SELECT
     from_address,
     to_address,
     raw_amount,
-    decimals,
-    symbol,
+    C.decimals AS decimals,
+    C.symbol AS symbol,
     price AS token_price,
     CASE
-        WHEN decimals IS NOT NULL THEN raw_amount / pow(
+        WHEN C.decimals IS NOT NULL THEN raw_amount / pow(
             10,
-            decimals
+            C.decimals
         )
         ELSE NULL
     END AS amount,
     CASE
-        WHEN decimals IS NOT NULL AND price IS NOT NULL THEN amount * price
+        WHEN C.decimals IS NOT NULL
+        AND price IS NOT NULL THEN amount * price
         ELSE NULL
     END AS amount_usd,
     CASE
-        WHEN decimals IS NULL THEN 'false'
+        WHEN C.decimals IS NULL THEN 'false'
         ELSE 'true'
     END AS has_decimal,
     CASE
@@ -39,7 +40,14 @@ SELECT
     END AS has_price,
     _log_id
 FROM
-    {{ ref('core__fact_token_transfers') }} t
-LEFT JOIN {{ ref('core__fact_hourly_token_prices') }} p 
-    ON t.contract_address = p.token_address 
-        AND DATE_TRUNC('hour', t.block_timestamp) = HOUR
+    {{ ref('core__fact_token_transfers') }}
+    t
+    LEFT JOIN {{ ref('core__fact_hourly_token_prices') }}
+    p
+    ON t.contract_address = p.token_address
+    AND DATE_TRUNC(
+        'hour',
+        t.block_timestamp
+    ) = HOUR
+    LEFT JOIN {{ ref('core__dim_contracts') }} C
+    ON t.contract_address = C.address
