@@ -33,7 +33,19 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
+      - name: AMOUNT_IN_UNADJ
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - NUMBER
+                - FLOAT
       - name: AMOUNT_IN
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - NUMBER
+                - FLOAT
+      - name: AMOUNT_OUT_UNADJ
         tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:

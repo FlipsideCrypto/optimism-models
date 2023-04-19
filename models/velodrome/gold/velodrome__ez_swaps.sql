@@ -3,14 +3,8 @@
     persist_docs ={ "relation": true,
     "columns": true },
     tags = ['velodrome'],
-    meta={
-        'database_tags':{
-            'table': {
-                'PROTOCOL': 'VELODROME',
-                'PURPOSE': 'DEFI, DEX, SWAPS'
-            }
-        }
-    }
+    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'VELODROME',
+    'PURPOSE': 'DEFI, DEX, SWAPS' } } }
 ) }}
 
 WITH velo_pools AS (
@@ -59,6 +53,10 @@ SELECT
     sender_address,
     to_address,
     CASE
+        WHEN amount0_in_unadj <> 0 THEN amount0_in_unadj
+        WHEN amount1_in_unadj <> 0 THEN amount1_in_unadj
+    END AS amount_in_unadj,
+    CASE
         WHEN (
             CASE
                 WHEN amount0_in_unadj <> 0 THEN token0_decimals
@@ -94,6 +92,10 @@ SELECT
             2
         )
     END AS amount_in_usd,
+    CASE
+        WHEN amount0_out_unadj <> 0 THEN amount0_out_unadj
+        WHEN amount1_out_unadj <> 0 THEN amount1_out_unadj
+    END AS amount_out_unadj,
     CASE
         WHEN (
             CASE
@@ -165,7 +167,9 @@ SELECT
     END AS lp_fee_usd,
     tokens.token_symbol AS lp_fee_symbol,
     CASE
-        WHEN fee_currency IS NULL AND lp_fee <> 0 AND pool_address <> '0xce9accfbb25eddce91845c3a7c3d1613d1d7081f' THEN token_address_in
+        WHEN fee_currency IS NULL
+        AND lp_fee <> 0
+        AND pool_address <> '0xce9accfbb25eddce91845c3a7c3d1613d1d7081f' THEN token_address_in
         ELSE fee_currency
     END AS lp_fee_token_address,
     _log_id
