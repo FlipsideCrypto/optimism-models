@@ -4,14 +4,8 @@
     "columns": true },
     unique_key = '_log_id',
     cluster_by = ['block_timestamp::DATE'],
-    meta={
-        'database_tags':{
-            'table': {
-                'PROTOCOL': 'SUSHI',
-                'PURPOSE': 'DEFI, DEX, SWAPS'
-            }
-        }
-    }
+    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'SUSHI',
+    'PURPOSE': 'DEFI, DEX, SWAPS' }} }
 ) }}
 
 WITH swap_events AS (
@@ -27,12 +21,16 @@ WITH swap_events AS (
         event_name,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         TRY_TO_NUMBER(
-            ethereum.public.udf_hex_to_int(segmented_data[0]::string)::INTEGER
+            ethereum.public.udf_hex_to_int(
+                segmented_data [0] :: STRING
+            ) :: INTEGER
         ) AS amountIn,
         TRY_TO_NUMBER(
-            ethereum.public.udf_hex_to_int(segmented_data[1]::string)::INTEGER
+            ethereum.public.udf_hex_to_int(
+                segmented_data [1] :: STRING
+            ) :: INTEGER
         ) AS amountOut,
-        CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS token_out, 
+        CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS token_out,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token_in,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS tx_to,
         event_index,
@@ -41,7 +39,7 @@ WITH swap_events AS (
     FROM
         {{ ref('silver__logs') }}
     WHERE
-        topics[0]::string = '0xcd3829a3813dc3cdd188fd3d01dcf3268c16be2fdd2dd21d0665418816e46062'
+        topics [0] :: STRING = '0xcd3829a3813dc3cdd188fd3d01dcf3268c16be2fdd2dd21d0665418816e46062'
         AND tx_status = 'SUCCESS'
         AND contract_address IN (
             SELECT
@@ -71,31 +69,55 @@ FINAL AS (
         event_name,
         token0_decimals,
         token1_decimals,
-        CASE WHEN token_in = token0_address THEN amountIn/power( 10, token0_decimals) :: FLOAT 
-             WHEN token_in = token1_address THEN amountIn/power( 10, token1_decimals) :: FLOAT
-             END AS amount_in,
-        CASE WHEN token_out = token0_address THEN amountOut/power( 10, token0_decimals) :: FLOAT 
-             WHEN token_out = token1_address THEN amountOut/power( 10, token1_decimals) :: FLOAT
-             END AS amount_out,
+        CASE
+            WHEN token_in = token0_address THEN amountIn :: FLOAT
+            WHEN token_in = token1_address THEN amountIn :: FLOAT
+        END AS amount_in_unadj,
+        CASE
+            WHEN token_in = token0_address THEN amountIn / power(
+                10,
+                token0_decimals
+            ) :: FLOAT
+            WHEN token_in = token1_address THEN amountIn / power(
+                10,
+                token1_decimals
+            ) :: FLOAT
+        END AS amount_in,
+        CASE
+            WHEN token_out = token0_address THEN amountOut :: FLOAT
+            WHEN token_out = token1_address THEN amountOut :: FLOAT
+        END AS amount_out_unadj,
+        CASE
+            WHEN token_out = token0_address THEN amountOut / power(
+                10,
+                token0_decimals
+            ) :: FLOAT
+            WHEN token_out = token1_address THEN amountOut / power(
+                10,
+                token1_decimals
+            ) :: FLOAT
+        END AS amount_out,
         tx_to,
         event_index,
         _log_id,
-        CASE WHEN token_in = token0_address THEN token0_symbol
-             WHEN token_in = token1_address THEN token1_symbol
+        CASE
+            WHEN token_in = token0_address THEN token0_symbol
+            WHEN token_in = token1_address THEN token1_symbol
         END AS symbol_in,
-        CASE WHEN token_out = token0_address THEN token0_symbol
-             WHEN token_out = token1_address THEN token1_symbol
+        CASE
+            WHEN token_out = token0_address THEN token0_symbol
+            WHEN token_out = token1_address THEN token1_symbol
         END AS symbol_out,
         token_in,
         token_out,
         pool_name,
         _inserted_timestamp
     FROM
-        swap_events a
-        LEFT JOIN {{ ref('silver_dex__sushi_pools') }} bb
-        ON a.contract_address = bb.pool_address 
+        swap_events A
+        LEFT JOIN {{ ref('silver_dex__sushi_pools') }}
+        bb
+        ON A.contract_address = bb.pool_address
 )
-
 SELECT
     block_number,
     block_timestamp,
@@ -106,7 +128,9 @@ SELECT
     contract_address,
     'sushiswap' AS platform,
     pool_name,
+    amount_in_unadj,
     amount_in,
+    amount_out_unadj,
     amount_out,
     tx_to,
     event_index,

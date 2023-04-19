@@ -48,6 +48,8 @@ models:
         description: 'The sender of the swap event.'
       - name: TO_ADDRESS
         description: 'The receiver of the swap event.'
+      - name: AMOUNT_IN_UNADJ
+        description: 'The amount of tokens in without decimal adjustment.'
       - name: AMOUNT_IN
         description: 'The amount of tokens in.'
         tests:
@@ -58,6 +60,8 @@ models:
                 - NUMBER 
       - name: AMOUNT_IN_USD
         description: 'The amount of tokens in, in USD.'
+      - name: AMOUNT_OUT_UNADJ
+        description: 'The amount of tokens out without decimal adjustment.'
       - name: AMOUNT_OUT
         description: 'The amount of tokens out.'
         tests:
