@@ -57,8 +57,6 @@ univ3_swaps AS (
       tick_spacing
     ) AS pool_name,
     'Swap' AS event_name,
-    amount0_unadj AS amount_in_unadj,
-    amount1_unadj AS amount_out_unadj,
     amount0_unadj / pow(10, COALESCE(c1.decimals, 18)) AS amount0_adjusted,
     amount1_unadj / pow(10, COALESCE(c2.decimals, 18)) AS amount1_adjusted,
     CASE
@@ -74,6 +72,10 @@ univ3_swaps AS (
       )
     END AS amount1_usd,
     CASE
+      WHEN amount0_unadj > 0 THEN ABS(amount0_unadj)
+      ELSE ABS(amount1_unadj)
+    END AS amount_in_unadj,
+    CASE
       WHEN amount0_unadj > 0 THEN ABS(amount0_adjusted)
       ELSE ABS(amount1_adjusted)
     END AS amount_in,
@@ -81,6 +83,10 @@ univ3_swaps AS (
       WHEN amount0_unadj > 0 THEN ABS(amount0_usd)
       ELSE ABS(amount1_usd)
     END AS amount_in_usd,
+    CASE
+      WHEN amount0_unadj < 0 THEN ABS(amount0_unadj)
+      ELSE ABS(amount1_unadj)
+    END AS amount_out_unadj,
     CASE
       WHEN amount0_unadj < 0 THEN ABS(amount0_adjusted)
       ELSE ABS(amount1_adjusted)
