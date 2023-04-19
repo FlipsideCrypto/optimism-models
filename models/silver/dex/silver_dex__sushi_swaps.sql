@@ -3,9 +3,7 @@
     persist_docs ={ "relation": true,
     "columns": true },
     unique_key = '_log_id',
-    cluster_by = ['block_timestamp::DATE'],
-    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'SUSHI',
-    'PURPOSE': 'DEFI, DEX, SWAPS' }} }
+    cluster_by = ['block_timestamp::DATE']
 ) }}
 
 WITH swap_events AS (
@@ -70,8 +68,8 @@ FINAL AS (
         token0_decimals,
         token1_decimals,
         CASE
-            WHEN token_in = token0_address THEN amountIn :: FLOAT
-            WHEN token_in = token1_address THEN amountIn :: FLOAT
+            WHEN token_in = token0_address THEN amountIn
+            WHEN token_in = token1_address THEN amountIn
         END AS amount_in_unadj,
         CASE
             WHEN token_in = token0_address THEN amountIn / power(
@@ -84,8 +82,8 @@ FINAL AS (
             ) :: FLOAT
         END AS amount_in,
         CASE
-            WHEN token_out = token0_address THEN amountOut :: FLOAT
-            WHEN token_out = token1_address THEN amountOut :: FLOAT
+            WHEN token_out = token0_address THEN amountOut
+            WHEN token_out = token1_address THEN amountOut
         END AS amount_out_unadj,
         CASE
             WHEN token_out = token0_address THEN amountOut / power(
