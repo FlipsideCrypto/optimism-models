@@ -26,7 +26,7 @@ WITH pools AS (
             --dpp - factory,
             '0x1f83858cd6d0ae7a08ab1fd977c06dabece6d711',
             --dsp - factory
-            '0x2b800dc6270726f7e2266ce8cd5a3f8436fe0b40',
+            '0x2b800dc6270726f7e2266ce8cd5a3f8436fe0b40'
              --dvm - factory
         )
         AND topics [0] :: STRING IN (

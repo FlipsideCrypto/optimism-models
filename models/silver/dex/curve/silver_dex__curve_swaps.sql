@@ -22,7 +22,7 @@ WITH pool_meta AS (
     LEFT JOIN (
         SELECT
             pool_address,
-            array_agg(pool_symbol)::STRING AS agg_symbol
+            array_agg(DISTINCT pool_symbol)::STRING AS agg_symbol
         FROM {{ ref('silver_dex__curve_pools') }}
         GROUP BY 1
         ) USING(pool_address)
