@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = "pool_id",
-    full_refresh = false
+
 ) }}
 
 WITH contract_deployments AS (
@@ -10,17 +10,19 @@ SELECT
     tx_hash,
     block_number,
     block_timestamp,
-    deployer_address,
-    contract_address,
-    _inserted_timestamp
+    from_address AS deployer_address,
+    to_address AS contract_address,
+    _inserted_timestamp,
+    ROW_NUMBER() OVER (ORDER BY contract_address) AS row_num
 FROM
     {{ ref('silver__traces' )}}
 WHERE 
     -- curve contract deployers
-    from_address IN (
+   from_address IN (
         '0x2db0e83599a91b508ac268a6197b8b14f5e72840',
         '0x7eeac6cddbd1d0b8af061742d41877d7f707289a',
-        '0x745748bcfd8f9c2de519a71d789be8a63dd7d66c')
+        '0x745748bcfd8f9c2de519a71d789be8a63dd7d66c'
+        )
     AND TYPE ilike 'create%'
     AND TX_STATUS ilike 'success'
 {% if is_incremental() %}
@@ -43,6 +45,14 @@ QUALIFY(ROW_NUMBER() OVER(PARTITION BY to_address ORDER BY block_timestamp ASC))
 function_sigs AS (
 
 SELECT
+	'0x87cb4f57' AS function_sig,
+    'base_coins' AS function_name
+UNION ALL
+SELECT
+	'0xb9947eb0' AS function_sig,
+    'underlying_coins' AS function_name
+UNION ALL
+SELECT
     '0xc6610657' AS function_sig, 
     'coins' AS function_name
 UNION ALL
@@ -63,7 +73,7 @@ function_inputs AS (
     SELECT
         SEQ4() AS function_input
     FROM
-        TABLE(GENERATOR(rowcount => 4))
+        TABLE(GENERATOR(rowcount => 8))
 ),
 
 inputs_coins AS (
@@ -79,6 +89,36 @@ FROM contract_deployments
 JOIN function_sigs ON 1=1
 JOIN function_inputs ON 1=1
     WHERE function_name = 'coins'
+),
+
+inputs_base_coins AS (
+
+SELECT
+    deployer_address,
+    contract_address,
+    block_number,
+    function_sig,
+    (ROW_NUMBER() OVER (PARTITION BY contract_address
+        ORDER BY block_number)) - 1 AS function_input
+FROM contract_deployments
+JOIN function_sigs ON 1=1
+JOIN function_inputs ON 1=1
+    WHERE function_name = 'base_coins'
+),
+
+inputs_underlying_coins AS (
+
+SELECT
+    deployer_address,
+    contract_address,
+    block_number,
+    function_sig,
+    (ROW_NUMBER() OVER (PARTITION BY contract_address
+        ORDER BY block_number)) - 1 AS function_input
+FROM contract_deployments
+JOIN function_sigs ON 1=1
+JOIN function_inputs ON 1=1
+    WHERE function_name = 'underlying_coins'
 ),
 
 inputs_pool_details AS (
@@ -110,40 +150,29 @@ SELECT
     block_number,
     function_sig,
     function_input
-FROM inputs_pool_details
-),
-
-ready_reads_pools AS (
-SELECT 
+FROM inputs_base_coins
+UNION ALL
+SELECT
     deployer_address,
     contract_address,
     block_number,
     function_sig,
-    function_input,
-    CONCAT(
-        '[\'',
-        contract_address,
-        '\',',
-        block_number,
-        ',\'',
-        function_sig,
-        '\',\'',
-        (CASE WHEN function_input IS NULL THEN '' ELSE function_input::STRING END),
-        '\']'
-        ) AS read_input
-FROM all_inputs
-),
-
-batch_reads_pools AS (
-    
+    function_input
+FROM inputs_underlying_coins
+UNION ALL
 SELECT
-    CONCAT('[', LISTAGG(read_input, ','), ']') AS batch_read
-FROM
-    ready_reads_pools
+    deployer_address,
+    contract_address,
+    block_number,
+    function_sig,
+    function_input
+FROM inputs_pool_details
 ),
 
 pool_token_reads AS (
 
+{% for item in range(8) %}
+(
 SELECT
     ethereum.streamline.udf_json_rpc_read_calls(
         node_url,
@@ -151,19 +180,42 @@ SELECT
         PARSE_JSON(batch_read)
     ) AS read_output,
     SYSDATE() AS _inserted_timestamp
-FROM
-    batch_reads_pools
-JOIN streamline.crosschain.node_mapping ON 1=1 
+FROM (
+    SELECT
+        CONCAT('[', LISTAGG(read_input, ','), ']') AS batch_read
+    FROM (
+        SELECT 
+            deployer_address,
+            contract_address,
+            block_number,
+            function_sig,
+            function_input,
+            CONCAT(
+                '[\'',
+                contract_address,
+                '\',',
+                block_number,
+                ',\'',
+                function_sig,
+                '\',\'',
+                (CASE WHEN function_input IS NULL THEN '' ELSE function_input::STRING END),
+                '\']'
+                ) AS read_input,
+                row_num
+        FROM all_inputs
+        LEFT JOIN contract_deployments USING(contract_address) 
+            ) ready_reads_pools
+    WHERE row_num BETWEEN {{ item * 500 + 1 }} AND {{ (item + 1) * 500}}
+    ) batch_reads_pools
+JOIN {{ source(
+            'streamline_crosschain',
+            'node_mapping'
+        ) }} ON 1=1 
     AND chain = 'optimism'
-WHERE
-    EXISTS (
-        SELECT
-            1
-        FROM
-            ready_reads_pools
-        LIMIT
-            1
-    ) 
+) {% if not loop.last %}
+UNION ALL
+{% endif %}
+{% endfor %}
 ),
 
 reads_adjusted AS (
@@ -193,13 +245,15 @@ SELECT
     contract_address,
     function_sig,
     function_name,
+    function_input,
     read_result,
     regexp_substr_all(SUBSTR(read_result, 3, len(read_result)), '.{64}')[0]AS segmented_token_address,
     _inserted_timestamp
 FROM reads_adjusted
 LEFT JOIN function_sigs USING(function_sig)
-WHERE read_result IS NOT NULL
-    AND function_name = 'coins'
+WHERE function_name IN ('coins','base_coins','underlying_coins')
+    AND read_result IS NOT NULL
+    
 ),
 
 pool_details AS (
@@ -208,49 +262,79 @@ SELECT
     contract_address,
     function_sig,
     function_name,
+    function_input,
     read_result,
     regexp_substr_all(SUBSTR(read_result, 3, len(read_result)), '.{64}') AS segmented_output,
     _inserted_timestamp
 FROM reads_adjusted
 LEFT JOIN function_sigs USING(function_sig)
-WHERE read_result IS NOT NULL
-    AND function_name IN ('name','symbol','decimals')
+WHERE function_name IN ('name','symbol','decimals')
+    AND read_result IS NOT NULL
+
 ),
 
-FINAL AS (
+all_pools AS (
 SELECT
     t.contract_address AS pool_address,
     CONCAT('0x',SUBSTRING(t.segmented_token_address,25,40)) AS token_address,
+    function_input AS token_id,
+    function_name AS token_type,
     MIN(CASE WHEN p.function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(RTRIM(p.segmented_output [2] :: STRING, 0)) END) AS pool_symbol,
     MIN(CASE WHEN p.function_name = 'name' THEN CONCAT(TRY_HEX_DECODE_STRING(p.segmented_output [2] :: STRING),
         TRY_HEX_DECODE_STRING(segmented_output [3] :: STRING)) END) AS pool_name,
     MIN(CASE 
             WHEN p.read_result::STRING = '0x' THEN NULL
-            ELSE ethereum.public.udf_hex_to_int(p.read_result::STRING)
+            ELSE ethereum.public.udf_hex_to_int(LEFT(p.read_result::STRING,66))
         END)::INTEGER  AS pool_decimals,
     CONCAT(
         t.contract_address,
         '-',
-        CONCAT('0x',SUBSTRING(t.segmented_token_address,25,40))
+        CONCAT('0x',SUBSTRING(t.segmented_token_address,25,40)),
+        '-',
+        function_input,
+        '-',
+        function_name
     ) AS pool_id,
     MAX(t._inserted_timestamp) AS _inserted_timestamp
 FROM tokens t
-LEFT JOIN pool_details p ON t.contract_address = p.contract_address
+LEFT JOIN pool_details p USING(contract_address)
 WHERE token_address IS NOT NULL 
     AND token_address <> '0x0000000000000000000000000000000000000000'
-GROUP BY 1,2
-)
+GROUP BY 1,2,3,4
+),
 
+FINAL AS (
 SELECT
     pool_address,
     CASE
         WHEN token_address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' THEN '0x4200000000000000000000000000000000000006'
         ELSE token_address
     END AS token_address,
+    token_id,
+    token_type,
     CASE 
         WHEN token_address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' THEN 'WETH'
+        WHEN pool_symbol IS NULL THEN c.token_symbol
         ELSE pool_symbol
     END AS pool_symbol,
+    pool_name,
+    CASE 
+        WHEN token_address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' THEN '18'
+    	WHEN pool_decimals IS NULL THEN c.token_decimals
+        ELSE pool_decimals
+    END AS pool_decimals,
+    pool_id,
+    a._inserted_timestamp
+FROM all_pools a
+LEFT JOIN {{ ref('silver__contracts') }} c ON a.token_address = c.contract_address
+)
+
+SELECT
+    pool_address,
+    token_address,
+    token_id,
+    token_type,
+    pool_symbol,
     pool_name,
     pool_decimals,
     pool_id,

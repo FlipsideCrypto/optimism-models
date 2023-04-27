@@ -311,53 +311,52 @@ curve_swaps AS (
     origin_from_address,
     origin_to_address,
     contract_address,
-    pool_name,
     event_name,
-    token_in,
-    token_out,
-    c1.symbol AS symbol_in,
-    c2.symbol AS symbol_out,
-    c1.decimals AS decimals_in,
-    c2.decimals AS decimals_out,
-    tokens_sold AS amount_in_unadj,
-    CASE
-      WHEN decimals_in IS NOT NULL THEN tokens_sold / pow(
-        10,
-        decimals_in
-      )
-      ELSE tokens_sold
-    END AS amount_in,
-    tokens_bought AS amount_out_unadj,
-    CASE
-      WHEN decimals_out IS NOT NULL THEN tokens_bought / pow(
-        10,
-        decimals_out
-      )
-      ELSE tokens_bought
-    END AS amount_out,
+    s.tokens_sold AS amount_in_unadj,
+    s.tokens_bought AS amount_out_unadj,
     sender,
     tx_to,
     event_index,
     platform,
+    token_in,
+    token_out,
+    COALESCE(c1.symbol,s.symbol_in) AS token_symbol_in,
+    COALESCE(c2.symbol,s.symbol_out) AS token_symbol_out,
+    pool_name,
+    c1.decimals AS decimals_in,
+    CASE
+        WHEN decimals_in IS NOT NULL THEN s.tokens_sold / pow(
+            10,
+            decimals_in
+        )
+        ELSE s.tokens_sold
+    END AS amount_in,
+    c2.decimals AS decimals_out,
+    CASE
+        WHEN decimals_out IS NOT NULL THEN s.tokens_bought / pow(
+            10,
+            decimals_out
+        )
+        ELSE s.tokens_bought
+    END AS amount_out,
     _log_id,
     _inserted_timestamp
   FROM
-    {{ ref('silver_dex__curve_swaps') }}
-    s
-    LEFT JOIN contracts c1
+    {{ ref('silver_dex__curve_swaps') }} s
+  LEFT JOIN contracts c1
     ON c1.address = s.token_in
-    LEFT JOIN contracts c2
+  LEFT JOIN contracts c2
     ON c2.address = s.token_out
-  WHERE
-    symbol_out <> symbol_in
-
+  WHERE amount_out <> 0
+    AND COALESCE(token_symbol_in,'null') <> COALESCE(token_symbol_out,'null')
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
-  SELECT
-    MAX(_inserted_timestamp) :: DATE - 1
-  FROM
-    {{ this }}
-)
+AND
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE
+    FROM
+      {{ this }}
+  )
 {% endif %}
 ),
 beethovenx_swaps AS (
