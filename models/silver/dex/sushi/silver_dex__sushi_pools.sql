@@ -12,19 +12,16 @@ WITH pool_creation AS (
         event_index,
         contract_address,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS token0,
-        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token1,
-        CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS pool_address,
-        ethereum.public.udf_hex_to_int(
-            segmented_data [1] :: STRING
-        ) :: INT AS pool_id,
+        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS pool_address,
+        CONCAT('0x', SUBSTR(segmented_data [2] :: STRING, 25, 40)) AS token0,
+        CONCAT('0x', SUBSTR(segmented_data [3] :: STRING, 25, 40)) AS token1,
         _log_id,
         _inserted_timestamp
     FROM
         {{ ref ('silver__logs') }}
     WHERE
-        contract_address = LOWER('0xc35DADB65012eC5796536bD9864eD8773aBc74C4')
-        AND topics [0] :: STRING = '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9' --PairCreated
+        contract_address IN ('0xcaabdd9cf4b61813d4a52f980d6bc1b713fe66f5','0x1b02da8cb0d097eb8d57a175b88c7d8b47997506')
+        AND topics [0] :: STRING = '0xe469f9471ac1d98222517eb2cdff1ef4df5f7880269173bb782bb78e499d9de3' --DeployPool
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -49,7 +46,6 @@ SELECT
     token0,
     token1,
     pool_address,
-    pool_id,
     _log_id,
     _inserted_timestamp
 FROM

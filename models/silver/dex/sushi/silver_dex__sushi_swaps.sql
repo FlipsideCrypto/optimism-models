@@ -25,27 +25,18 @@ swaps_base AS (
         contract_address,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         TRY_TO_NUMBER(
-            PUBLIC.udf_hex_to_int(
+            ethereum.public.udf_hex_to_int(
                 segmented_data [0] :: STRING
-            ) :: INTEGER
-        ) AS amount0In,
+            )
+        ) AS amountIn,
         TRY_TO_NUMBER(
-            PUBLIC.udf_hex_to_int(
+            ethereum.public.udf_hex_to_int(
                 segmented_data [1] :: STRING
-            ) :: INTEGER
-        ) AS amount1In,
-        TRY_TO_NUMBER(
-            PUBLIC.udf_hex_to_int(
-                segmented_data [2] :: STRING
-            ) :: INTEGER
-        ) AS amount0Out,
-        TRY_TO_NUMBER(
-            PUBLIC.udf_hex_to_int(
-                segmented_data [3] :: STRING
-            ) :: INTEGER
-        ) AS amount1Out,
-        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS sender,
-        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS tx_to,
+            )
+        ) AS amountOut,
+        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS tx_to,
+        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS tokenIn,
+        CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS tokenOut,
         token0,
         token1,
         _log_id,
@@ -55,7 +46,7 @@ swaps_base AS (
         INNER JOIN pools p
         ON p.pool_address = contract_address
     WHERE
-        topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822'
+        topics [0] :: STRING = '0xcd3829a3813dc3cdd188fd3d01dcf3268c16be2fdd2dd21d0665418816e46062'
         AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
@@ -76,41 +67,17 @@ SELECT
     tx_hash,
     event_index,
     contract_address,
-    sender,
+    origin_from_address AS sender,
     tx_to,
-    amount0In,
-    amount1In,
-    amount0Out,
-    amount1Out,
+    amountIn AS amount_in_unadj,
+    amountOut AS amount_out_unadj,
+    tokenIn AS token_in,
+    tokenOut AS token_out,
     token0,
     token1,
-    CASE
-        WHEN amount0In <> 0
-        AND amount1In <> 0
-        AND amount0Out <> 0 THEN amount1In
-        WHEN amount0In <> 0 THEN amount0In
-        WHEN amount1In <> 0 THEN amount1In
-    END AS amount_in_unadj,
-    CASE
-        WHEN amount0Out <> 0 THEN amount0Out
-        WHEN amount1Out <> 0 THEN amount1Out
-    END AS amount_out_unadj,
-    CASE
-        WHEN amount0In <> 0
-        AND amount1In <> 0
-        AND amount0Out <> 0 THEN token1
-        WHEN amount0In <> 0 THEN token0
-        WHEN amount1In <> 0 THEN token1
-    END AS token_in,
-    CASE
-        WHEN amount0Out <> 0 THEN token0
-        WHEN amount1Out <> 0 THEN token1
-    END AS token_out,
     'Swap' AS event_name,
     'sushiswap' AS platform,
     _log_id,
     _inserted_timestamp
 FROM
     swaps_base
-WHERE
-    token_in <> token_out

@@ -32,7 +32,7 @@ prices AS (
 {% if is_incremental() %}
 AND HOUR >= (
   SELECT
-    MAX(_inserted_timestamp) :: DATE - 1
+    MAX(_inserted_timestamp) :: DATE - 2
   FROM
     {{ this }}
 )
@@ -190,11 +190,6 @@ sushi_swaps AS (
     origin_from_address,
     origin_to_address,
     contract_address,
-    CONCAT(
-      c1.symbol,
-      '-',
-      c2.symbol
-    ) AS pool_name,
     event_name,
     c1.decimals AS decimals_in,
     c1.symbol AS symbol_in,
@@ -216,6 +211,7 @@ sushi_swaps AS (
     platform,
     token_in,
     token_out,
+    CONCAT(LEAST(symbol_in, symbol_out), '-', GREATEST(symbol_in, symbol_out)) AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
@@ -250,11 +246,7 @@ synthetix_swaps AS (
     token_out,
     symbol_in,
     symbol_out,
-    CONCAT(
-      LEAST(symbol_in,symbol_out),
-      '-',
-      GREATEST(symbol_in,symbol_out)
-    ) AS pool_name,
+    CONCAT(LEAST(symbol_in, symbol_out), '-', GREATEST(symbol_in, symbol_out)) AS pool_name,
     COALESCE(
       decimals_in,
       18
@@ -469,11 +461,7 @@ kyberswap_v1_static AS (
     platform,
     token_in,
     token_out,
-    CONCAT(
-      LEAST(symbol_in,symbol_out),
-      '-',
-      GREATEST(symbol_in,symbol_out)
-    ) AS pool_name,
+    CONCAT(LEAST(symbol_in, symbol_out), '-', GREATEST(symbol_in, symbol_out)) AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
@@ -524,11 +512,7 @@ kyberswap_v2_elastic AS (
     platform,
     token_in,
     token_out,
-    CONCAT(
-      LEAST(symbol_in,symbol_out),
-      '-',
-      GREATEST(symbol_in,symbol_out)
-    ) AS pool_name,
+    CONCAT(LEAST(symbol_in, symbol_out), '-', GREATEST(symbol_in, symbol_out)) AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
@@ -579,11 +563,7 @@ fraxswap_swaps AS (
     platform,
     token_in,
     token_out,
-    CONCAT(
-      LEAST(symbol_in,symbol_out),
-      '-',
-      GREATEST(symbol_in,symbol_out)
-    ) AS pool_name,
+    CONCAT(LEAST(symbol_in, symbol_out), '-', GREATEST(symbol_in, symbol_out)) AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
@@ -634,11 +614,7 @@ woofi_swaps AS (
     platform,
     token_in,
     token_out,
-    CONCAT(
-      LEAST(symbol_in,symbol_out),
-      '-',
-      GREATEST(symbol_in,symbol_out)
-    ) AS pool_name,
+    CONCAT(LEAST(symbol_in, symbol_out), '-', GREATEST(symbol_in, symbol_out)) AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
@@ -689,11 +665,7 @@ dodo_v2_swaps AS (
     platform,
     token_in,
     token_out,
-    CONCAT(
-      LEAST(symbol_in,symbol_out),
-      '-',
-      GREATEST(symbol_in,symbol_out)
-    ) AS pool_name,
+    CONCAT(LEAST(symbol_in, symbol_out), '-', GREATEST(symbol_in, symbol_out)) AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
@@ -843,8 +815,8 @@ all_dex_standard AS (
     pool_name,
     event_name,
     amount_in_unadj,
-    amount_out_unadj,
     amount_in,
+    amount_out_unadj,
     amount_out,
     sender,
     tx_to,
@@ -869,11 +841,14 @@ all_dex_standard AS (
     origin_from_address,
     origin_to_address,
     contract_address,
-    pool_name,
+    CASE
+      WHEN pool_name = 'WETH-WETH' THEN 'ETH-WETH'
+      ELSE pool_name
+    END AS pool_name,
     event_name,
     amount_in_unadj,
-    amount_out_unadj,
     amount_in,
+    amount_out_unadj,
     amount_out,
     sender,
     tx_to,
@@ -901,8 +876,8 @@ all_dex_standard AS (
     pool_name,
     event_name,
     amount_in_unadj,
-    amount_out_unadj,
     amount_in,
+    amount_out_unadj,
     amount_out,
     sender,
     tx_to,
@@ -930,8 +905,8 @@ all_dex_standard AS (
     pool_name,
     event_name,
     amount_in_unadj,
-    amount_out_unadj,
     amount_in,
+    amount_out_unadj,
     amount_out,
     sender,
     tx_to,
@@ -959,8 +934,8 @@ all_dex_standard AS (
     pool_name,
     event_name,
     amount_in_unadj,
-    amount_out_unadj,
     amount_in,
+    amount_out_unadj,
     amount_out,
     sender,
     tx_to,
@@ -1134,10 +1109,7 @@ SELECT
   origin_from_address,
   origin_to_address,
   contract_address,
-  CASE
-    WHEN pool_name = 'WETH-WETH' THEN 'ETH-WETH'
-    ELSE pool_name
-  END AS pool_name,
+  pool_name,
   event_name,
   amount_in_unadj,
   amount_in,
