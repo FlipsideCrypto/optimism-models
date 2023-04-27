@@ -1,36 +1,43 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = "pool_id"
+    unique_key = "pool_id",
+    full_refresh = false
 ) }}
 
 WITH contract_deployments AS (
 
 SELECT
-    a.tx_hash AS tx_hash,
-    a.block_number AS block_number,
-    a.block_timestamp AS block_timestamp,
-    a.from_address AS deployer_address,
-    a.to_address AS contract_address,
-    a._inserted_timestamp AS _inserted_timestamp
+    tx_hash,
+    block_number,
+    block_timestamp,
+    deployer_address,
+    contract_address,
+    _inserted_timestamp
 FROM
-    {{ ref('silver__traces' )}} a
+    {{ ref('silver__traces' )}}
 WHERE 
     -- curve contract deployers
-    a.from_address IN (
+    from_address IN (
         '0x2db0e83599a91b508ac268a6197b8b14f5e72840',
         '0x7eeac6cddbd1d0b8af061742d41877d7f707289a',
         '0x745748bcfd8f9c2de519a71d789be8a63dd7d66c')
     AND TYPE ilike 'create%'
     AND TX_STATUS ilike 'success'
 {% if is_incremental() %}
-AND a.to_address NOT IN (
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(_inserted_timestamp) :: DATE - 3
+    FROM
+        {{ this }}
+)
+AND to_address NOT IN (
     SELECT
         DISTINCT pool_address
     FROM
         {{ this }}
 )
 {% endif %}
-QUALIFY(ROW_NUMBER() OVER(PARTITION BY a.to_address ORDER BY block_timestamp ASC)) = 1
+QUALIFY(ROW_NUMBER() OVER(PARTITION BY to_address ORDER BY block_timestamp ASC)) = 1
 ),
 
 function_sigs AS (

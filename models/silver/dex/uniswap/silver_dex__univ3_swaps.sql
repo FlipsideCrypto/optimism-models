@@ -44,7 +44,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 2
+        ) :: DATE
     FROM
         {{ this }}
 )

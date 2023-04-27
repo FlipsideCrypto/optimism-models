@@ -1,28 +1,56 @@
 {{ config(
-    materialized = 'table',
-    meta={
-        'database_tags':{
-            'table': {
-                'PROTOCOL': 'SUSHI',
-                'PURPOSE': 'DEFI, DEX'
-            }
-        }
-    }
+    materialized = 'incremental',
+    unique_key = "pool_address"
 ) }}
 
+WITH pool_creation AS (
+
     SELECT
-        pool_address,
-        pool as pool_name,
-        fee_tier,
-        TWAP,
-        lower(token0_address) as token0_address,
-        token0_name as token0_symbol,
-        lower(token1_address) as token1_address,
-        token1_name as token1_symbol,
-        token0_decimal as token0_decimals,
-        token1_decimal as token1_decimals 
+        block_number,
+        block_timestamp,
+        tx_hash,
+        event_index,
+        contract_address,
+        regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
+        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS token0,
+        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token1,
+        CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS pool_address,
+        ethereum.public.udf_hex_to_int(
+            segmented_data [1] :: STRING
+        ) :: INT AS pool_id,
+        _log_id,
+        _inserted_timestamp
     FROM
-         {{ source(
-            'optimism_pools',
-            'SUSHI_DIM_DEX_POOLS'
-        ) }} 
+        {{ ref ('silver__logs') }}
+    WHERE
+        contract_address = LOWER('0xc35DADB65012eC5796536bD9864eD8773aBc74C4')
+        AND topics [0] :: STRING = '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9' --PairCreated
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(_inserted_timestamp) :: DATE
+    FROM
+        {{ this }}
+)
+AND pool_address NOT IN (
+    SELECT
+        DISTINCT pool_address
+    FROM
+        {{ this }}
+)
+{% endif %}
+)
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    event_index,
+    token0,
+    token1,
+    pool_address,
+    pool_id,
+    _log_id,
+    _inserted_timestamp
+FROM
+    pool_creation
