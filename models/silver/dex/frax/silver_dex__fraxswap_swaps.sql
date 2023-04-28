@@ -112,3 +112,4 @@ SELECT
     _inserted_timestamp
 FROM
     swaps_base
+WHERE token_in <> token_out
