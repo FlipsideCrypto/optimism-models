@@ -180,6 +180,15 @@ velodrome_swaps AS (
   FROM
     {{ ref('velodrome__ez_swaps') }}
     s
+  {% if is_incremental() %}
+  WHERE
+    block_timestamp >= (
+      SELECT
+        MAX(block_timestamp) :: DATE - 7
+      FROM
+        {{ this }}
+    )
+  {% endif %}
 ),
 sushi_swaps AS (
   SELECT
