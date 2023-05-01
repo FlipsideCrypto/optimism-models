@@ -34,6 +34,7 @@ SELECT
 	DISTINCT pool_address,
 	pool_name
 FROM pool_meta
+QUALIFY (ROW_NUMBER() OVER (PARTITION BY pool_address ORDER BY pool_name ASC)) = 1
 ),
 
 curve_base AS (
