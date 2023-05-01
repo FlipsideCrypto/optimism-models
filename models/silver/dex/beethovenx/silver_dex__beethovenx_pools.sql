@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = "pool_address",
+    full_refresh = false
 ) }}
 
 WITH pool_creation AS (
@@ -17,6 +18,12 @@ WITH pool_creation AS (
         topics[0]::STRING = '0x3c13bc30b8e878c53fd2a36b679409c073afd75950be43d8858768e956fbc20e'
         AND contract_address = '0xba12222222228d8ba445958a75a0704d566bf2c8'
 {% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(_inserted_timestamp) :: DATE
+    FROM
+        {{ this }}
+)
 AND pool_address NOT IN (
     SELECT
         DISTINCT pool_address

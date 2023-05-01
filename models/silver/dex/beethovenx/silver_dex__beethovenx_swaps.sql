@@ -55,7 +55,7 @@ swaps_base AS (
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
+        MAX(_inserted_timestamp) :: DATE
     FROM
         {{ this }}
 )
@@ -69,7 +69,6 @@ SELECT
     origin_function_signature,
     origin_from_address,
     origin_to_address,
-    contract_address,
     _inserted_timestamp,
     s.event_name,
     event_index,
@@ -78,7 +77,7 @@ SELECT
     s.pool_id,
     token_in,
     token_out,
-    s.pool_address,
+    s.pool_address AS contract_address,
     s._log_id,
     s.ingested_at,
     s.platform,

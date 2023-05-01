@@ -1,15 +1,15 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'pool_address',
-    cluster_by = ['_inserted_timestamp::DATE']
+    cluster_by = ['block_timestamp::DATE']
 ) }}
 
 WITH created_pools AS (
 
     SELECT
-        block_number AS created_block,
-        block_timestamp AS created_time,
-        tx_hash AS created_tx_hash,
+        block_number,
+        block_timestamp,
+        tx_hash,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         LOWER(CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40))) AS token0_address,
         LOWER(CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40))) AS token1_address,
@@ -34,7 +34,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 2
+        ) :: DATE
     FROM
         {{ this }}
 )
@@ -67,11 +67,21 @@ AND _inserted_timestamp >= (
 {% endif %}
 ),
 
+legacy_pools AS (
+
+    SELECT
+        pool_address,
+        token0 AS token0_address,
+        token1 AS token1_address,
+        fee
+    FROM {{ ref('silver__univ3_ovm1_legacy_pools') }}
+),
+
 FINAL AS (
     SELECT
-        created_block,
-        created_time,
-        created_tx_hash,
+        block_number,
+        block_timestamp,
+        tx_hash,
         token0_address,
         token1_address,
         fee :: INTEGER AS fee,
@@ -89,6 +99,22 @@ FINAL AS (
         created_pools
         LEFT JOIN initial_info
         ON pool_address = contract_address
+    UNION
+    SELECT
+        0 AS block_number,
+        '1970-01-01 00:00:00' :: TIMESTAMP AS block_timestamp,
+        NULL AS tx_hash,
+        token0_address,
+        token1_address,
+        fee,
+        (
+            fee / 10000
+        ) :: FLOAT AS fee_percent,
+        NULL AS tick_spacing,
+        pool_address,
+        NULL AS init_tick,
+        '1970-01-01 00:00:00' :: TIMESTAMP AS _inserted_timestamp
+    FROM legacy_pools
 )
 
 SELECT

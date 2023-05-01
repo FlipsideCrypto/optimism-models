@@ -14,7 +14,6 @@ WITH swaps_base AS (
         origin_from_address,
         origin_to_address,
         contract_address,
-        NULL AS pool_name,
         'Swap' AS event_name,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS sender,
@@ -46,7 +45,7 @@ WITH swaps_base AS (
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
+        MAX(_inserted_timestamp) :: DATE
     FROM
         {{ this }}
 )
@@ -62,7 +61,6 @@ SELECT
     origin_from_address,
     origin_to_address,
     contract_address,
-    pool_name,
     event_name,
     sender,
     amount_in_unadj,

@@ -1,6 +1,7 @@
 version: 2
 models:
-  - name: silver_dex__complete_dex_swaps
+  - name: silver_dex__fraxswap_swaps
+   
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -16,11 +17,9 @@ models:
       - name: BLOCK_TIMESTAMP
         tests:
           - not_null
-          - dbt_expectations.expect_row_values_to_have_recent_data:
-              datepart: day
-              interval: 1
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
+                - TIMESTAMP_LTZ
                 - TIMESTAMP_NTZ
       - name: TX_HASH
         tests:
@@ -32,73 +31,16 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: EVENT_NAME
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING
-                - VARCHAR
-          - not_null
-      - name: AMOUNT_IN_UNADJ
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT
-      - name: AMOUNT_IN
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT
-      - name: AMOUNT_OUT_UNADJ
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT
-      - name: AMOUNT_OUT
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT
-      - name: AMOUNT_IN_USD
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT
-      - name: AMOUNT_OUT_USD
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT
       - name: TOKEN_IN
         tests:
-          - not_null:
-              where: PLATFORM <> 'uniswap-v3'
+          - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: TOKEN_OUT
         tests:
-          - not_null:
-              where: PLATFORM <> 'uniswap-v3'
+          - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: SYMBOL_IN
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING
-                - VARCHAR
-      - name: SYMBOL_OUT
-        tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING
-                - VARCHAR
       - name: SENDER
         tests:
           - not_null:
@@ -110,7 +52,6 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-              enabled: False
       - name: PLATFORM
         tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
