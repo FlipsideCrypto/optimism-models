@@ -27,12 +27,7 @@ eth_price AS (
         HOUR,
         price AS eth_price
     FROM
-        {{ source(
-            'ethereum',
-            'fact_hourly_token_prices'
-        ) }}
-    WHERE
-        token_address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        {{ ref('silver__prices_eth') }}
 )
 SELECT
     A.tx_hash AS tx_hash,

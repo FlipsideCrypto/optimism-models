@@ -13,10 +13,4 @@ SELECT
     label_subtype,
     project_name
 FROM
-    {{ source(
-        'crosschain',
-        'address_labels'
-    ) }}
-WHERE
-    blockchain = 'optimism'
-    AND address LIKE '0x%'
+    {{ ref('silver__labels') }}

@@ -55,6 +55,8 @@ sources:
       - name: hourly_prices_coin_gecko
       - name: hourly_prices_coin_market_cap
       - name: apis_keys
+      - name: token_prices_priority_hourly
+      - name: asset_metadata_priority
   - name: streamline_crosschain
     database: streamline
     schema: crosschain
