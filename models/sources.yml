@@ -62,6 +62,11 @@ sources:
     schema: crosschain
     tables: 
       - name: node_mapping
+  - name: crosschain_public
+    database: crosschain
+    schema: bronze_public
+    tables:
+      - name: user_abis
 
   
   
