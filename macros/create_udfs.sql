@@ -11,5 +11,9 @@
 
         {% endset %}
         {% do run_query(sql) %}
+        {% set name %}
+        {{- fsc_utils.create_udfs() -}}
+        {% endset %}
+        {% do run_query(sql) %}
     {% endif %}
 {% endmacro %}
