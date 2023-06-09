@@ -43,7 +43,7 @@ CREATE USER AWS_LAMBDA_OPTIMISM_API_SBX PASSWORD='abc123' DEFAULT_ROLE = AWS_LAM
 
 GRANT SELECT ON ALL VIEWS IN SCHEMA OPTIMISM_DEV.STREAMLINE TO ROLE AWS_LAMBDA_OPTIMISM_API_SBX;
 
-ALTER USER AWS_LAMBDA_OPTIMISM_API_SBX SET ROLE AWS_LAMBDA_OPTIMISM_API_SBX;
+GRANT ROLE AWS_LAMBDA_OPTIMISM_API TO USER AWS_LAMBDA_OPTIMISM_API;
 
 -- Note that the password must meet Snowflake's password requirements, which include a minimum length of 8 characters, at least one uppercase letter, at least one lowercase letter, and at least one number or special character.
 
@@ -51,7 +51,7 @@ ALTER USER AWS_LAMBDA_OPTIMISM_API_SBX SET PASSWORD = 'new_password';
 ```
 ### Register Snowflake integration and UDF's
 
-- Register the ![snowflake api integration](/macros/streamline/api_integrations.sql) either manually on `snowsight worksheet` or via `dbt`
+- Register the ![snowflake api integration](../../../macros/streamline/api_integrations.sql) either manually on `snowsight worksheet` or via `dbt`
 
 ```sql
 -- Manually run on snowflake
@@ -61,7 +61,7 @@ CREATE api integration IF NOT EXISTS aws_optimism_api_sbx_shah api_provider = aw
 ```
 
 ```zsh
-# Use dbt to run create_aws_terra_api macro
+# Use dbt to run create_aws_optimism_api macro
 dbt run-operation create_aws_optimism_api --target dev
 ```
 
@@ -70,14 +70,17 @@ dbt run-operation create_aws_optimism_api --target dev
 
 ```sql
 CREATE
-OR REPLACE EXTERNAL FUNCTION streamline.udf_bulk_json_rpc(json variant) returns text api_integration = aws_terra_api_sbx_shah AS 'https://33fgv8p4d4.execute-api.us-east-1.amazonaws.com/sbx/udf_bulk_json_rpc';
+OR REPLACE EXTERNAL FUNCTION streamline.udf_bulk_json_rpc(json variant) returns text api_integration = aws_optimism_api_sbx_shah AS 'https://3ifufl19z4.execute-api.us-east-1.amazonaws.com/sbx/udf_bulk_json_rpc';
+
+CREATE
+OR REPLACE EXTERNAL FUNCTION streamline.udf_bulk_json_rpc(json variant) returns text api_integration = aws_optimism_api_sbx_shah AS 'https://3ifufl19z4.execute-api.us-east-1.amazonaws.com/sbx/bulk_decode_logs';
 ```
 
 - Add the ![_max_block_by_date.sql](_max_block_by_date.sql) model
 - Add the ![streamline__blocks](streamline__blocks.sql) model
 - Add the ![get_base_table_udft.sql](../.././macros/streamline/get_base_table_udft.sql) macro
 
-- Grant privileges to `AWS_LAMBDA_TERRA_API`
+- Grant privileges to `AWS_LAMBDA_OPTIMISMT_API`
 
 ```sql
 GRANT SELECT ON VIEW streamline.pc_getBlock_realtime TO ROLE AWS_LAMBDA_TERRA_API;
@@ -85,6 +88,12 @@ GRANT SELECT ON VIEW streamline.pc_getBlock_realtime TO ROLE AWS_LAMBDA_TERRA_AP
 GRANT USAGE ON DATABASE OPTIMISM_DEV TO ROLE AWS_LAMBDA_TERRA_API;
 ```
 
+## Run decode models
+
 ```zsh
-dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/core/realtime/streamline__pc_getBlock_realtime.sql --profile terra --target sbx --profiles-dir ~/.dbt
+# SBX
+dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/decoder/streamline__decode_logs_realtime.sql --profile optimism --target sbx --profiles-dir ~/.dbt
+
+# DEV
+dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/decoder/streamline__decode_logs_realtime.sql --profile optimism --target dev --profiles-dir ~/.dbt
 ```
