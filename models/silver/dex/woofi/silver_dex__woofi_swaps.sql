@@ -20,17 +20,17 @@ WITH router_swaps_base AS (
         CONCAT('0x', SUBSTR(l.topics [2] :: STRING, 27, 40)) AS to_token,
         CONCAT('0x', SUBSTR(l.topics [3] :: STRING, 27, 40)) AS to_address,
         TRY_TO_NUMBER(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 l_segmented_data [0] :: STRING
             )
         ) AS swapType,
         TRY_TO_NUMBER(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 l_segmented_data [1] :: STRING
             )
         ) AS fromAmount,
         TRY_TO_NUMBER(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 l_segmented_data [2] :: STRING
             )
         ) AS toAmount,
@@ -85,12 +85,12 @@ swaps_base AS (
         CONCAT('0x', SUBSTR(l.topics [2] :: STRING, 27, 40)) AS to_token,
         CONCAT('0x', SUBSTR(l.topics [3] :: STRING, 27, 40)) AS to_address,
         TRY_TO_NUMBER(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 l_segmented_data [0] :: STRING
             )
         ) AS fromAmount,
         TRY_TO_NUMBER(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 l_segmented_data [1] :: STRING
             )
         ) AS toAmount,

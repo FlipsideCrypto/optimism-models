@@ -39,24 +39,24 @@ all_records AS (
         network :: STRING AS network,
         chain_id :: STRING AS blockchain,
         tx_count :: INTEGER AS tx_count,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             header :difficulty :: STRING
         ) :: INTEGER AS difficulty,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             header :totalDifficulty :: STRING
         ) :: INTEGER AS total_difficulty,
         header: extraData :: STRING AS extra_data,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             header :gasLimit :: STRING
         ) :: INTEGER AS gas_limit,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             header :gasUsed :: STRING
         ) :: INTEGER AS gas_used,
         header: "hash" :: STRING AS HASH,
         header: parentHash :: STRING AS parent_hash,
         header: receiptsRoot :: STRING AS receipts_root,
         header: sha3Uncles :: STRING AS sha3_uncles,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             header: "size" :: STRING
         ) :: INTEGER AS SIZE,
         CASE
