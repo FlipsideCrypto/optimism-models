@@ -15,7 +15,8 @@
         {{ create_udf_get_chainhead() }}
         {{ create_udf_bulk_json_rpc() }}
         {{ create_udf_bulk_decode_logs() }}
-
+        {{ create_udf_bulk_get_traces() }}
+        
         {% endset %}
         {% do run_query(sql) %}
         {{- fsc_utils.create_udfs() -}}

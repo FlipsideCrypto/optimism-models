@@ -28,3 +28,14 @@
         'https://3ifufl19z4.execute-api.us-east-1.amazonaws.com/sbx/bulk_decode_logs'
     {%- endif %};
 {% endmacro %}
+
+{% macro create_udf_bulk_get_traces() %}
+    CREATE
+    OR REPLACE EXTERNAL FUNCTION streamline.udf_bulk_get_traces(
+        json variant
+    ) returns text api_integration = aws_arbitrum_api AS {% if target.name == "prod" %}
+        'https://s7qxto6wkd.execute-api.us-east-1.amazonaws.com/prod/udf_bulk_get_traces'
+    {% else %}
+        'ttps://4sovbxzgsf.execute-api.us-east-1.amazonaws.com/dev/udf_bulk_get_traces'
+    {%- endif %};
+{% endmacro %}
