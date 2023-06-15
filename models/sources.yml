@@ -67,6 +67,15 @@ sources:
     schema: bronze_public
     tables:
       - name: user_abis
-
+  - name: bronze_streamline
+    database: streamline
+    schema: |
+      {{ "OPTIMISM_DEV" if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else "OPTIMISM" }}
+    tables:
+      - name: receipts
+      - name: blocks
+      - name: transactions
+      - name: debug_traceBlockByNumber
+      - name: decoded_logs
   
   

@@ -70,10 +70,14 @@ dbt run-operation create_aws_optimism_api --target dev
 
 ```sql
 CREATE
-OR REPLACE EXTERNAL FUNCTION streamline.udf_bulk_json_rpc(json variant) returns text api_integration = aws_optimism_api_sbx_shah AS 'https://3ifufl19z4.execute-api.us-east-1.amazonaws.com/sbx/udf_bulk_json_rpc';
+OR REPLACE EXTERNAL FUNCTION streamline.udf_get_chainhead() returns text api_integration = aws_optimism_api_sbx_shah AS 'https://3ifufl19z4.execute-api.us-east-1.amazonaws.com/sbx/udf_bulk_json_rpc';
 
 CREATE
 OR REPLACE EXTERNAL FUNCTION streamline.udf_bulk_json_rpc(json variant) returns text api_integration = aws_optimism_api_sbx_shah AS 'https://3ifufl19z4.execute-api.us-east-1.amazonaws.com/sbx/bulk_decode_logs';
+
+GRANT USAGE ON FUNCTION streamline.udf_get_chainhead() TO DBT_CLOUD_OPTIMISM;
+GRANT USAGE ON FUNCTION streamline.udf_bulk_json_rpc(variantq) TO DBT_CLOUD_OPTIMISM;
+GRANT USAGE ON FUNCTION streamline.udtf_get_base_table(integer) TO DBT_CLOUD_OPTIMISM;
 ```
 
 - Add the ![_max_block_by_date.sql](_max_block_by_date.sql) model
@@ -83,17 +87,20 @@ OR REPLACE EXTERNAL FUNCTION streamline.udf_bulk_json_rpc(json variant) returns 
 - Grant privileges to `AWS_LAMBDA_OPTIMISMT_API`
 
 ```sql
-GRANT SELECT ON VIEW streamline.pc_getBlock_realtime TO ROLE AWS_LAMBDA_TERRA_API;
-
-GRANT USAGE ON DATABASE OPTIMISM_DEV TO ROLE AWS_LAMBDA_TERRA_API;
+GRANT USAGE ON DATABASE OPTIMISM_DEV TO ROLE AWS_LAMBDA_OPTIMISM_API;
+GRANT USAGE ON SCHEMA STREAMLINE TO ROLE AWS_LAMBDA_OPTIMISM_API;
+GRANT USAGE ON WAREHOUSE DBT_CLOUD TO ROLE AWS_LAMBDA_OPTIMISM_API;
 ```
 
 ## Run decode models
 
 ```zsh
 # SBX
-dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/decoder/streamline__decode_logs_realtime.sql --profile optimism --target sbx --profiles-dir ~/.dbt
+dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/history --profile optimism --target sbx --profiles-dir ~/.dbt
 
 # DEV
-dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/decoder/streamline__decode_logs_realtime.sql --profile optimism --target dev --profiles-dir ~/.dbt
+dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/history/ --profile optimism --target dev --profiles-dir ~/.dbt
+
+# PROD
+dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m 1+models/silver/streamline/history/ --profile optimism --target prod --profiles-dir ~/.dbt
 ```
