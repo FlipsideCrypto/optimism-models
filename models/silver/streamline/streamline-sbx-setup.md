@@ -96,8 +96,11 @@ GRANT USAGE ON WAREHOUSE DBT_CLOUD TO ROLE AWS_LAMBDA_OPTIMISM_API;
 
 ```zsh
 # SBX
-dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/decoder/streamline__decode_logs_realtime.sql --profile optimism --target sbx --profiles-dir ~/.dbt
+dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/history --profile optimism --target sbx --profiles-dir ~/.dbt
 
 # DEV
-dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/decoder/streamline__decode_logs_realtime.sql --profile optimism --target dev --profiles-dir ~/.dbt
+dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True, "STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES": True}' -m 1+models/silver/streamline/history/ --profile optimism --target dev --profiles-dir ~/.dbt
+
+# PROD
+dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m 1+models/silver/streamline/history/ --profile optimism --target prod --profiles-dir ~/.dbt
 ```
