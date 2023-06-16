@@ -49,7 +49,7 @@ models:
       - name: STATUS
         description: '{{ doc("opt_tx_status") }}' 
       - name: TX_JSON
-        description: '{{ doc("opt_tx_json") }}'
+        description: '{{ doc("deprecation") }}'
       - name: INPUT_DATA
         description: '{{ doc("opt_tx_input_data") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE 
