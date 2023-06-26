@@ -25,6 +25,7 @@ There is more information on how to use dbt docs in the last section of this doc
 **Fact Tables:**
 - [fact_blocks](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_blocks)
 - [fact_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_event_logs)
+- [fact_decoded_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_decoded_event_logs)
 - [fact_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_token_transfers)
 - [fact_traces](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_traces)
 - [fact_transactions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_transactions)
@@ -37,6 +38,7 @@ There is more information on how to use dbt docs in the last section of this doc
 - [ez_dex_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_dex_swaps)
 - [ez_eth_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_eth_transfers)
 - [ez_nft_sales](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_sales)
+- [ez_decoded_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_decoded_event_logs)
 
 **Velodrome**
  - [ez_claimed_rewards](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_claimed_rewards)
