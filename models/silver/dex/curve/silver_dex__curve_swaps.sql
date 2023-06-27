@@ -55,16 +55,16 @@ curve_base AS (
         pool_name,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS sender,
-        TRY_TO_NUMBER(ethereum.public.udf_hex_to_int(
+        TRY_TO_NUMBER(utils.udf_hex_to_int(
             segmented_data [0] :: STRING
         )) AS sold_id,
-        TRY_TO_NUMBER(ethereum.public.udf_hex_to_int(
+        TRY_TO_NUMBER(utils.udf_hex_to_int(
             segmented_data [1] :: STRING
         )) AS tokens_sold,
-        TRY_TO_NUMBER(ethereum.public.udf_hex_to_int(
+        TRY_TO_NUMBER(utils.udf_hex_to_int(
             segmented_data [2] :: STRING
         )) AS bought_id,
-        TRY_TO_NUMBER(ethereum.public.udf_hex_to_int(
+        TRY_TO_NUMBER(utils.udf_hex_to_int(
             segmented_data [3] :: STRING
         )) AS tokens_bought,
         _log_id,
@@ -109,7 +109,7 @@ token_transfers AS (
         tx_hash,
         contract_address AS token_address,
         TRY_TO_NUMBER(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 DATA :: STRING
             )
         ) AS amount,

@@ -21,11 +21,11 @@ WITH staking_actions AS (
             WHEN topics [0] :: STRING = '0xdcbc1c05240f31ff3ad067ef1ee35ce4997762752e3a095284754544f4c709d7' THEN 'deposit'
             WHEN topics [0] :: STRING = '0xf341246adaac6f497bc2a656f546ab9e182111d630394f0c57c710a59a2cb567' THEN 'withdraw'
         END AS staking_action_type,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             segmented_data [0] :: STRING
         ) :: INTEGER AS token_id,
         (
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 segmented_data [1] :: STRING
             ) :: FLOAT / pow(
                 10,
@@ -66,7 +66,7 @@ token_transfer AS (
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS gauge_address,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS lp_provider_address,
         (
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 segmented_data [0] :: STRING
             ) :: FLOAT / pow(
                 10,

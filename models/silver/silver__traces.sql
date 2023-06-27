@@ -96,10 +96,10 @@ base_table AS (
 flattened_traces AS (
     SELECT
         DATA :from :: STRING AS from_address,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             DATA :gas :: STRING
         ) AS gas,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             DATA :gasUsed :: STRING
         ) AS gas_used,
         DATA :input :: STRING AS input,
@@ -108,7 +108,7 @@ flattened_traces AS (
         DATA :to :: STRING AS to_address,
         DATA :type :: STRING AS TYPE,
         CASE
-            WHEN DATA :type :: STRING = 'CALL' THEN ethereum.public.udf_hex_to_int(
+            WHEN DATA :type :: STRING = 'CALL' THEN utils.udf_hex_to_int(
                 DATA :value :: STRING
             ) / pow(
                 10,

@@ -27,7 +27,7 @@ WITH lp_actions AS (
             WHEN topics [0] :: STRING IN(
                 '0xdccd412f0b1252819cb1fd330b93224ca42612892bb3f4f789976e6d81936496',
                 '0x4c209b5fc8ad50758f13e2e1088ba56a560dff690a1c6fef26394f4c03821c4f'
-            ) THEN ethereum.public.udf_hex_to_int(
+            ) THEN utils.udf_hex_to_int(
                 segmented_data [0] :: STRING
             ) :: FLOAT
         END AS amount0_unadj,
@@ -35,7 +35,7 @@ WITH lp_actions AS (
             WHEN topics [0] :: STRING IN(
                 '0xdccd412f0b1252819cb1fd330b93224ca42612892bb3f4f789976e6d81936496',
                 '0x4c209b5fc8ad50758f13e2e1088ba56a560dff690a1c6fef26394f4c03821c4f'
-            ) THEN ethereum.public.udf_hex_to_int(
+            ) THEN utils.udf_hex_to_int(
                 segmented_data [1] :: STRING
             ) :: FLOAT
         END AS amount1_unadj,
@@ -47,7 +47,7 @@ WITH lp_actions AS (
         END AS to_address,
         CASE
             WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' THEN (
-                ethereum.public.udf_hex_to_int(
+                utils.udf_hex_to_int(
                     segmented_data [0] :: STRING
                 ) :: FLOAT / pow(
                     10,

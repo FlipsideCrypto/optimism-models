@@ -27,13 +27,13 @@ swaps_base AS (
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         (CASE 
             WHEN segmented_data [0] = '0x' THEN NULL 
-            ELSE ethereum.public.udf_hex_to_int(
+            ELSE utils.udf_hex_to_int(
             segmented_data [0] :: STRING
                 )
             END) :: INTEGER AS amount_in_unadj,
         (CASE 
             WHEN segmented_data [1] = '0x' THEN NULL 
-            ELSE ethereum.public.udf_hex_to_int(
+            ELSE utils.udf_hex_to_int(
             segmented_data [1] :: STRING
                 ) 
             END) :: INTEGER AS amount_out_unadj,
