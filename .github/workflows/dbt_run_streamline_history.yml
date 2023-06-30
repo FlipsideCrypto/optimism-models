@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   schedule:
     # Runs "every 20 mins (see https://crontab.guru)
-    - cron: '*/20 * * * *'
+    - cron: '*/16 * * * *'
 
 env:
   DBT_PROFILES_DIR: ./
