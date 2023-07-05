@@ -18,28 +18,6 @@ sources:
     schema: core
     tables:
       - name: fact_hourly_token_prices
-  - name: shared
-    schema: silver
-    tables:
-      - name: prices_v2
-      - name: market_asset_metadata
-  - name: legacy_silver
-    database: flipside_prod_db
-    schema: silver
-    tables:
-      - name: hours
-      - name: market_asset_metadata
-      - name: prices_v2
-  - name: optimism_pools
-    database: optimism
-    schema: bronze
-    tables:
-      - name: SUSHI_DIM_DEX_POOLS
-  - name: prices
-    database: FLIPSIDE_PROD_DB
-    schema: SILVER
-    tables:
-      - name: prices_v2
   - name: ethereum_silver
     database: ethereum
     schema: silver
