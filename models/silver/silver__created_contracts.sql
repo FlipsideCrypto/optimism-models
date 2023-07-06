@@ -18,13 +18,12 @@ WHERE
     AND to_address IS NOT NULL
     AND input IS NOT NULL
     AND input != '0x'
+    AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        MAX(
-            _inserted_timestamp
-        )
+        MAX(_inserted_timestamp) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
