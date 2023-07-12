@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   schedule:
     # Runs at minute 0 past every 6th hour. (see https://crontab.guru)
-    - cron: '0 */9 * * *'
+    - cron: '0 */6 * * *'
 
 env:
   DBT_PROFILES_DIR: ./
