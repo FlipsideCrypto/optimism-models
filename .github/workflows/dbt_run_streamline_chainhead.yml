@@ -1,11 +1,11 @@
-name: dbt_run_streamline_realtime
-run-name: dbt_run_streamline_realtime
+name: dbt_run_streamline_chainhead
+run-name: dbt_run_streamline_chainhead
 
 on:
   workflow_dispatch:
   schedule:
-    # Runs "every 30 mins (see https://crontab.guru)
-    - cron: '*/30 * * * *'
+    # Runs "at minute 5 and 35, every hour" (see https://crontab.guru)
+    - cron: '5,35 * * * *'
 
 env:
   DBT_PROFILES_DIR: ./
