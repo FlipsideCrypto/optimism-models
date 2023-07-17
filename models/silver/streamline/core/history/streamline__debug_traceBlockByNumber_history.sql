@@ -37,7 +37,7 @@ SELECT
             ),
             '",{"tracer": "callTracer","timeout": "30s"}',
             '],"id":"',
-            block_number :: STRING,
+            block_number :: INTEGER,
             '"}'
         )
     ) AS request
