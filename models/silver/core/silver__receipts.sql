@@ -99,9 +99,12 @@ FINAL AS (
             ELSE to_address1
         END AS to_address,
         DATA :transactionHash :: STRING AS tx_hash,
-        utils.udf_hex_to_int(
-            DATA :transactionIndex :: STRING
-        ) :: INT AS POSITION,
+        CASE
+            WHEN block_number <> blockNumber THEN NULL
+            ELSE utils.udf_hex_to_int(
+                DATA :transactionIndex :: STRING
+            ) :: INT
+        END AS POSITION,
         utils.udf_hex_to_int(
             DATA :type :: STRING
         ) :: INT AS TYPE,
@@ -114,6 +117,7 @@ SELECT
 FROM
     FINAL
 WHERE
-    tx_hash IS NOT NULL qualify(ROW_NUMBER() over (PARTITION BY block_number, POSITION
+    tx_hash IS NOT NULL
+    AND POSITION IS NOT NULL qualify(ROW_NUMBER() over (PARTITION BY block_number, POSITION
 ORDER BY
     _inserted_timestamp DESC)) = 1
