@@ -35,7 +35,7 @@ SELECT
                 ' ',
                 ''
             ),
-            '",{"tracer": "callTracer"}',
+            '",{"tracer": "callTracer","timeout": "30s"}',
             '],"id":"',
             block_number :: STRING,
             '"}'
