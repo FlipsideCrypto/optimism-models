@@ -31,14 +31,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v1
         with:
-          python-version: '3.7.x'
-          cache: 'pip'
+          python-version: "3.7.x"
 
       - name: install dependencies
         run: |
-          pip3 install dbt-snowflake==${{ vars.DBT_VERSION }} cli_passthrough requests click
+          pip3 install dbt-snowflake~=${{ vars.DBT_VERSION }} cli_passthrough requests click
           dbt deps
       - name: Run DBT Jobs
         run: |
