@@ -1,11 +1,11 @@
-name: dbt_run_streamline_chainhead
-run-name: dbt_run_streamline_chainhead
+name: dbt_run_temp_backfill
+run-name: dbt_run_temp_backfill
 
 on:
   workflow_dispatch:
   schedule:
-    # Runs "at minute 20 and 50, every hour" (see https://crontab.guru)
-    - cron: '20,50 * * * *'
+    # Runs "every 2 hours at minute 20" (see https://crontab.guru)
+    - cron: '20 */2 * * *'
 
 env:
   DBT_PROFILES_DIR: ./
@@ -41,4 +41,4 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m 1+models/silver/streamline/core/realtime
+          dbt run -m models/silver/core --exclude models/silver/core/silver__traces2.sql
