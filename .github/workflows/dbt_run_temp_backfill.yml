@@ -41,4 +41,4 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run -m models/silver/core --exclude models/silver/core/silver__traces2.sql
+          dbt run -m models/silver/core
