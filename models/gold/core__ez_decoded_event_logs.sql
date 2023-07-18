@@ -10,7 +10,7 @@ SELECT
     tx_hash,
     event_index,
     contract_address,
-    C.name AS contract_name,
+    token_name AS contract_name,
     event_name,
     decoded_flat AS decoded_log,
     decoded_data AS full_decoded_log,
@@ -23,5 +23,4 @@ SELECT
     tx_status
 FROM
     {{ ref('silver__decoded_logs') }} 
-    LEFT JOIN {{ ref('core__dim_contracts') }} C
-    ON contract_address = C.address
+    LEFT JOIN {{ ref('silver__contracts') }} using (contract_address)
