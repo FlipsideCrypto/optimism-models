@@ -3,7 +3,8 @@
     materialized = 'incremental',
     unique_key = "block_number",
     cluster_by = "block_timestamp::date",
-    tags = ['core']
+    tags = ['core'],
+    full_refresh = false
 ) }}
 
 SELECT
