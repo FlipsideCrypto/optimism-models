@@ -45,6 +45,32 @@ blocks AS (
                     last_3_days
             )
         )
+),
+all_blocks AS (
+    SELECT
+        block_number
+    FROM
+        blocks
+    UNION
+    SELECT
+        block_number
+    FROM
+        (
+            SELECT
+                block_number
+            FROM
+                {{ ref("_missing_receipts") }}
+            UNION
+            SELECT
+                block_number
+            FROM
+                {{ ref("_missing_txs") }}
+            UNION
+            SELECT
+                block_number
+            FROM
+                {{ ref("_unconfirmed_blocks") }}
+        )
 )
 SELECT
     PARSE_JSON(

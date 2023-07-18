@@ -245,6 +245,16 @@ missing_data AS (
         t.is_pending
 )
 {% endif %},
+exclusions AS (
+    SELECT
+        CONCAT(
+            block_number,
+            '-',
+            tx_hash
+        ) AS block_tx_id
+    FROM
+        {{ ref('silver_observability__excluded_receipt_blocks') }}
+),
 FINAL AS (
     SELECT
         block_number,
@@ -324,7 +334,51 @@ FROM
 {% endif %}
 )
 SELECT
-    *
+    block_number,
+    block_hash,
+    chain_id,
+    from_address,
+    gas,
+    gas_price,
+    tx_hash,
+    input_data,
+    origin_function_signature,
+    max_fee_per_gas,
+    max_priority_fee_per_gas,
+    nonce,
+    r,
+    s,
+    to_address,
+    POSITION,
+    TYPE,
+    v,
+    VALUE,
+    block_timestamp,
+    CASE
+        WHEN CONCAT(
+            block_number,
+            '-',
+            tx_hash
+        ) IN (
+            SELECT
+                block_tx_id
+            FROM
+                exclusions
+        ) THEN FALSE
+        ELSE is_pending
+    END AS is_pending,
+    gas_used,
+    tx_success,
+    tx_status,
+    cumulative_gas_used,
+    effective_gas_price,
+    l1_fee,
+    l1_fee_scalar,
+    l1_gas_used,
+    l1_gas_price,
+    tx_fee,
+    tx_type,
+    _inserted_timestamp
 FROM
     FINAL qualify(ROW_NUMBER() over (PARTITION BY block_number, POSITION
 ORDER BY
