@@ -11,27 +11,27 @@ SELECT
     origin_function_signature,
     origin_from_address,
     origin_to_address,
-    contract_address,
+    t.contract_address,
     from_address,
     to_address,
     raw_amount,
-    C.decimals AS decimals,
-    C.symbol AS symbol,
+    token_decimals AS decimals,
+    token_symbol AS symbol,
     price AS token_price,
     CASE
-        WHEN C.decimals IS NOT NULL THEN raw_amount / pow(
+        WHEN C.token_decimals IS NOT NULL THEN raw_amount / pow(
             10,
-            C.decimals
+            C.token_decimals
         )
         ELSE NULL
     END AS amount,
     CASE
-        WHEN C.decimals IS NOT NULL
+        WHEN C.token_decimals IS NOT NULL
         AND price IS NOT NULL THEN amount * price
         ELSE NULL
     END AS amount_usd,
     CASE
-        WHEN C.decimals IS NULL THEN 'false'
+        WHEN C.token_decimals IS NULL THEN 'false'
         ELSE 'true'
     END AS has_decimal,
     CASE
@@ -49,5 +49,5 @@ FROM
         'hour',
         t.block_timestamp
     ) = HOUR
-    LEFT JOIN {{ ref('core__dim_contracts') }} C
-    ON t.contract_address = C.address
+    LEFT JOIN {{ ref('silver__contracts') }} C
+    ON t.contract_address = C.contract_address

@@ -51,7 +51,7 @@ SELECT
     origin_function_signature,
     origin_from_address,
     origin_to_address,
-    contract_address,
+    base.contract_address,
     event_index,
     reward_type,
     token_id,
@@ -60,7 +60,7 @@ SELECT
         ELSE COALESCE(
             claimed_amount / pow(
                 10,
-                token_decimals
+                t.token_decimals
             ),
             claimed_amount
         )
@@ -71,11 +71,11 @@ SELECT
             2
         )
         WHEN reward_type <> 'venft_distribution'
-        AND token_decimals IS NOT NULL THEN ROUND(
+        AND t.token_decimals IS NOT NULL THEN ROUND(
             (
                 claimed_amount / pow(
                     10,
-                    token_decimals
+                    t.token_decimals
                 )
             ) * prices.price,
             2
@@ -83,8 +83,8 @@ SELECT
         ELSE NULL
     END AS claimed_amount_usd,
     COALESCE(
-        token_symbol,
-        C.symbol
+        t.token_symbol,
+        C.token_symbol
     ) AS token_symbol,
     base.token_address AS token_address,
     claim_epoch,
@@ -92,8 +92,8 @@ SELECT
 FROM
     {{ ref('silver__velodrome_claimed_rewards') }}
     base
-    LEFT JOIN tokens
-    ON tokens.token_address = base.token_address
+    LEFT JOIN tokens t 
+    ON t.token_address = base.token_address
     LEFT JOIN {{ ref('core__fact_hourly_token_prices') }}
     prices
     ON HOUR = DATE_TRUNC(
@@ -101,5 +101,5 @@ FROM
         block_timestamp
     )
     AND prices.token_address = base.token_address
-    LEFT JOIN {{ ref('core__dim_contracts') }} C
-    ON C.address = base.token_address
+    LEFT JOIN {{ ref('silver__contracts') }} C
+    ON C.contract_address = base.token_address
