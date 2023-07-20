@@ -497,7 +497,7 @@ token_sales_raw AS (
         erc1155_value,
         contract_address AS currency_address,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS transfer_to,
-        TRY_TO_NUMBER(utils.udf_hex_to_int(regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}')[0] :: STRING)) AS transfer_value
+        TRY_TO_NUMBER(utils.udf_hex_to_int(regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}')[0] :: STRING)) AS transfer_value,
         COALESCE (
             CASE
                 WHEN transfer_to = LOWER('0xeC1557A67d4980C948cD473075293204F4D280fd') THEN transfer_value / 1e18
