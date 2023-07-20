@@ -13,7 +13,7 @@ WITH summary_stats AS (
         MAX(block_timestamp) AS max_block_timestamp,
         COUNT(1) AS blocks_tested
     FROM
-        {{ ref('silver__blocks2') }}
+        {{ ref('silver__blocks') }}
     WHERE
         block_timestamp <= DATEADD('hour', -12, CURRENT_TIMESTAMP())
 
@@ -27,7 +27,7 @@ AND (
                 SELECT
                     MIN(block_number) AS block_number
                 FROM
-                    {{ ref('silver__blocks2') }}
+                    {{ ref('silver__blocks') }}
                 WHERE
                     block_timestamp BETWEEN DATEADD('hour', -96, CURRENT_TIMESTAMP())
                     AND DATEADD('hour', -95, CURRENT_TIMESTAMP())
@@ -81,7 +81,7 @@ broken_blocks AS (
     SELECT
         DISTINCT block_number
     FROM
-        {{ ref("silver__transactions2") }}
+        {{ ref("silver__transactions") }}
         t
         LEFT JOIN {{ ref("silver__receipts") }}
         r USING (
