@@ -37,7 +37,7 @@ blocks AS (
     SELECT
         SEQ4() AS block_number
     FROM
-        TABLE(GENERATOR(rowcount => 106000000))
+        TABLE(GENERATOR(rowcount => (SELECT max(block_number) as max_block FROM {{ref ('silver__blocks')}}) ))
 )
 SELECT
     block_number,
