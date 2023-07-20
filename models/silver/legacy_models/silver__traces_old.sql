@@ -2,7 +2,8 @@
     materialized = 'incremental',
     unique_key = 'tx_hash',
     cluster_by = ['block_timestamp::DATE'],
-    incremental_strategy = 'delete+insert'
+    incremental_strategy = 'delete+insert',
+    enabled = false
 ) }}
 
 WITH new_blocks AS (

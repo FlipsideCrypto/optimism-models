@@ -26,6 +26,8 @@ models:
         description: '{{ doc("opt_tx_fee") }}' 
       - name: GAS_PRICE
         description: '{{ doc("opt_tx_gas_price") }}' 
+      - name: EFFECTIVE_GAS_PRICE
+        description: The total base charge plus tip paid for each unit of gas, in Gwei.
       - name: GAS_LIMIT
         description: '{{ doc("opt_tx_gas_limit") }}' 
       - name: GAS_USED
@@ -36,6 +38,8 @@ models:
         description: '{{ doc("op_l1_gas_used") }}'
       - name: L1_FEE_SCALAR
         description: '{{ doc("op_l1_fee_scalar") }}'
+      - name: L1_FEE
+        description: The L1 portion of fees paid.
       - name: L1_STATE_ROOT_TX_HASH
         description: '{{ doc("op_l1_state_tx_hash") }}'
       - name: L1_STATE_ROOT_BATCH_INDEX
@@ -46,11 +50,19 @@ models:
         description: '{{ doc("op_l1_sub_batch") }}'        
       - name: CUMULATIVE_GAS_USED
         description: '{{ doc("opt_cumulative_gas_used") }}' 
+      - name: MAX_FEE_PER_GAS
+        description: The maximum fee per gas of the transaction, in Gwei.
+      - name: MAX_PRIORITY_FEE_PER_GAS
+        description: The maximum priority fee per gas of the transaction, in Gwei.
       - name: STATUS
         description: '{{ doc("opt_tx_status") }}' 
-      - name: TX_JSON
-        description: '{{ doc("deprecation") }}'
       - name: INPUT_DATA
         description: '{{ doc("opt_tx_input_data") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE 
         description: '{{ doc("opt_tx_origin_sig") }}'
+      - name: R
+        description: The r value of the transaction signature.
+      - name: S
+        description: The s value of the transaction signature.
+      - name: V
+        description: The v value of the transaction signature.

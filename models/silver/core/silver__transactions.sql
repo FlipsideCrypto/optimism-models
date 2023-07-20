@@ -173,7 +173,7 @@ new_records AS (
         t._inserted_timestamp
     FROM
         base_tx t
-        LEFT OUTER JOIN {{ ref('silver__blocks2') }}
+        LEFT OUTER JOIN {{ ref('silver__blocks') }}
         b
         ON t.block_number = b.block_number
         LEFT OUTER JOIN {{ ref('silver__receipts') }}
@@ -234,7 +234,7 @@ missing_data AS (
     FROM
         {{ this }}
         t
-        INNER JOIN {{ ref('silver__blocks2') }}
+        INNER JOIN {{ ref('silver__blocks') }}
         b
         ON t.block_number = b.block_number
         INNER JOIN {{ ref('silver__receipts') }}

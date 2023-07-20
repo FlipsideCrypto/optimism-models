@@ -7,14 +7,14 @@ WITH lookback AS (
     SELECT
         MAX(block_number) AS block_number
     FROM
-        {{ ref("silver__blocks2") }}
+        {{ ref("silver__blocks") }}
     WHERE
         block_timestamp :: DATE = CURRENT_DATE() - 3
 )
 SELECT
     DISTINCT t.block_number AS block_number
 FROM
-    {{ ref("silver__transactions2") }}
+    {{ ref("silver__transactions") }}
     t
     LEFT JOIN {{ ref("silver__receipts") }}
     r USING (

@@ -8,7 +8,7 @@ SELECT
     MIN(_inserted_timestamp) AS _inserted_timestamp,
     COUNT(*) AS tx_count
 FROM
-    {{ ref('silver__transactions2') }}
+    {{ ref('silver__transactions') }}
 
 {% if is_incremental() %}
 WHERE
