@@ -19,7 +19,7 @@ WITH base AS (
         state_max_block,
         _inserted_timestamp
     FROM
-        {{ ref('bronze__state_hashes') }}
+        ethereum_dev.silver.optimism_bedrock_state_hashes --{{ ref('bronze__state_hashes') }}
 
 {% if is_incremental() %}
 WHERE
@@ -37,7 +37,7 @@ blocks AS (
     SELECT
         SEQ4() AS block_number
     FROM
-        TABLE(GENERATOR(rowcount => 106000000))
+        TABLE(GENERATOR(rowcount => (SELECT max(block_number) as max_block FROM {{ref ('silver__blocks')}}) ))
 )
 SELECT
     block_number,
@@ -56,3 +56,4 @@ FROM
     INNER JOIN base
     ON block_number BETWEEN state_min_block
     AND state_max_block
+

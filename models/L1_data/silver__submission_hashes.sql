@@ -37,7 +37,7 @@ blocks AS (
     SELECT
         SEQ4() AS block_number
     FROM
-        TABLE(GENERATOR(rowcount => 100000000))
+        TABLE(GENERATOR(rowcount => 106000000))
 )
 SELECT
     block_number,
