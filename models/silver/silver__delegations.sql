@@ -80,7 +80,10 @@ SELECT
     v.block_timestamp,
     v.tx_hash,
     v.status,
-    v.origin_from_address AS delegator,
+    delegator_address AS delegator,
+    delegate_address AS delegate,
+    from_delegate_address AS from_delegate,
+    to_delegate_address AS to_delegate,
     CASE
         WHEN from_delegate_address = '0x0000000000000000000000000000000000000000'
         AND to_delegate_address <> delegator THEN 'First Time Delegator'
@@ -90,11 +93,6 @@ SELECT
         AND from_delegate_address <> '0x0000000000000000000000000000000000000000' THEN 'Self-Delegation'
         ELSE 'Re-Delegation'
     END AS delegation_type,
-    CASE
-        WHEN delegation_type = 'Re-Delegation' THEN delegate_address
-        ELSE to_delegate_address
-    END AS to_delegate,
-    from_delegate_address AS from_delegate,
     COALESCE(
         raw_new_balance,
         0
@@ -111,5 +109,3 @@ FROM
     delegate_votes_changed v
     LEFT JOIN delegate_changed d
     ON d.tx_hash = v.tx_hash
-WHERE
-    to_delegate IS NOT NULL
