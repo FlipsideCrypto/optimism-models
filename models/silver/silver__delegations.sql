@@ -33,7 +33,7 @@ WITH delegate_votes_changed AS (
         _log_id,
         _inserted_timestamp
     FROM
-        optimism.silver.logs2
+        {{ ref('silver__logs') }}
     WHERE
         topics [0] :: STRING = '0xdec2bacdd2f05b59de34da9b523dff8be42e5e38e818c82fdb0bae774387a724' --DelegateVotesChanged
         AND contract_address = '0x4200000000000000000000000000000000000042'
@@ -63,7 +63,7 @@ delegate_changed AS (
         _log_id,
         _inserted_timestamp
     FROM
-        optimism.silver.logs2
+        {{ ref('silver__logs') }}
     WHERE
         topics [0] :: STRING = '0x3134e8a2e6d97e929a7e54011ea5485d7d196dd5f0ba4d4ef95803e8e3fc257f' --DelegateChanged
         AND contract_address = '0x4200000000000000000000000000000000000042'
