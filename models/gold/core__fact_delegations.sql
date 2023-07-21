@@ -8,7 +8,7 @@ SELECT
     block_number, 
     block_timestamp, 
     tx_hash, 
-    status, 
+    tx_status AS status, 
     event_name,
     delegator, 
     to_delegate, 
