@@ -8,7 +8,7 @@ SELECT
     r.block_number, 
     l.block_timestamp,
     r.tx_hash,
-    l.tx_status, 
+    l.tx_status AS status, 
     CASE
         WHEN topics [0] :: STRING = '0x3134e8a2e6d97e929a7e54011ea5485d7d196dd5f0ba4d4ef95803e8e3fc257f' THEN 'DelegateChanged'
         WHEN topics [0] :: STRING = '0xdec2bacdd2f05b59de34da9b523dff8be42e5e38e818c82fdb0bae774387a724' THEN 'DelegateVotesChanged'

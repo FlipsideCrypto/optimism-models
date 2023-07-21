@@ -72,4 +72,6 @@ FROM
     ON A.block_number = b.block_number
     LEFT JOIN {{ ref('silver__submission_hashes') }} C
     ON A.block_number = C.block_number
-    LEFT JOIN {{ ref('silver__tx_count') }} USING (block_number)
+    LEFT JOIN {{ ref('silver__tx_count') }}
+    d
+    ON A.block_number = d.block_number

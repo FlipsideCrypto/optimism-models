@@ -13,7 +13,6 @@ WITH eth_base AS (
         eth_value,
         identifier,
         _call_id,
-        ingested_at,
         input
     FROM
         {{ ref('silver__traces') }}
