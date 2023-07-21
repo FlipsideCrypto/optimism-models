@@ -4,20 +4,37 @@
     cluster_by = ['block_timestamp::DATE']
 ) }}
 
-WITH delegate_votes_changed AS (
-
-    SELECT
-        block_number,
-        block_timestamp,
-        tx_hash,
-        tx_status AS status,
-        origin_from_address,
-        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS delegate_address,
-        regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-        COALESCE(
+SELECT 
+    r.block_number, 
+    l.block_timestamp,
+    r.tx_hash,
+    l.tx_status, 
+    CASE
+        WHEN topics [0] :: STRING = '0x3134e8a2e6d97e929a7e54011ea5485d7d196dd5f0ba4d4ef95803e8e3fc257f' THEN 'DelegateChanged'
+        WHEN topics [0] :: STRING = '0xdec2bacdd2f05b59de34da9b523dff8be42e5e38e818c82fdb0bae774387a724' THEN 'DelegateVotesChanged'
+    END AS event_name,
+    from_address AS delegator,
+    CASE 
+        WHEN CONCAT('0x', SUBSTR(logs[0]:topics [2] :: STRING, 27, 40)) = '0x0000000000000000000000000000000000000000' 
+            AND CONCAT('0x', SUBSTR(logs[0]:topics [3] :: STRING, 27, 40)) <> delegator THEN 'First Time Delegator'
+        WHEN CONCAT('0x', SUBSTR(logs[0]:topics [2] :: STRING, 27, 40)) = '0x0000000000000000000000000000000000000000' 
+            AND delegator = CONCAT('0x', SUBSTR(logs[0]:topics [3] :: STRING, 27, 40)) THEN 'First Time Delegator - Self Delegation'
+        WHEN delegator = CONCAT('0x', SUBSTR(logs[0]:topics [3] :: STRING, 27, 40)) THEN 'Self-Delegation'
+        ELSE 'Re-Delegation' 
+    END AS delegation_type, 
+    CASE 
+        WHEN delegation_type = 'Re-Delegation' AND event_name = 'DelegateVotesChanged' THEN CONCAT('0x', SUBSTR(l.topics [1] :: STRING, 27, 40))
+        ELSE CONCAT('0x', SUBSTR(logs[0]:topics [3] :: STRING, 27, 40))
+    END AS to_delegate, 
+    CASE 
+        WHEN delegation_type = 'Re-Delegation' THEN CONCAT('0x', SUBSTR(logs[0]:topics [2] :: STRING, 27, 40))
+        WHEN delegation_type = 'First Time Delegator' AND event_name = 'DelegateChanged' THEN CONCAT('0x', SUBSTR(logs[0]:topics [2] :: STRING, 27, 40))
+        ELSE NULL 
+    END AS from_delegate, 
+    COALESCE(
             TRY_TO_NUMBER(
                 utils.udf_hex_to_int(
-                    segmented_data [0] :: STRING
+                    regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') [0] :: STRING
                 )
             ),
             0
@@ -25,87 +42,45 @@ WITH delegate_votes_changed AS (
         COALESCE(
             TRY_TO_NUMBER(
                 utils.udf_hex_to_int(
-                    segmented_data [1] :: STRING
+                    regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') [1] :: STRING
                 )
             ),
             0
         ) AS raw_new_balance,
-        _log_id,
-        _inserted_timestamp
-    FROM
-        {{ ref('silver__logs') }}
-    WHERE
-        topics [0] :: STRING = '0xdec2bacdd2f05b59de34da9b523dff8be42e5e38e818c82fdb0bae774387a724' --DelegateVotesChanged
-        AND contract_address = '0x4200000000000000000000000000000000000042'
-        AND origin_function_signature = '0x5c19a95c'
+    COALESCE(raw_new_balance / pow(10, 18), 0) AS new_balance,
+    COALESCE(raw_previous_balance / pow(10, 18), 0) AS previous_balance,
+    r._inserted_timestamp, 
+    l._log_id
+FROM 
+    {{ ref('silver__receipts') }} r
+LEFT OUTER JOIN 
+    {{ ref('silver__logs')}} l 
+ON r.tx_hash = l.tx_hash
+
+WHERE 
+    origin_function_signature = '0x5c19a95c'
+    AND to_address = '0x4200000000000000000000000000000000000042'
+    AND topics[0] :: STRING IN (
+            '0x3134e8a2e6d97e929a7e54011ea5485d7d196dd5f0ba4d4ef95803e8e3fc257f',
+            '0xdec2bacdd2f05b59de34da9b523dff8be42e5e38e818c82fdb0bae774387a724'
+        )
+    AND to_delegate IS NOT NULL
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND r._inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE
+        )
+    FROM
+        {{ this }}
+)
+AND l._inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        )
     FROM
         {{ this }}
 )
 {% endif %}
-),
-delegate_changed AS (
-    SELECT
-        block_number,
-        block_timestamp,
-        tx_hash,
-        tx_status AS status,
-        origin_from_address,
-        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS delegator_address,
-        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS from_delegate_address,
-        CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS to_delegate_address,
-        _log_id,
-        _inserted_timestamp
-    FROM
-        {{ ref('silver__logs') }}
-    WHERE
-        topics [0] :: STRING = '0x3134e8a2e6d97e929a7e54011ea5485d7d196dd5f0ba4d4ef95803e8e3fc257f' --DelegateChanged
-        AND contract_address = '0x4200000000000000000000000000000000000042'
-        AND origin_function_signature = '0x5c19a95c'
-        AND tx_hash IN (
-            SELECT
-                tx_hash
-            FROM
-                delegate_votes_changed
-        )
-)
-SELECT
-    v.block_number,
-    v.block_timestamp,
-    v.tx_hash,
-    v.status,
-    delegator_address AS delegator,
-    delegate_address AS delegate,
-    from_delegate_address AS from_delegate,
-    to_delegate_address AS to_delegate,
-    CASE
-        WHEN from_delegate_address = '0x0000000000000000000000000000000000000000'
-        AND to_delegate_address <> delegator THEN 'First Time Delegator'
-        WHEN from_delegate_address = '0x0000000000000000000000000000000000000000'
-        AND delegator = to_delegate_address THEN 'First Time Delegator - Self Delegation'
-        WHEN delegator = to_delegate_address
-        AND from_delegate_address <> '0x0000000000000000000000000000000000000000' THEN 'Self-Delegation'
-        ELSE 'Re-Delegation'
-    END AS delegation_type,
-    COALESCE(
-        raw_new_balance,
-        0
-    ) AS raw_new_balance,
-    COALESCE(
-        raw_previous_balance,
-        0
-    ) AS raw_previous_balance,
-    COALESCE(raw_new_balance / pow(10, 18), 0) AS new_balance,
-    COALESCE(raw_previous_balance / pow(10, 18), 0) AS previous_balance,
-    v._log_id,
-    v._inserted_timestamp
-FROM
-    delegate_votes_changed v
-    LEFT JOIN delegate_changed d
-    ON d.tx_hash = v.tx_hash
