@@ -9,6 +9,7 @@ SELECT
     block_timestamp, 
     tx_hash, 
     status, 
+    event_name,
     delegator, 
     to_delegate, 
     from_delegate, 
