@@ -137,7 +137,7 @@ base_sales AS (
         )
         AND (
             transfer_single_token_id IS NOT NULL
-            transfer_token_id IS NOT NULL
+            OR transfer_token_id IS NOT NULL
         )
         AND seller_address != '0x0000000000000000000000000000000000000000'
 
