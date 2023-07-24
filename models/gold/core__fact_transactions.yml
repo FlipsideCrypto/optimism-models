@@ -48,6 +48,8 @@ models:
         description: '{{ doc("op_l1_sub_tx_hash") }}'
       - name: L1_SUBMISSION_BATCH_INDEX
         description: '{{ doc("op_l1_sub_batch") }}'        
+      - name: L1_SUBMISSION_DETAILS
+        description: Variant column that includes details regarding state and submission root, index and tx_hash information for when the block is submitted to Ethereum Mainnet.
       - name: CUMULATIVE_GAS_USED
         description: '{{ doc("opt_cumulative_gas_used") }}' 
       - name: MAX_FEE_PER_GAS
