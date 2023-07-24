@@ -171,7 +171,7 @@ FROM inputs_pool_details
 
 pool_token_reads AS (
 
-{% for item in range(8) %}
+{% for item in range(10) %}
 (
 SELECT
     ethereum.streamline.udf_json_rpc_read_calls(
@@ -205,7 +205,7 @@ FROM (
         FROM all_inputs
         LEFT JOIN contract_deployments USING(contract_address) 
             ) ready_reads_pools
-    WHERE row_num BETWEEN {{ item * 500 + 1 }} AND {{ (item + 1) * 500}}
+    WHERE row_num BETWEEN {{ item * 50 + 1 }} AND {{ (item + 1) * 50}}
     ) batch_reads_pools
 JOIN {{ source(
             'streamline_crosschain',
