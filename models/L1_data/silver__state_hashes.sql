@@ -11,6 +11,8 @@ WITH base AS (
         state_tx_hash,
         state_block_number,
         state_block_timestamp,
+        bedrock_state_batch_index,
+        bedrock_state_batch_root,
         state_batch_index,
         state_batch_root,
         state_batch_size,
@@ -37,13 +39,15 @@ blocks AS (
     SELECT
         SEQ4() AS block_number
     FROM
-        TABLE(GENERATOR(rowcount => 100000000))
+        TABLE(GENERATOR(rowcount => (SELECT max(block_number) as max_block FROM {{ref ('silver__blocks')}}) ))
 )
 SELECT
     block_number,
     state_tx_hash,
     state_block_number,
     state_block_timestamp,
+    bedrock_state_batch_index,
+    bedrock_state_batch_root,
     state_batch_index,
     state_batch_root,
     state_batch_size,

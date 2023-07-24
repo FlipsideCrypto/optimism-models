@@ -11,7 +11,7 @@ models:
       - name: L1_BLOCK_TIMESTAMP
         description: '{{ doc("op_l1_block_time") }}'   
       - name: L1_STATE_ROOT_BATCH_INDEX 
-        description: '{{ doc("op_l1_state_batch") }}'   
+        description: The batch index of when this block was included in the Ethereum state root. This index was reset with the June 2023 OP Bedrock upgrade.   
       - name: BATCH_ROOT 
         description: '{{ doc("op_batch_root") }}'   
       - name: BATCH_SIZE
