@@ -251,7 +251,7 @@ flattened_traces AS (
                 f._inserted_timestamp
             FROM
                 final_traces f
-                LEFT OUTER JOIN {{ ref('silver__transactions2') }}
+                LEFT OUTER JOIN {{ ref('silver__transactions') }}
                 t
                 ON f.tx_position = t.position
                 AND f.block_number = t.block_number
@@ -297,7 +297,7 @@ missing_data AS (
     FROM
         {{ this }}
         t
-        INNER JOIN {{ ref('silver__transactions2') }}
+        INNER JOIN {{ ref('silver__transactions') }}
         txs
         ON t.tx_position = txs.position
         AND t.block_number = txs.block_number

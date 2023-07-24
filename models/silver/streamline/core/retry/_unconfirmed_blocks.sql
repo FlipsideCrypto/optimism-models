@@ -16,7 +16,7 @@ SELECT
 FROM
     {{ ref("silver__confirmed_blocks") }}
     cb
-    LEFT JOIN {{ ref("silver__transactions2") }}
+    LEFT JOIN {{ ref("silver__transactions") }}
     txs USING (
         block_number,
         block_hash,

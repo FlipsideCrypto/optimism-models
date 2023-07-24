@@ -85,27 +85,55 @@ base_sales AS (
         block_timestamp,
         tx_hash,
         CASE
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
+                THEN CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) 
+        END AS transfer_from,
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40))
+        END AS transfer_single_from,
+        CASE
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
+                THEN CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) 
+        END AS transfer_to,
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40))
+        END AS transfer_single_to,
+        CASE
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
+                THEN TRY_TO_NUMBER(utils.udf_hex_to_int(topics [3] :: STRING))
+        END AS transfer_token_id, 
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN TRY_TO_NUMBER(utils.udf_hex_to_int(regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}')[0] :: STRING))
+        END AS transfer_single_token_id,
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN TRY_TO_NUMBER(utils.udf_hex_to_int(regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}')[1] :: STRING)) 
+        END AS transfer_single_erc1155_value,
+        CASE
             WHEN origin_from_address = COALESCE (
-                event_inputs :_from :: STRING,
-                event_inputs :from :: STRING
+                transfer_single_from,
+                transfer_from
             ) THEN 'bid_won'
             ELSE 'sale'
         END AS event_type,
         origin_to_address AS platform_address,
         COALESCE (
-            event_inputs :_from :: STRING,
-            event_inputs :from :: STRING
+            transfer_single_from,
+            transfer_from
         ) AS seller_address,
         COALESCE (
-            event_inputs :_to :: STRING,
-            event_inputs :to :: STRING
+            transfer_single_to,
+            transfer_to
         ) AS buyer_address,
         contract_address AS nft_address,
         COALESCE (
-            event_inputs :_id :: STRING,
-            event_inputs :tokenId :: STRING
+            transfer_single_token_id,
+            transfer_token_id
         ) AS tokenId,
-        event_inputs :_value :: STRING AS erc1155_value,
+        transfer_single_erc1155_value AS erc1155_value,
         origin_from_address,
         origin_to_address,
         origin_function_signature,
@@ -121,10 +149,10 @@ base_sales AS (
             FROM
                 seaport_indirect_contract_tx
         )
-        AND event_name IN (
-            'Transfer',
-            'TransferSingle'
-        )
+        AND topics[0] :: STRING IN (
+            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+            '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62'
+            ) -- Transfer, TransferSingle
         AND tokenId IS NOT NULL
         AND tx_status = 'SUCCESS'
 
@@ -145,15 +173,43 @@ optimism_campaign_tx_seller AS (
         block_timestamp,
         tx_hash,
         origin_to_address AS platform_address,
+        CASE
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
+                THEN CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) 
+        END AS transfer_from,
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40))
+        END AS transfer_single_from,
+        CASE
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
+                THEN CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) 
+        END AS transfer_to,
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40))
+        END AS transfer_single_to,
+        CASE
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
+                THEN TRY_TO_NUMBER(utils.udf_hex_to_int(topics [3] :: STRING))
+        END AS transfer_token_id, 
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN TRY_TO_NUMBER(utils.udf_hex_to_int(regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}')[0] :: STRING))
+        END AS transfer_single_token_id,
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN TRY_TO_NUMBER(utils.udf_hex_to_int(regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}')[1] :: STRING)) 
+        END AS transfer_single_erc1155_value,
         COALESCE (
-            event_inputs :_from :: STRING,
-            event_inputs :from :: STRING
+            transfer_single_from,
+            transfer_from
         ) AS seller_address,
         COALESCE (
-            event_inputs :_id :: STRING,
-            event_inputs :tokenId :: STRING
+            transfer_single_token_id,
+            transfer_token_id
         ) AS tokenId,
-        event_inputs :_value :: STRING AS erc1155_value,
+        transfer_single_erc1155_value AS erc1155_value,
         contract_address AS nft_address,
         origin_from_address,
         origin_to_address,
@@ -173,15 +229,15 @@ optimism_campaign_tx_seller AS (
         )
         AND origin_to_address IN ('0xc78a09d6a4badecc7614a339fd264b7290361ef1')
         AND block_timestamp >= '2021-01-01'
-        AND event_name IN (
-            'Transfer',
-            'TransferSingle'
-        )
+        AND topics[0] :: STRING IN (
+            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+            '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62'
+            ) 
         AND tokenId IS NOT NULL
         AND tx_status = 'SUCCESS'
         AND COALESCE (
-            event_inputs :_to :: STRING,
-            event_inputs :to :: STRING
+            transfer_single_to,
+            transfer_to
         ) = '0xc78a09d6a4badecc7614a339fd264b7290361ef1'
 
 {% if is_incremental() %}
@@ -199,14 +255,38 @@ optimism_campaign_tx_buyer AS (
     SELECT
         tx_hash,
         _inserted_timestamp,
+        CASE
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
+                THEN CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) 
+        END AS transfer_from,
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40))
+        END AS transfer_single_from,
+        CASE
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
+                THEN CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) 
+        END AS transfer_to,
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40))
+        END AS transfer_single_to,
+        CASE
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
+                THEN TRY_TO_NUMBER(utils.udf_hex_to_int(topics [3] :: STRING))
+        END AS transfer_token_id, 
+        CASE
+            WHEN topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' 
+                THEN TRY_TO_NUMBER(utils.udf_hex_to_int(regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}')[0] :: STRING))
+        END AS transfer_single_token_id,
         COALESCE (
-            event_inputs :_to :: STRING,
-            event_inputs :to :: STRING
+            transfer_single_to,
+            transfer_to
         ) AS buyer_address,
         contract_address AS nft_address,
         COALESCE (
-            event_inputs :_id :: STRING,
-            event_inputs :tokenId :: STRING
+            transfer_single_token_id,
+            transfer_token_id
         ) AS tokenId
     FROM
         {{ ref('silver__logs') }}
@@ -217,15 +297,15 @@ optimism_campaign_tx_buyer AS (
         )
         AND origin_to_address IN ('0xc78a09d6a4badecc7614a339fd264b7290361ef1')
         AND block_timestamp >= '2021-01-01'
-        AND event_name IN (
-            'Transfer',
-            'TransferSingle'
-        )
+        AND topics[0] :: STRING IN (
+            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+            '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62'
+            ) 
         AND tokenId IS NOT NULL
         AND tx_status = 'SUCCESS'
         AND COALESCE (
-            event_inputs :_from :: STRING,
-            event_inputs :from :: STRING
+            transfer_single_from,
+            transfer_from
         ) = '0xc78a09d6a4badecc7614a339fd264b7290361ef1'
 
 {% if is_incremental() %}
@@ -416,22 +496,24 @@ token_sales_raw AS (
         tokenId,
         erc1155_value,
         contract_address AS currency_address,
+        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS transfer_to,
+        TRY_TO_NUMBER(utils.udf_hex_to_int(regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}')[0] :: STRING)) AS transfer_value,
         COALESCE (
             CASE
-                WHEN event_inputs :to = LOWER('0xeC1557A67d4980C948cD473075293204F4D280fd') THEN t.event_inputs :value / 1e18
+                WHEN transfer_to = LOWER('0xeC1557A67d4980C948cD473075293204F4D280fd') THEN transfer_value / 1e18
             END,
             0
         ) AS platform_fee_raw,
         COALESCE (
             CASE
-                WHEN event_inputs :to = seller_address THEN t.event_inputs :value / 1e18
+                WHEN transfer_to = seller_address THEN transfer_value / 1e18
             END,
             0
         ) AS sale_price_raw,
         COALESCE (
             CASE
-                WHEN event_inputs :to != seller_address
-                AND event_inputs :to != LOWER('0xeC1557A67d4980C948cD473075293204F4D280fd') THEN t.event_inputs :value / 1e18
+                WHEN transfer_to != seller_address
+                AND transfer_to != LOWER('0xeC1557A67d4980C948cD473075293204F4D280fd') THEN transfer_value / 1e18
             END,
             0
         ) AS creator_fee_raw,
@@ -454,9 +536,9 @@ token_sales_raw AS (
                 eth_sales
         )
         AND f.seller_address IS NOT NULL
-        AND t.event_inputs :value IS NOT NULL
+        AND transfer_value IS NOT NULL
         AND nft_address IS NOT NULL
-        AND event_name = 'Transfer'
+        AND topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

@@ -16,7 +16,7 @@ WITH transactions AS (
                 POSITION ASC
         ) AS prev_POSITION
     FROM
-        {{ ref("silver__transactions2") }}
+        {{ ref("silver__transactions") }}
     WHERE
         block_timestamp >= DATEADD(
             'day',

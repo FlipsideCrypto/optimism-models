@@ -22,7 +22,7 @@ swaps_base AS (
         origin_to_address,
         contract_address,
         _inserted_timestamp,
-        event_name,
+        'Swap' AS event_name,
         event_index,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         (CASE 
@@ -42,7 +42,6 @@ swaps_base AS (
         CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS token_out,
         SUBSTR(topics [1] :: STRING,1,42) AS pool_address,
         _log_id,
-        ingested_at,
         'beethoven-x' AS platform,
         origin_from_address AS sender,
         origin_from_address AS tx_to
@@ -79,7 +78,6 @@ SELECT
     token_out,
     s.pool_address AS contract_address,
     s._log_id,
-    s.ingested_at,
     s.platform,
     sender,
     tx_to,
