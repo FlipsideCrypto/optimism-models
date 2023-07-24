@@ -36,7 +36,7 @@ SELECT
         'l1_state_root_batch_index',
         state_batch_index,
         'l1_state_root_tx_hash',
-        state_batch_root,
+        state_tx_hash,
         'l1_submission_batch_index',
         l1_submission_batch_index,
         'l1_submission_batch_root',

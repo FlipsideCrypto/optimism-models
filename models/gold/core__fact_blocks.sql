@@ -64,7 +64,23 @@ SELECT
     state_tx_hash AS l1_state_root_tx_hash,
     state_batch_index AS l1_state_root_batch_index,
     l1_submission_tx_hash,
-    l1_submission_batch_index
+    l1_submission_batch_index,
+    OBJECT_CONSTRUCT(
+        'l1_bedrock_state_batch_index',
+        bedrock_state_batch_index,
+        'l1_bedrock_state_batch_root',
+        bedrock_state_batch_root,
+        'l1_state_root_batch_index',
+        state_batch_index,
+        'l1_state_root_tx_hash',
+        state_tx_hash,
+        'l1_submission_batch_index',
+        l1_submission_batch_index,
+        'l1_submission_batch_root',
+        l1_submission_batch_root,
+        'l1_submission_tx_hash',
+        l1_submission_tx_hash
+    ) AS l1_submission_details
 FROM
     {{ ref('silver__blocks') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}

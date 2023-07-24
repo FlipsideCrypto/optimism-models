@@ -9,6 +9,8 @@ SELECT
     state_block_timestamp,
     state_batch_index,
     state_batch_root,
+    bedrock_state_batch_index,
+    bedrock_state_batch_root,
     state_batch_size,
     state_prev_total_elements,
     state_min_block,
