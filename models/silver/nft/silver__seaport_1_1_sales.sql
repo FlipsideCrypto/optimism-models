@@ -61,7 +61,7 @@ decoded AS (
     FROM
         {{ ref('silver__decoded_logs') }}
     WHERE
-        block_number >= 14000000
+        block_timestamp >= '2022-06-01'
         AND contract_address = '0x00000000006c3852cbef3e08e8df289169ede581'
         AND tx_hash IN (
             SELECT

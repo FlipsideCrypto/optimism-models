@@ -22,9 +22,8 @@ raw_decoded_logs AS (
     FROM
         {{ ref('silver__decoded_logs') }}
     WHERE
-        block_timestamp :: DATE >= '2023-03-01'
-        AND contract_address = '0x00000000000001ad428e4906ae43d8f9852d0dd6'
-        AND event_name = 'OrderFulfilled'
+        block_timestamp :: DATE >= '2023-05-01'
+        AND contract_address = '0x00000000000000adc04c56bf30ac9d3c0aaf14dc'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -52,7 +51,8 @@ mao_buy_tx AS (
     FROM
         raw_decoded_logs
     WHERE
-        trade_type = 'buy'
+        event_name = 'OrderFulfilled'
+        AND trade_type = 'buy'
 ),
 mao_offer_accepted_tx AS (
     SELECT
@@ -69,7 +69,8 @@ mao_offer_accepted_tx AS (
     FROM
         raw_decoded_logs
     WHERE
-        trade_type = 'offer_accepted'
+        event_name = 'OrderFulfilled'
+        AND trade_type = 'offer_accepted'
         AND tx_hash IN (
             SELECT
                 tx_hash
@@ -83,8 +84,8 @@ raw_logs AS (
     FROM
         {{ ref('silver__logs') }}
     WHERE
-        block_number >= 16530300
-        AND contract_address = '0x00000000000001ad428e4906ae43d8f9852d0dd6'
+        block_timestamp :: DATE >= '2023-05-01'
+        AND contract_address = '0x00000000000000adc04c56bf30ac9d3c0aaf14dc'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -177,7 +178,8 @@ mao_orderhash AS (
             FROM
                 raw_decoded_logs
             WHERE
-                tx_hash IN (
+                event_name = 'OrderFulfilled'
+                AND tx_hash IN (
                     SELECT
                         tx_hash
                     FROM
@@ -190,6 +192,21 @@ mao_orderhash AS (
                         mao_orderhash
                 )
         ),
+        mao_raw_decoded_category AS (
+            -- trade_type buy or offer accepted
+            SELECT
+                tx_hash,
+                trade_type AS true_trade_type,
+                decoded_flat :offerer :: STRING AS offerer,
+                decoded_flat :recipient :: STRING AS recipient
+            FROM
+                mao_raw_decoded qualify ROW_NUMBER() over (
+                    PARTITION BY tx_hash
+                    ORDER BY
+                        block_number,
+                        event_index ASC
+                ) = 1
+        ),
         seaport_tx_table AS (
             SELECT
                 block_timestamp,
@@ -197,8 +214,7 @@ mao_orderhash AS (
             FROM
                 raw_logs
             WHERE
-                block_timestamp >= '2023-02-01'
-                AND topics [0] = '0x9d9af8e38d66c62e2c12f0225249fd9d721c54b83f48d9352c97c6cacdcb6f31'
+                topics [0] = '0x9d9af8e38d66c62e2c12f0225249fd9d721c54b83f48d9352c97c6cacdcb6f31'
         ),
         decoded AS (
             SELECT
@@ -695,6 +711,7 @@ mao_orderhash AS (
                 tx_hash,
                 event_index,
                 first_flatten_index,
+                first_flatten_value,
                 first_flatten_value [1] :: STRING AS currency_address,
                 first_flatten_value [3] :: INT AS raw_amount,
                 first_flatten_value [4] :: STRING AS address_list,
@@ -1187,10 +1204,20 @@ mao_orderhash AS (
                 offer_length_raw,
                 decoded_data,
                 decoded_flat,
-                decoded_flat :offerer :: STRING AS offerer,
-                -- or the one who proposed the sale so that they receive the nft
+                true_trade_type,
+                CASE
+                    WHEN true_trade_type = 'buy' THEN offerer
+                    ELSE recipient
+                END AS nft_seller,
+                -- not used at the moment
+                CASE
+                    WHEN true_trade_type = 'buy' THEN recipient
+                    ELSE offerer
+                END AS nft_buyer,
+                offerer,
+                -- in the case of oa, the one who proposed the sale so that they receive the nft
+                recipient,
                 decoded_flat :zone :: STRING AS ZONE,
-                decoded_flat :recipient :: STRING AS recipient,
                 decoded_flat :orderHash :: STRING AS orderhash,
                 COALESCE(
                     A.tx_hash_orderhash_full,
@@ -1216,6 +1243,8 @@ mao_orderhash AS (
                     A.tx_hash_orderhash_full,
                     b.tx_hash_orderhash_full
                 ) = o.tx_hash_orderhash_full
+                LEFT JOIN mao_raw_decoded_category C
+                ON r.tx_hash = C.tx_hash
             WHERE
                 trade_type = 'offer_accepted'
                 AND decoded_flat :offer [0] :itemType :: INT IN (
@@ -1227,6 +1256,7 @@ mao_orderhash AS (
             SELECT
                 tx_hash,
                 event_index,
+                VALUE,
                 decoded_flat :orderHash :: STRING AS orderhash,
                 decoded_flat :offerer :: STRING AS transfers_nft_receiver,
                 decoded_flat :recipient :: STRING AS transfers_nft_seller,
@@ -1517,6 +1547,7 @@ mao_orderhash AS (
         base_sales_buy_and_offer AS (
             SELECT
                 tx_hash,
+                'fulfil_buy' AS category,
                 event_index,
                 contract_address,
                 event_name,
@@ -1552,6 +1583,7 @@ mao_orderhash AS (
             UNION ALL
             SELECT
                 tx_hash,
+                'fulfil_oa' AS category,
                 event_index,
                 contract_address,
                 event_name,
@@ -1587,6 +1619,7 @@ mao_orderhash AS (
             UNION ALL
             SELECT
                 tx_hash,
+                'mao' AS category,
                 event_index,
                 contract_address,
                 event_name,
@@ -1633,7 +1666,7 @@ mao_orderhash AS (
             FROM
                 {{ ref('silver__transactions') }}
             WHERE
-                block_timestamp :: DATE >= '2023-02-01'
+                block_timestamp :: DATE >= '2023-04-01'
                 AND tx_hash IN (
                     SELECT
                         DISTINCT tx_hash
@@ -1669,7 +1702,7 @@ nft_transfers AS (
     FROM
         {{ ref('silver__nft_transfers') }}
     WHERE
-        block_timestamp :: DATE >= '2023-02-01'
+        block_timestamp :: DATE >= '2023-04-01'
         AND tx_hash IN (
             SELECT
                 DISTINCT tx_hash
@@ -1693,10 +1726,11 @@ final_seaport AS (
         t.block_number,
         t.block_timestamp,
         s.tx_hash,
+        category,
         s.event_index,
         s.contract_address AS platform_address,
         'opensea' AS platform_name,
-        'seaport_1_4' AS platform_exchange_version,
+        'seaport_1_5' AS platform_exchange_version,
         s.event_name,
         offer_length,
         offerer AS seller_address,
