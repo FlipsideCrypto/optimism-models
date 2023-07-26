@@ -61,15 +61,12 @@ user_abis AS (
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        MAX(
-            _inserted_timestamp
-        )
+        COALESCE(MAX(_inserted_timestamp), '1970-01-01' :: TIMESTAMP)
     FROM
         {{ this }}
     WHERE
-        abi_source = 'user'
-)
-{% endif %}
+        abi_source = 'user')
+    {% endif %}
 ),
 bytecode_abis AS (
     SELECT
