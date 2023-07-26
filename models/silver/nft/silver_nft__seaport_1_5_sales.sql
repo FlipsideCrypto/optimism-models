@@ -22,7 +22,7 @@ raw_decoded_logs AS (
     FROM
         {{ ref('silver__decoded_logs') }}
     WHERE
-        block_number >= 17129530
+        block_timestamp :: DATE >= '2023-05-01'
         AND contract_address = '0x00000000000000adc04c56bf30ac9d3c0aaf14dc'
 
 {% if is_incremental() %}
@@ -30,7 +30,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE 
+        ) :: DATE
     FROM
         {{ this }}
 )
@@ -92,7 +92,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE 
+        ) :: DATE
     FROM
         {{ this }}
 )
@@ -1653,34 +1653,33 @@ mao_orderhash AS (
             FROM
                 match_advanced_orders_base
         ),
-      
-tx_data AS (
-    SELECT
-        tx_hash,
-        block_timestamp,
-        block_number,
-        from_address,
-        to_address,
-        origin_function_signature,
-        tx_fee,
-        input_data
-    FROM
-        {{ ref('silver__transactions') }}
-    WHERE
-        block_timestamp :: DATE >= '2023-04-01'
-        AND tx_hash IN (
+        tx_data AS (
             SELECT
-                DISTINCT tx_hash
+                tx_hash,
+                block_timestamp,
+                block_number,
+                from_address,
+                to_address,
+                origin_function_signature,
+                tx_fee,
+                input_data
             FROM
-                base_sales_buy_and_offer
-        )
+                {{ ref('silver__transactions') }}
+            WHERE
+                block_timestamp :: DATE >= '2023-04-01'
+                AND tx_hash IN (
+                    SELECT
+                        DISTINCT tx_hash
+                    FROM
+                        base_sales_buy_and_offer
+                )
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 1 
+        ) :: DATE - 1
     FROM
         {{ this }}
 )
@@ -1716,7 +1715,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 1 
+        ) :: DATE - 1
     FROM
         {{ this }}
 )
@@ -1755,37 +1754,35 @@ final_seaport AS (
         total_fees_raw,
         platform_fee_raw,
         creator_fee_raw,
-       
-t.tx_fee,
-t.from_address AS origin_from_address,
-t.to_address AS origin_to_address,
-t.origin_function_signature,
-decoded_output,
-consideration,
-offer,
-input_data,
-CONCAT(
-    s.nft_address,
-    '-',
-    s.tokenId,
-    '-',
-    platform_exchange_version,
-    '-',
-    _log_id
-) AS nft_log_id,
-_log_id,
-_inserted_timestamp
-FROM
-    base_sales_buy_and_offer s
-    INNER JOIN tx_data t
-    ON t.tx_hash = s.tx_hash 
-    LEFT JOIN nft_transfers n
-    ON n.tx_hash = s.tx_hash
-    AND n.contract_address = s.nft_address
-    AND n.tokenId = s.tokenId 
-    qualify(ROW_NUMBER() over(PARTITION BY nft_log_id
-ORDER BY
-    _inserted_timestamp DESC)) = 1
+        t.tx_fee,
+        t.from_address AS origin_from_address,
+        t.to_address AS origin_to_address,
+        t.origin_function_signature,
+        decoded_output,
+        consideration,
+        offer,
+        input_data,
+        CONCAT(
+            s.nft_address,
+            '-',
+            s.tokenId,
+            '-',
+            platform_exchange_version,
+            '-',
+            _log_id
+        ) AS nft_log_id,
+        _log_id,
+        _inserted_timestamp
+    FROM
+        base_sales_buy_and_offer s
+        INNER JOIN tx_data t
+        ON t.tx_hash = s.tx_hash
+        LEFT JOIN nft_transfers n
+        ON n.tx_hash = s.tx_hash
+        AND n.contract_address = s.nft_address
+        AND n.tokenId = s.tokenId qualify(ROW_NUMBER() over(PARTITION BY nft_log_id
+    ORDER BY
+        _inserted_timestamp DESC)) = 1
 )
 SELECT
     *

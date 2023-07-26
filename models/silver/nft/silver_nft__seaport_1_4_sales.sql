@@ -22,7 +22,7 @@ raw_decoded_logs AS (
     FROM
         {{ ref('silver__decoded_logs') }}
     WHERE
-        block_number >= 16530300
+        block_timestamp :: DATE >= '2023-03-01'
         AND contract_address = '0x00000000000001ad428e4906ae43d8f9852d0dd6'
         AND event_name = 'OrderFulfilled'
 
@@ -31,7 +31,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE 
+        ) :: DATE
     FROM
         {{ this }}
 )
@@ -91,7 +91,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE 
+        ) :: DATE
     FROM
         {{ this }}
 )
@@ -1620,7 +1620,6 @@ mao_orderhash AS (
             FROM
                 match_advanced_orders_base
         ),
-       
         tx_data AS (
             SELECT
                 tx_hash,
@@ -1647,7 +1646,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 1 
+        ) :: DATE - 1
     FROM
         {{ this }}
 )
@@ -1683,7 +1682,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 1 
+        ) :: DATE - 1
     FROM
         {{ this }}
 )
@@ -1717,11 +1716,10 @@ final_seaport AS (
         s.tokenId,
         s.erc1155_value,
         s.currency_address,
-        total_sale_amount_raw as total_price_raw, 
+        total_sale_amount_raw AS total_price_raw,
         total_fees_raw,
         platform_fee_raw,
         creator_fee_raw,
-        
         t.tx_fee,
         t.from_address AS origin_from_address,
         t.to_address AS origin_to_address,
@@ -1745,13 +1743,10 @@ final_seaport AS (
         base_sales_buy_and_offer s
         INNER JOIN tx_data t
         ON t.tx_hash = s.tx_hash
-    
         LEFT JOIN nft_transfers n
         ON n.tx_hash = s.tx_hash
         AND n.contract_address = s.nft_address
-        AND n.tokenId = s.tokenId
-       
-        qualify(ROW_NUMBER() over(PARTITION BY nft_log_id
+        AND n.tokenId = s.tokenId qualify(ROW_NUMBER() over(PARTITION BY nft_log_id
     ORDER BY
         _inserted_timestamp DESC)) = 1
 )
