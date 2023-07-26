@@ -1,10 +1,10 @@
 version: 2
 models:
-  - name: silver__quixotic_revamped_sales
+  - name: silver_nft__complete_nft_sales 
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - _log_id
+            - nft_log_id
     columns:
       - name: BLOCK_NUMBER
         tests:
@@ -21,29 +21,19 @@ models:
               interval: 1
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
-                - TIMESTAMP_NTZ
                 - TIMESTAMP_LTZ
+                - TIMESTAMP_NTZ
       - name: TX_HASH
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: EVENT_TYPE
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_set:
-              value_set: ['bid_won', 'sale']
       - name: PLATFORM_ADDRESS
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: PLATFORM_NAME
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_set:
-              value_set: ['quixotic']
-      - name: PLATFORM_EXCHANGE_VERSION
         tests:
           - not_null
       - name: SELLER_ADDRESS
@@ -64,10 +54,10 @@ models:
       - name: TOKENID
         tests:
           - not_null
-      - name: CURRENCY_SYMBOL
       - name: CURRENCY_ADDRESS
         tests:
-          - not_null
+          - not_null: 
+              where: platform_exchange_version not in ('seaport_1_1', 'seaport_1_4', 'seaport_1_5') 
       - name: PRICE
         tests:
           - not_null
@@ -83,40 +73,56 @@ models:
                 - FLOAT  
       - name: TOTAL_FEES
         tests:
+          - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
-                - FLOAT  
+                - FLOAT 
       - name: PLATFORM_FEE
         tests:
+          - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
-                - FLOAT  
+                - FLOAT
       - name: CREATOR_FEE
         tests:
+          - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
-                - FLOAT  
+                - FLOAT
       - name: TOTAL_FEES_USD
         tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
-                - FLOAT  
+                - FLOAT 
       - name: PLATFORM_FEE_USD
         tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
-                - FLOAT  
+                - FLOAT
       - name: CREATOR_FEE_USD
         tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
+                - FLOAT
+      - name: TX_FEE
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - NUMBER    
                 - FLOAT 
+      - name: NFT_LOG_ID
+        tests:
+          - not_null 
+      - name: _LOG_ID
+        tests:
+          - not_null 
       - name: ORIGIN_FROM_ADDRESS
         tests:
           - not_null
@@ -124,7 +130,8 @@ models:
               regex: 0[xX][0-9a-fA-F]+
       - name: ORIGIN_TO_ADDRESS
         tests:
-          - not_null
+          - not_null:
+              where: platform_exchange_version != 'nftx'
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: ORIGIN_FUNCTION_SIGNATURE
@@ -132,15 +139,9 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: _INSERTED_TIMESTAMP
+      - name: EVENT_TYPE
         tests:
           - not_null
-          - dbt_expectations.expect_row_values_to_have_recent_data:
-              datepart: day
-              interval: 1
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - TIMESTAMP_NTZ
-                - TIMESTAMP_LTZ
-      
-      
+      - name: INPUT_DATA
+        tests:
+          - not_null
