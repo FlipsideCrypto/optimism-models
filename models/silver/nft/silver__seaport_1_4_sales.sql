@@ -1633,7 +1633,7 @@ mao_orderhash AS (
             FROM
                 {{ ref('silver__transactions') }}
             WHERE
-                block_timestamp :: DATE >= '2023-02-01'
+                block_timestamp :: DATE >= '2023-03-01'
                 AND tx_hash IN (
                     SELECT
                         DISTINCT tx_hash
@@ -1669,7 +1669,7 @@ nft_transfers AS (
     FROM
         {{ ref('silver__nft_transfers') }}
     WHERE
-        block_timestamp :: DATE >= '2023-02-01'
+        block_timestamp :: DATE >= '2023-03-01'
         AND tx_hash IN (
             SELECT
                 DISTINCT tx_hash
