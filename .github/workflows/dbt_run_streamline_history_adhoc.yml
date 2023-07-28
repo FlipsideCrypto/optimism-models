@@ -1,5 +1,5 @@
-name: dbt_run_adhoc
-run-name: dbt_run_adhoc
+name: dbt_run_streamline_history_adhoc
+run-name: dbt_run_streamline_history_adhoc
 
 on:
   workflow_dispatch:
@@ -13,6 +13,7 @@ on:
         options:
           - dev
           - prod
+          - prod_backfill
         default: dev
       warehouse:
         type: choice 
@@ -24,9 +25,12 @@ on:
           - DBT_EMERGENCY
         default: DBT
       dbt_command:
-        type: string
+        type: choice
         description: 'DBT Run Command'
         required: true
+        options:
+          - dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m 1+models/silver/streamline/core/history
+          - dbt run --threads 8 --vars '{"STREAMLINE_INVOKE_STREAMS":True,"WAIT":120}' -m 1+models/silver/streamline/decoder/history
     
 env:
   DBT_PROFILES_DIR: ./
