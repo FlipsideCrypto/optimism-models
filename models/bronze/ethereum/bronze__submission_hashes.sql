@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = "l1_submission_tx_hash"
+    unique_key = "l1_submission_tx_hash",
+    tags = ['ethereum','non_realtime']
 ) }}
 
 SELECT

@@ -3,7 +3,8 @@
     unique_key = '_log_id',
     cluster_by = ['block_timestamp::DATE', '_inserted_timestamp::DATE'],
     merge_update_columns = ["_log_id"],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION on equality(contract_address, tx_hash)"
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION on equality(contract_address, tx_hash)",
+    tags = ['non_realtime']
 ) }}
 
 WITH base AS (

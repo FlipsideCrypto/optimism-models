@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'gauge_address',
-    tags = ['velodrome']
+    tags = ['non_realtime']
 ) }}
 
 WITH backfill AS (

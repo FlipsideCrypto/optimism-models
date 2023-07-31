@@ -2,7 +2,7 @@
     materialized = 'incremental',
     unique_key = "block_number",
     cluster_by = ['state_block_timestamp::DATE'],
-    tags = ['optimism']
+    tags = ['ethereum','non_realtime']
 ) }}
 
 WITH base AS (
