@@ -29,8 +29,8 @@ on:
         description: 'DBT Run Command'
         required: true
         options:
-          - dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m 1+models/silver/streamline/core/history
-          - dbt run --threads 8 --vars '{"STREAMLINE_INVOKE_STREAMS":True,"WAIT":120}' -m 1+models/silver/streamline/decoder/history
+          - dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m 1+tag:streamline_core_history
+          - dbt run --threads 8 --vars '{"STREAMLINE_INVOKE_STREAMS":True,"WAIT":120}' -m 1+tag:streamline_decoded_logs_history
     
 env:
   DBT_PROFILES_DIR: ./

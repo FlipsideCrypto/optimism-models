@@ -2,7 +2,6 @@
     materialized = 'view',
     persist_docs ={ "relation": true,
     "columns": true },
-    tags = ['velodrome'],
     meta={
         'database_tags':{
             'table': {

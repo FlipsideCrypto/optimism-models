@@ -1,5 +1,6 @@
 {{ config(
-    materialized = "table"
+    materialized = "table",
+    tags = ['non_realtime']
 ) }}
 {{ dbt_date.get_date_dimension(
     '2017-01-01',
