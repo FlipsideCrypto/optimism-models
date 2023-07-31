@@ -1,5 +1,5 @@
-name: dbt_run_scheduled
-run-name: dbt_run_scheduled
+name: dbt_run_scheduled_non_realtime
+run-name: dbt_run_scheduled_non_realtime
 
 on:
   workflow_dispatch:

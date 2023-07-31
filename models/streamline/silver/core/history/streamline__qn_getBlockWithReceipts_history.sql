@@ -3,7 +3,8 @@
     post_hook = if_data_call_function(
         func = "{{this.schema}}.udf_bulk_json_rpc(object_construct('sql_source', '{{this.identifier}}', 'external_table', 'qn_getBlockWithReceipts', 'sql_limit', {{var('sql_limit','200000')}}, 'producer_batch_size', {{var('producer_batch_size','3500')}}, 'worker_batch_size', {{var('worker_batch_size','3500')}}, 'batch_call_limit', {{var('batch_call_limit','10')}}))",
         target = "{{this.schema}}.{{this.identifier}}"
-    )
+    ),
+    tags = ['streamline_core_history']
 ) }}
 
 WITH blocks AS (
