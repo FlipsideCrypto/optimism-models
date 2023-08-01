@@ -10,6 +10,7 @@ WITH pool_creation AS (
         block_timestamp AS created_timestamp,
         block_number,
         tx_hash AS created_hash,
+        contract_address AS deployer_address,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS token0_address,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token1_address,
         CONCAT('0x', SUBSTR(DATA :: STRING, 91, 40)) AS pool_address,
@@ -21,6 +22,7 @@ WITH pool_creation AS (
             ) = 1 THEN 'stable'
             ELSE 'volatile'
         END AS pool_type,
+        _log_id,
         _inserted_timestamp
     FROM
         {{ ref('silver__logs') }}
@@ -237,6 +239,8 @@ SELECT
     created_timestamp,
     block_number AS created_block,
     created_hash,
+    deployer_address,
+    _log_id,
     a._inserted_timestamp
 FROM pools a
 LEFT JOIN pool_creation c USING(pool_address)
