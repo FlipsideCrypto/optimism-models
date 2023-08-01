@@ -9,7 +9,7 @@ SELECT
     symbols: token0 :: STRING AS token0_symbol,
     decimals: token0 :: STRING AS token0_decimal
 FROM optimism.defi.dim_dex_liquidity_pools
-WHERE token0 = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+WHERE token0 = '0x4200000000000000000000000000000000000006'
 ;
 
 {% enddocs %}
