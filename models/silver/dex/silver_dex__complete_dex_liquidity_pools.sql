@@ -404,18 +404,3 @@ FINAL AS (
     LEFT JOIN contracts c7
         ON c7.address = p.token7
 )
-
-SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    platform,
-    contract_address,
-    pool_address,
-    pool_name,
-    tokens,
-    symbols,
-    decimals,
-    _id,
-    _inserted_timestamp
-FROM FINAL 
