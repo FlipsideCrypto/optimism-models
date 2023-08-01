@@ -5,7 +5,7 @@
     meta={
     'database_tags':{
         'table': {
-            'PROTOCOL': 'BEETHOVENX, CURVE, DODO, FRAXSWAP, KYBERSWAP, SYNTHETIX, SUSHISWAP, UNISWAP, WOOFI',
+            'PROTOCOL': 'BEETHOVENX, CURVE, DODO, FRAXSWAP, KYBERSWAP, SYNTHETIX, SUSHISWAP, UNISWAP, VELODROME, WOOFI',
             'PURPOSE': 'DEX, LIQUIDITY, POOLS, LP, SWAPS',
             }
         }
