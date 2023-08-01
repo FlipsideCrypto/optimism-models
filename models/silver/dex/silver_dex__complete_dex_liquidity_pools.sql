@@ -91,6 +91,7 @@ SELECT
     tx_hash,
     contract_address,
     pool_address,
+    NULL AS pool_name,
     base_token AS token0,
     quote_token AS token1,
     'dodo-v2' AS platform,
@@ -118,6 +119,7 @@ SELECT
     tx_hash,
     factory_address AS contract_address,
     pool_address,
+    NULL AS pool_name,
     token0,
     token1,
     'fraxswap' AS platform,
@@ -144,6 +146,7 @@ SELECT
     tx_hash,
     contract_address,
     pool_address,
+    NULL AS pool_name,
     token0,
     token1,
     'kyberswap-v1' AS platform,
@@ -198,6 +201,7 @@ SELECT
     tx_hash,
     contract_address,
     pool_address,
+    NULL AS pool_name,
     token0,
     token1,
     'sushiswap' AS platform,
@@ -281,11 +285,15 @@ FINAL AS (
         tx_hash,
         contract_address,
         pool_address,
-        CONCAT(  
-            COALESCE(c0.symbol,CONCAT(SUBSTRING(token0, 1, 5),'...',SUBSTRING(token0, 39, 42))),
-            '-',
-            COALESCE(c1.symbol,CONCAT(SUBSTRING(token1, 1, 5),'...',SUBSTRING(token1, 39, 42)))
-        ) AS pool_name,
+        CASE
+          WHEN pool_name IS NULL 
+            THEN CONCAT(  
+                    COALESCE(c0.symbol,CONCAT(SUBSTRING(token0, 1, 5),'...',SUBSTRING(token0, 39, 42))),
+                    '-',
+                    COALESCE(c1.symbol,CONCAT(SUBSTRING(token1, 1, 5),'...',SUBSTRING(token1, 39, 42)))
+                  ) 
+          ELSE pool_name
+        END AS pool_name,
         OBJECT_CONSTRUCT('token0',token0,'token1',token1) AS tokens,
         OBJECT_CONSTRUCT('token0',c0.symbol,'token1',c1.symbol) AS symbols,
         OBJECT_CONSTRUCT('token0',c0.decimals,'token1',c1.decimals) AS decimals,
@@ -328,16 +336,20 @@ FINAL AS (
         tx_hash,
         contract_address,
         pool_address,
-        CONCAT(
-            COALESCE(c0.symbol, SUBSTRING(token0, 1, 5) || '...' || SUBSTRING(token0, 39, 42)),
-            CASE WHEN token1 IS NOT NULL THEN '-' || COALESCE(c1.symbol, SUBSTRING(token1, 1, 5) || '...' || SUBSTRING(token1, 39, 42)) ELSE '' END,
-            CASE WHEN token2 IS NOT NULL THEN '-' || COALESCE(c2.symbol, SUBSTRING(token2, 1, 5) || '...' || SUBSTRING(token2, 39, 42)) ELSE '' END,
-            CASE WHEN token3 IS NOT NULL THEN '-' || COALESCE(c3.symbol, SUBSTRING(token3, 1, 5) || '...' || SUBSTRING(token3, 39, 42)) ELSE '' END,
-            CASE WHEN token4 IS NOT NULL THEN '-' || COALESCE(c4.symbol, SUBSTRING(token4, 1, 5) || '...' || SUBSTRING(token4, 39, 42)) ELSE '' END,
-            CASE WHEN token5 IS NOT NULL THEN '-' || COALESCE(c5.symbol, SUBSTRING(token5, 1, 5) || '...' || SUBSTRING(token5, 39, 42)) ELSE '' END,
-            CASE WHEN token6 IS NOT NULL THEN '-' || COALESCE(c6.symbol, SUBSTRING(token6, 1, 5) || '...' || SUBSTRING(token6, 39, 42)) ELSE '' END,
-            CASE WHEN token7 IS NOT NULL THEN '-' || COALESCE(c7.symbol, SUBSTRING(token7, 1, 5) || '...' || SUBSTRING(token7, 39, 42)) ELSE '' END
-        ) AS pool_name,
+        CASE 
+          WHEN pool_name IS NULL 
+            THEN CONCAT(
+                  COALESCE(c0.symbol, SUBSTRING(token0, 1, 5) || '...' || SUBSTRING(token0, 39, 42)),
+                  CASE WHEN token1 IS NOT NULL THEN '-' || COALESCE(c1.symbol, SUBSTRING(token1, 1, 5) || '...' || SUBSTRING(token1, 39, 42)) ELSE '' END,
+                  CASE WHEN token2 IS NOT NULL THEN '-' || COALESCE(c2.symbol, SUBSTRING(token2, 1, 5) || '...' || SUBSTRING(token2, 39, 42)) ELSE '' END,
+                  CASE WHEN token3 IS NOT NULL THEN '-' || COALESCE(c3.symbol, SUBSTRING(token3, 1, 5) || '...' || SUBSTRING(token3, 39, 42)) ELSE '' END,
+                  CASE WHEN token4 IS NOT NULL THEN '-' || COALESCE(c4.symbol, SUBSTRING(token4, 1, 5) || '...' || SUBSTRING(token4, 39, 42)) ELSE '' END,
+                  CASE WHEN token5 IS NOT NULL THEN '-' || COALESCE(c5.symbol, SUBSTRING(token5, 1, 5) || '...' || SUBSTRING(token5, 39, 42)) ELSE '' END,
+                  CASE WHEN token6 IS NOT NULL THEN '-' || COALESCE(c6.symbol, SUBSTRING(token6, 1, 5) || '...' || SUBSTRING(token6, 39, 42)) ELSE '' END,
+                  CASE WHEN token7 IS NOT NULL THEN '-' || COALESCE(c7.symbol, SUBSTRING(token7, 1, 5) || '...' || SUBSTRING(token7, 39, 42)) ELSE '' END
+              ) 
+            ELSE pool_name
+        END AS pool_name,
         OBJECT_CONSTRUCT('token0', token0, 'token1', token1, 'token2', token2, 'token3', token3, 'token4', token4, 'token5', token5, 'token6', token6, 'token7', token7) AS tokens,
         OBJECT_CONSTRUCT('token0', c0.symbol, 'token1', c1.symbol, 'token2', c2.symbol, 'token3', c3.symbol, 'token4', c4.symbol, 'token5', c5.symbol, 'token6', c6.symbol, 'token7', c7.symbol) AS symbols,
         OBJECT_CONSTRUCT('token0', c0.decimals, 'token1', c1.decimals, 'token2', c2.decimals, 'token3', c3.decimals, 'token4', c4.decimals, 'token5', c5.decimals, 'token6', c6.decimals, 'token7', c7.decimals) AS decimals,
