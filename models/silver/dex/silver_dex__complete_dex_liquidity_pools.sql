@@ -256,13 +256,14 @@ SELECT
     created_hash AS tx_hash,
     deployer_address AS contract_address,
     pool_address,
+    pool_name,
     token0_address AS token0,
     token1_address AS token1,
     'velodrome' AS platform,
     _log_id AS _id,
     _inserted_timestamp
 FROM
-    {{ ref('silver__velodrome_pools') }}
+    {{ ref('silver__velodrome_pool_details') }}
 {% if is_incremental() %}
 WHERE
   _inserted_timestamp >= (
