@@ -8,15 +8,15 @@
 WITH contracts AS (
 
   SELECT
-    address,
-    symbol,
-    decimals,
+    contract_address AS address,
+    token_symbol AS symbol,
+    token_decimals AS decimals,
     _inserted_timestamp
   FROM
     {{ ref('silver__contracts') }}
 ),
 
-balancer AS (
+beethovenx AS (
 
 SELECT
     block_number,
@@ -25,7 +25,7 @@ SELECT
     contract_address,
     pool_address,
     pool_name,
-    'balancer' AS platform,
+    'beethoven-x' AS platform,
     _log_id AS _id,
     _inserted_timestamp,
     token0,
@@ -37,7 +37,7 @@ SELECT
     token6,
     token7
 FROM
-    {{ ref('silver_dex__balancer_pools') }}
+    {{ ref('silver_dex__beethovenx_pools') }}
 {% if is_incremental() %}
 WHERE
   _inserted_timestamp >= (
@@ -83,32 +83,6 @@ WHERE
 GROUP BY all
 ),
 
-dodo_v1 AS (
-
-SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    contract_address,
-    pool_address,
-    base_token AS token0,
-    quote_token AS token1,
-    'dodo-v1' AS platform,
-    _id,
-    _inserted_timestamp
-FROM 
-    {{ ref('silver_dex__dodo_v1_pools') }}
-{% if is_incremental() %}
-WHERE
-  _inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
-    FROM
-      {{ this }}
-  )
-{% endif %}
-),
-
 dodo_v2 AS (
 
 SELECT
@@ -120,12 +94,13 @@ SELECT
     base_token AS token0,
     quote_token AS token1,
     'dodo-v2' AS platform,
-    _log_id AS _id,
+    _id,
     _inserted_timestamp
 FROM 
     {{ ref('silver_dex__dodo_v2_pools') }}
+WHERE token0 IS NOT NULL
 {% if is_incremental() %}
-WHERE
+AND
   _inserted_timestamp >= (
     SELECT
       MAX(_inserted_timestamp) :: DATE - 1
@@ -150,32 +125,6 @@ SELECT
     _inserted_timestamp
 FROM
     {{ ref('silver_dex__fraxswap_pools') }}
-{% if is_incremental() %}
-WHERE
-  _inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
-    FROM
-      {{ this }}
-  )
-{% endif %}
-),
-
-kyberswap_v1_dynamic AS (
-
-SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    contract_address,
-    pool_address,
-    token0,
-    token1,
-    'kyberswap-v1' AS platform,
-    _log_id AS _id,
-    _inserted_timestamp
-FROM
-    {{ ref('silver_dex__kyberswap_v1_dynamic_pools') }}
 {% if is_incremental() %}
 WHERE
   _inserted_timestamp >= (
@@ -221,6 +170,8 @@ SELECT
     tx_hash,
     contract_address,
     pool_address,
+    swap_fee_units AS fee,
+    tick_distance AS tick_spacing,
     token0,
     token1,
     'kyberswap-v2' AS platform,
@@ -239,33 +190,7 @@ WHERE
 {% endif %}
 ),
 
-maverick AS (
-
-SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    contract_address,
-    pool_address,
-    tokenA AS token0,
-    tokenB AS token1,
-    'maverick' AS platform,
-    _log_id AS _id,
-    _inserted_timestamp
-FROM
-    {{ ref('silver_dex__maverick_pools') }}
-{% if is_incremental() %}
-WHERE
-  _inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
-    FROM
-      {{ this }}
-  )
-{% endif %}
-),
-
-shibaswap AS (
+sushi AS (
 
 SELECT
     block_number,
@@ -275,11 +200,11 @@ SELECT
     pool_address,
     token0,
     token1,
-    'shibaswap' AS platform,
+    'sushiswap' AS platform,
     _log_id AS _id,
     _inserted_timestamp
 FROM
-    {{ ref('silver_dex__shibaswap_pools') }}
+    {{ ref('silver_dex__sushi_pools') }}
 {% if is_incremental() %}
 WHERE
   _inserted_timestamp >= (
@@ -291,7 +216,7 @@ WHERE
 {% endif %}
 ),
 
-pancakeswap_v2_amm AS (
+uni_v3 AS (
 
 SELECT
     block_number,
@@ -299,71 +224,15 @@ SELECT
     tx_hash,
     contract_address,
     pool_address,
-    token0,
-    token1,
-    'pancakeswap-v2' AS platform,
-    _log_id AS _id,
-    _inserted_timestamp
-FROM
-    {{ ref('silver_dex__pancakeswap_v2_amm_pools') }}
-{% if is_incremental() %}
-WHERE
-  _inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
-    FROM
-      {{ this }}
-  )
-{% endif %}
-),
-
-pancakeswap_v3 AS (
-
-SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    contract_address,
-    pool_address,
-    NULL AS pool_name,
     fee,
     tick_spacing,
     token0_address AS token0,
     token1_address AS token1,
-    'pancakeswap-v3' AS platform,
-    _log_id AS _id,
+    'uniswap-v3' AS platform,
+    _id,
     _inserted_timestamp
 FROM
-    {{ ref('silver_dex__pancakeswap_v3_pools') }} 
-{% if is_incremental() %}
-WHERE
-  _inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
-    FROM
-      {{ this }}
-  )
-{% endif %}
-),
-
-uni_sushi_v2_v3 AS (
-
-SELECT
-    creation_block AS block_number,
-    creation_time AS block_timestamp,
-    creation_tx AS tx_hash,
-    factory_address AS contract_address,
-    pool_address,
-    pool_name,
-    fee,
-    tickSpacing AS tick_spacing,
-    token0,
-    token1,
-    platform,
-    _log_id AS _id,
-    _inserted_timestamp
-FROM
-    {{ ref('silver_dex__pools') }}
+    {{ ref('silver_dex__univ3_pools') }}
 {% if is_incremental() %}
 WHERE
   _inserted_timestamp >= (
@@ -377,44 +246,29 @@ WHERE
 
 all_pools_standard AS (
     SELECT *
-    FROM dodo_v1
-    UNION ALL
-    SELECT *
     FROM dodo_v2
     UNION ALL
     SELECT *
     FROM frax
     UNION ALL
     SELECT *
-    FROM kyberswap_v1_dynamic
-    UNION ALL
-    SELECT *
     FROM kyberswap_v1_static
     UNION ALL
     SELECT *
-    FROM kyberswap_v2_elastic
-    UNION ALL
-    SELECT *
-    FROM maverick
-    UNION ALL
-    SELECT *
-    FROM shibaswap
-    UNION ALL
-    SELECT *
-    FROM pancakeswap_v2_amm
+    FROM sushi
 ),
 
 all_pools_v3 AS (
     SELECT *
-    FROM uni_sushi_v2_v3
+    FROM uni_v3
     UNION ALL
     SELECT *
-    FROM pancakeswap_v3
+    FROM kyberswap_v2_elastic
 ),
 
 all_pools_other AS (
     SELECT *
-    FROM balancer
+    FROM beethovenx
     UNION ALL
     SELECT *
     FROM curve
@@ -451,15 +305,10 @@ FINAL AS (
         contract_address,
         pool_address,
         CASE
-            WHEN pool_name IS NULL AND platform = 'sushiswap' 
-                THEN CONCAT(COALESCE(c0.symbol,CONCAT(SUBSTRING(token0, 1, 5),'...',SUBSTRING(token0, 39, 42))),'-',COALESCE(c1.symbol,CONCAT(SUBSTRING(token1, 1, 5),'...',SUBSTRING(token1, 39, 42))),' SLP')
-            WHEN pool_name IS NULL AND platform = 'uniswap-v2' 
-                THEN CONCAT(COALESCE(c0.symbol,CONCAT(SUBSTRING(token0, 1, 5),'...',SUBSTRING(token0, 39, 42))),'-',COALESCE(c1.symbol,CONCAT(SUBSTRING(token1, 1, 5),'...',SUBSTRING(token1, 39, 42))),' UNI-V2 LP')
-            WHEN pool_name IS NULL AND platform = 'uniswap-v3' 
+            WHEN platform = 'kyberswap-v2' 
+                THEN CONCAT(COALESCE(c0.symbol,CONCAT(SUBSTRING(token0, 1, 5),'...',SUBSTRING(token0, 39, 42))),'-',COALESCE(c1.symbol,CONCAT(SUBSTRING(token1, 1, 5),'...',SUBSTRING(token1, 39, 42))),' ',COALESCE(fee,0),' ',COALESCE(tick_spacing,0))
+            WHEN platform = 'uniswap-v3' 
                 THEN CONCAT(COALESCE(c0.symbol,CONCAT(SUBSTRING(token0, 1, 5),'...',SUBSTRING(token0, 39, 42))),'-',COALESCE(c1.symbol,CONCAT(SUBSTRING(token1, 1, 5),'...',SUBSTRING(token1, 39, 42))),' ',COALESCE(fee,0),' ',COALESCE(tick_spacing,0),' UNI-V3 LP')
-            WHEN pool_name IS NULL AND platform = 'pancakeswap-v3'
-                THEN CONCAT(COALESCE(c0.symbol,CONCAT(SUBSTRING(token0, 1, 5),'...',SUBSTRING(token0, 39, 42))),'-',COALESCE(c1.symbol,CONCAT(SUBSTRING(token1, 1, 5),'...',SUBSTRING(token1, 39, 42))),' ',COALESCE(fee,0),' ',COALESCE(tick_spacing,0),' PCS-V3 LP')
-            ELSE pool_name
         END AS pool_name,
         OBJECT_CONSTRUCT('token0',token0,'token1',token1) AS tokens,
         OBJECT_CONSTRUCT('token0',c0.symbol,'token1',c1.symbol) AS symbols,
