@@ -22,8 +22,14 @@ models:
         description: '{{ doc("opt_to_address") }}' 
       - name: ETH_VALUE
         description: '{{ doc("opt_value") }}' 
+      - name: ETH_VALUE_PRECISE_RAW
+        description: '{{ doc("precise_amount_unadjusted") }}'
+      - name: ETH_VALUE_PRECISE
+        description: '{{ doc("precise_amount_adjusted") }}'
       - name: TX_FEE
         description: '{{ doc("opt_tx_fee") }}' 
+      - name: TX_FEE_PRECISE
+        description: '{{ doc("tx_fee_precise") }}' 
       - name: GAS_PRICE
         description: '{{ doc("opt_tx_gas_price") }}' 
       - name: EFFECTIVE_GAS_PRICE

@@ -15,6 +15,7 @@ SELECT
     from_address,
     to_address,
     raw_amount,
+    raw_amount_precise,
     token_decimals AS decimals,
     token_symbol AS symbol,
     price AS token_price,
@@ -25,6 +26,10 @@ SELECT
         )
         ELSE NULL
     END AS amount,
+    utils.udf_decimal_adjust(
+        raw_amount_precise,
+        token_decimals
+    ) AS amount_precise,
     CASE
         WHEN C.token_decimals IS NOT NULL
         AND price IS NOT NULL THEN amount * price
