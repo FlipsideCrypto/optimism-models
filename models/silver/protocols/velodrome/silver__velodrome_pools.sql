@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'pool_address',
-    tags = ['non_realtime']
+    tags = ['non_realtime'],
+    full_refresh = false
 ) }}
 
 WITH pool_creation AS (
