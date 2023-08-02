@@ -5,52 +5,52 @@ models:
       
     columns:
       - name: BLOCK_NUMBER
-        description: '{{ doc("opt_block_number") }}'
+        description: '{{ doc("nft_block_no") }}'
       - name: BLOCK_TIMESTAMP
-        description: '{{ doc("opt_block_timestamp") }}'
+        description: '{{ doc("nft_blocktime") }}'
       - name: TX_HASH
-        description: '{{ doc("opt_tx_hash") }}' 
+        description: '{{ doc("nft_tx_hash") }}' 
       - name: EVENT_TYPE
-        description: '{{ doc("op_nft_event_type") }}' 
+        description: '{{ doc("nft_event_type") }}' 
       - name: PLATFORM_ADDRESS
-        description: '{{ doc("op_platform_address") }}' 
+        description: '{{ doc("nft_platform_address") }}' 
       - name: PLATFORM_NAME
-        description: '{{ doc("op_platform_name") }}' 
+        description: '{{ doc("nft_platform_name") }}' 
       - name: PLATFORM_EXCHANGE_VERSION
-        description: '{{ doc("op_platform_exchange_version") }}' 
+        description: '{{ doc("nft_platform_exchange_version") }}' 
       - name: SELLER_ADDRESS
-        description: '{{ doc("op_seller_address") }}' 
+        description: '{{ doc("nft_seller_address") }}' 
       - name: BUYER_ADDRESS
-        description: '{{ doc("op_buyer_address") }}' 
+        description: '{{ doc("nft_buyer_address") }}' 
       - name: NFT_ADDRESS
-        description: '{{ doc("op_nft_address") }}' 
+        description: '{{ doc("nft_nft_address") }}' 
       - name: TOKENID
-        description: '{{ doc("op_tokenid") }}' 
+        description: '{{ doc("nft_tokenid") }}' 
       - name: ERC1155_VALUE
-        description: '{{ doc("op_erc1155_value") }}' 
+        description: '{{ doc("nft_erc1155_value") }}' 
       - name: CURRENCY_SYMBOL
-        description: '{{ doc("op_currency_symbol") }}' 
+        description: '{{ doc("nft_currency_symbol") }}' 
       - name: CURRENCY_ADDRESS
-        description: '{{ doc("op_currency_address") }}' 
+        description: '{{ doc("nft_currency_address") }}' 
       - name: PRICE
-        description: '{{ doc("op_price") }}' 
+        description: '{{ doc("nft_price") }}' 
       - name: PRICE_USD
-        description: '{{ doc("op_price_usd") }}' 
+        description: '{{ doc("nft_price_usd") }}' 
       - name: TOTAL_FEES
-        description: '{{ doc("op_total_fees") }}' 
+        description: '{{ doc("nft_total_fees") }}' 
       - name: PLATFORM_FEE
-        description: '{{ doc("op_platform_fee") }}' 
+        description: '{{ doc("nft_platform_fee") }}' 
       - name: CREATOR_FEE
-        description: '{{ doc("op_creator_fee") }}' 
+        description: '{{ doc("nft_creator_fee") }}' 
       - name: TOTAL_FEES_USD
-        description: '{{ doc("op_total_fees_usd") }}' 
+        description: '{{ doc("nft_total_fees_usd") }}' 
       - name: PLATFORM_FEE_USD
-        description: '{{ doc("op_platform_fee_usd") }}' 
+        description: '{{ doc("nft_platform_fee_usd") }}' 
       - name: CREATOR_FEE_USD
-        description: '{{ doc("op_creator_fee_usd") }}' 
+        description: '{{ doc("nft_creator_fee_usd") }}' 
       - name: ORIGIN_FROM_ADDRESS
-        description: '{{ doc("opt_origin_from") }}'
+        description: '{{ doc("nft_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
-        description: '{{ doc("opt_origin_to") }}'
+        description: '{{ doc("nft_origin_to") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description: '{{ doc("opt_origin_sig") }}'
+        description: '{{ doc("nft_origin_sig") }}'
