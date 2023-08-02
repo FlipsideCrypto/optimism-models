@@ -12,6 +12,7 @@ WITH pool_tr AS (
         block_timestamp,
         from_address AS deployer_address,
         to_address AS pool_address,
+        _call_id,
         _inserted_timestamp
     FROM
         {{ ref(
@@ -97,6 +98,7 @@ FINAL AS (
         quoteToken AS quote_token,
         creator,
         pool_address,
+        _log_id AS _id,
         _inserted_timestamp
     FROM
         pool_evt
@@ -106,11 +108,12 @@ FINAL AS (
         block_number,
         block_timestamp,
         NULL AS event_index,
-        NULL AS contract_address,
+        deployer_address AS contract_address,
         NULL AS base_token,
         NULL AS quote_token,
         deployer_address AS creator,
         pool_address,
+        _call_id AS _id,
         _inserted_timestamp
     FROM
         pool_tr
