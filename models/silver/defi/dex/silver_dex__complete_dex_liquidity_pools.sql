@@ -248,6 +248,33 @@ WHERE
 {% endif %}
 ),
 
+velodrome AS (
+
+SELECT
+    created_block AS block_number,
+    created_timestamp AS block_timestamp,
+    created_hash AS tx_hash,
+    deployer_address AS contract_address,
+    pool_address,
+    pool_name,
+    token0_address AS token0,
+    token1_address AS token1,
+    'velodrome' AS platform,
+    _log_id AS _id,
+    _inserted_timestamp
+FROM
+    {{ ref('silver__velodrome_pool_details') }}
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE - 1
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+
 all_pools_standard AS (
     SELECT *
     FROM dodo_v2
@@ -260,6 +287,9 @@ all_pools_standard AS (
     UNION ALL
     SELECT *
     FROM sushi
+    UNION ALL
+    SELECT *
+    FROM velodrome
 ),
 
 all_pools_v3 AS (
@@ -374,3 +404,18 @@ FINAL AS (
     LEFT JOIN contracts c7
         ON c7.address = p.token7
 )
+
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    platform,
+    contract_address,
+    pool_address,
+    pool_name,
+    tokens,
+    symbols,
+    decimals,
+    _id,
+    _inserted_timestamp
+FROM FINAL 

@@ -4,7 +4,7 @@
     {% if target.name == "prod" %} 
         aws_optimism_api AS 'https://s7qxto6wkd.execute-api.us-east-1.amazonaws.com/prod/get_chainhead'
     {% else %}
-        aws_optimism_api_dev AS 'https://4sovbxzgsf.execute-api.us-east-1.amazonaws.com/dev/get_chainhead'
+        aws_optimism_api_dev AS 'https://ngiz4ozok1.execute-api.us-east-1.amazonaws.com/dev/get_chainhead'
     {%- endif %};
 {% endmacro %}
 
@@ -15,7 +15,7 @@
     ) returns text api_integration = {% if target.name == "prod" %} 
         aws_optimism_api AS 'https://s7qxto6wkd.execute-api.us-east-1.amazonaws.com/prod/udf_bulk_json_rpc'
     {% else %}
-        aws_optimism_api_dev AS 'https://4sovbxzgsf.execute-api.us-east-1.amazonaws.com/dev/udf_bulk_json_rpc'
+        aws_optimism_api_dev AS 'https://ngiz4ozok1.execute-api.us-east-1.amazonaws.com/dev/udf_bulk_json_rpc'
     {%- endif %};
 {% endmacro %}
 
@@ -26,7 +26,7 @@
     ) returns ARRAY api_integration = {% if target.name == "prod" %}
         aws_optimism_api AS 'https://s7qxto6wkd.execute-api.us-east-1.amazonaws.com/prod/bulk_decode_logs'
     {% else %}
-        aws_optimism_api_dev AS'https://4sovbxzgsf.execute-api.us-east-1.amazonaws.com/dev/bulk_decode_logs'
+        aws_optimism_api_dev AS'https://ngiz4ozok1.execute-api.us-east-1.amazonaws.com/dev/bulk_decode_logs'
     {%- endif %};
 {% endmacro %}
 
@@ -37,6 +37,6 @@
     ) returns text api_integration = {% if target.name == "prod" %} 
         aws_optimism_api AS 'https://s7qxto6wkd.execute-api.us-east-1.amazonaws.com/prod/udf_bulk_get_traces'
     {% else %}
-        aws_optimism_api_dev AS 'https://4sovbxzgsf.execute-api.us-east-1.amazonaws.com/dev/udf_bulk_get_traces'
+        aws_optimism_api_dev AS 'https://ngiz4ozok1.execute-api.us-east-1.amazonaws.com/dev/udf_bulk_get_traces'
     {%- endif %};
 {% endmacro %}
