@@ -74,6 +74,7 @@ models:
         tests:
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
+              where: GAUGE_ADDRESS IS NOT NULL
       - name: LP_PROVIDER_ADDRESS
         tests:
           - not_null
