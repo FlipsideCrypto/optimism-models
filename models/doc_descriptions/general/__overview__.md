@@ -43,6 +43,9 @@ There is more information on how to use dbt docs in the last section of this doc
 - [ez_decoded_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_decoded_event_logs)
 - [ez_nft_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_transfers)
 
+### DeFi Tables (optimism.defi)
+- [dim_dex_liquidity_pools](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__dim_dex_liquidity_pools)
+
 **Velodrome**
  - [ez_claimed_rewards](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_claimed_rewards)
  - [ez_lp_actions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_lp_actions)

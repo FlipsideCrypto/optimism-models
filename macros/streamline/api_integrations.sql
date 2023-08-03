@@ -10,7 +10,7 @@
     {% elif target.name == "dev" %}
         {% set sql %}
         CREATE api integration IF NOT EXISTS aws_optimism_api_dev api_provider = aws_api_gateway api_aws_role_arn = 'arn:aws:iam::490041342817:role/snowflake-api-optimism' api_allowed_prefixes = (
-            'https://4sovbxzgsf.execute-api.us-east-1.amazonaws.com/dev/'
+            'https://ngiz4ozok1.execute-api.us-east-1.amazonaws.com/dev/'
         ) enabled = TRUE;
         {% endset %}
         {% do run_query(sql) %}
