@@ -292,7 +292,8 @@ FINAL AS (
         tx_fee,
         tx_fee_precise,
         tx_type,
-        _inserted_timestamp
+        _inserted_timestamp,
+        DATA
     FROM
         new_records
 
@@ -334,7 +335,8 @@ SELECT
     tx_fee,
     tx_fee_precise,
     tx_type,
-    _inserted_timestamp
+    _inserted_timestamp,
+    DATA
 FROM
     missing_data
 {% endif %}
@@ -394,7 +396,8 @@ SELECT
     tx_fee,
     tx_fee_precise,
     tx_type,
-    _inserted_timestamp
+    _inserted_timestamp,
+    DATA
 FROM
     FINAL
 WHERE
