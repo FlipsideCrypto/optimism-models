@@ -26,10 +26,6 @@ SELECT
         )
         ELSE NULL
     END AS amount,
-    utils.udf_decimal_adjust(
-        raw_amount_precise,
-        token_decimals
-    ) AS amount_precise,
     CASE
         WHEN C.token_decimals IS NOT NULL
         AND price IS NOT NULL THEN amount * price
