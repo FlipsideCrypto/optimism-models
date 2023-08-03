@@ -41,6 +41,7 @@ There is more information on how to use dbt docs in the last section of this doc
 - [ez_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_token_transfers)
 - [ez_nft_sales](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_sales)
 - [ez_decoded_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_decoded_event_logs)
+- [ez_nft_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_transfers)
 
 ### DeFi Tables (optimism.defi)
 - [dim_dex_liquidity_pools](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__dim_dex_liquidity_pools)
