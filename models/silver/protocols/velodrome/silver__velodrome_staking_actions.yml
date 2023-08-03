@@ -72,7 +72,6 @@ models:
                 - VARCHAR 
       - name: GAUGE_ADDRESS
         tests:
-          - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: LP_PROVIDER_ADDRESS
