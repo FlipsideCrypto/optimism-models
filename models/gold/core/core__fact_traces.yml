@@ -16,6 +16,10 @@ models:
         description: '{{ doc("opt_traces_to") }}'
       - name: ETH_VALUE
         description: '{{ doc("opt_traces_value") }}'
+      - name: ETH_VALUE_PRECISE_RAW
+        description: '{{ doc("precise_amount_unadjusted") }}'
+      - name: ETH_VALUE_PRECISE
+        description: '{{ doc("precise_amount_adjusted") }}'
       - name: GAS
         description: '{{ doc("opt_traces_gas") }}'
       - name: GAS_USED
