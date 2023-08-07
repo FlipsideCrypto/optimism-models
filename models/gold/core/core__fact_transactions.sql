@@ -40,7 +40,8 @@ SELECT
     status,
     r,
     s,
-    v
+    v,
+    tx_type
 FROM
     (
         SELECT
@@ -107,6 +108,7 @@ FROM
             r,
             s,
             v,
+            tx_type,
             to_varchar(
                 TO_NUMBER(REPLACE(DATA :value :: STRING, '0x'), REPEAT('X', LENGTH(REPLACE(DATA :value :: STRING, '0x'))))
             ) AS eth_value_precise_raw,
