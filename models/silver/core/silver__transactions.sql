@@ -370,13 +370,7 @@ SELECT
     tx_status,
     cumulative_gas_used,
     effective_gas_price,
-    -- utils.udf_decimal_adjust(
-    --     l1_fee,
-    --     18
-    -- ) AS l1_fee_precise,
-    -- l1_fee_precise :: FLOAT AS l1_fee,
     l1_fee AS l1_fee_precise_raw,
-    -- move to string and adjust in the view?
     l1_fee_scalar,
     l1_gas_used,
     l1_gas_price / pow(
