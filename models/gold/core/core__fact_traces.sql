@@ -11,8 +11,14 @@ SELECT
     from_address,
     to_address,
     eth_value,
-    eth_value_precise_raw,
-    eth_value_precise,
+    IFNULL(
+        eth_value_precise_raw,
+        '0'
+    ) AS eth_value_precise_raw,
+    IFNULL(
+        eth_value_precise,
+        '0'
+    ) AS eth_value_precise,
     gas,
     gas_used,
     input,
