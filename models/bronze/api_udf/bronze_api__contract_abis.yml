@@ -12,6 +12,7 @@ models:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - TIMESTAMP_NTZ
+                - TIMESTAMP_LTZ
       - name: CONTRACT_ADDRESS
         tests:
           - not_null
@@ -20,5 +21,3 @@ models:
                 - VARCHAR
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: "^(0x)[0-9a-fA-F]{40}$"
-          - unique:
-              where: "abi_data :data :result :: STRING <> 'Max rate limit reached'"

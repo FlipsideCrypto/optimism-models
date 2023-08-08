@@ -35,10 +35,11 @@ sources:
       - name: apis_keys
       - name: token_prices_priority_hourly
       - name: asset_metadata_priority
+      - name: number_sequence
   - name: streamline_crosschain
     database: streamline
     schema: crosschain
-    tables: 
+    tables:
       - name: node_mapping
   - name: crosschain_public
     database: crosschain
@@ -55,5 +56,14 @@ sources:
       - name: transactions
       - name: debug_traceBlockByNumber
       - name: decoded_logs
-  
-  
+      - name: confirm_blocks
+  - name: optimism_silver
+    database: optimism
+    schema: silver
+    tables:
+      - name: verified_abis
+  - name: optimism_bronze_api
+    database: optimism
+    schema: bronze_api
+    tables:
+      - name: contract_abis

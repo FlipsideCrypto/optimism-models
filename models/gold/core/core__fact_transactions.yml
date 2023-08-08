@@ -1,0 +1,78 @@
+version: 2
+models:
+  - name: core__fact_transactions
+    description: '{{ doc("opt_tx_table_doc") }}'  
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("opt_block_number") }}'   
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("opt_block_timestamp") }}'
+      - name: BLOCK_HASH
+        description: '{{ doc("opt_tx_block_hash") }}' 
+      - name: TX_HASH
+        description: '{{ doc("opt_tx_hash") }}' 
+      - name: NONCE
+        description: '{{ doc("opt_tx_nonce") }}' 
+      - name: POSITION
+        description: '{{ doc("opt_tx_position") }}' 
+      - name: FROM_ADDRESS
+        description: '{{ doc("opt_from_address") }}' 
+      - name: TO_ADDRESS
+        description: '{{ doc("opt_to_address") }}' 
+      - name: ETH_VALUE
+        description: '{{ doc("opt_value") }}' 
+      - name: ETH_VALUE_PRECISE_RAW
+        description: '{{ doc("precise_amount_unadjusted") }}'
+      - name: ETH_VALUE_PRECISE
+        description: '{{ doc("precise_amount_adjusted") }}'
+      - name: TX_FEE
+        description: '{{ doc("opt_tx_fee") }}' 
+      - name: TX_FEE_PRECISE
+        description: '{{ doc("tx_fee_precise") }}' 
+      - name: GAS_PRICE
+        description: '{{ doc("opt_tx_gas_price") }}' 
+      - name: EFFECTIVE_GAS_PRICE
+        description: The total base charge plus tip paid for each unit of gas, in Gwei.
+      - name: GAS_LIMIT
+        description: '{{ doc("opt_tx_gas_limit") }}' 
+      - name: GAS_USED
+        description: '{{ doc("opt_tx_gas_used") }}'
+      - name: L1_GAS_PRICE
+        description: '{{ doc("op_l1_gas_price") }}'
+      - name: L1_GAS_USED
+        description: '{{ doc("op_l1_gas_used") }}'
+      - name: L1_FEE_SCALAR
+        description: '{{ doc("op_l1_fee_scalar") }}'
+      - name: L1_FEE
+        description: The L1 portion of fees paid.
+      - name: L1_STATE_ROOT_TX_HASH
+        description: '{{ doc("op_l1_state_tx_hash") }}'
+      - name: L1_STATE_ROOT_BATCH_INDEX
+        description: '{{ doc("op_l1_state_batch") }}'
+      - name: L1_SUBMISSION_TX_HASH
+        description: '{{ doc("op_l1_sub_tx_hash") }}'
+      - name: L1_SUBMISSION_BATCH_INDEX
+        description: '{{ doc("op_l1_sub_batch") }}'        
+      - name: L1_SUBMISSION_DETAILS
+        description: Variant column that includes details regarding state and submission root, index and tx_hash information for when the block is submitted to Ethereum Mainnet.
+      - name: CUMULATIVE_GAS_USED
+        description: '{{ doc("opt_cumulative_gas_used") }}' 
+      - name: MAX_FEE_PER_GAS
+        description: The maximum fee per gas of the transaction, in Gwei.
+      - name: MAX_PRIORITY_FEE_PER_GAS
+        description: The maximum priority fee per gas of the transaction, in Gwei.
+      - name: STATUS
+        description: '{{ doc("opt_tx_status") }}' 
+      - name: INPUT_DATA
+        description: '{{ doc("opt_tx_input_data") }}'
+      - name: ORIGIN_FUNCTION_SIGNATURE 
+        description: '{{ doc("opt_tx_origin_sig") }}'
+      - name: R
+        description: The r value of the transaction signature.
+      - name: S
+        description: The s value of the transaction signature.
+      - name: V
+        description: The v value of the transaction signature.
+      - name: TX_TYPE
+        description: The type of the transaction, 2 for EIP-1559 transactions and 0 for legacy transactions.

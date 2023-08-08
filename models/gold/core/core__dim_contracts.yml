@@ -1,0 +1,20 @@
+version: 2
+models:
+  - name: core__dim_contracts
+    description: >
+      NOTICE: This table will be upgraded on 8/7. This upgrade will add all created contracts to the table. 
+      This will result in a large increase in the number of rows in this table, as well as a few new columns around the creation details.
+      Existing columns will not be affected.
+      
+      This table contains the contract addresses and their associated metadata. Includes all contracts with more than 25 total events. 
+      Metadata is read directly from contracts on the blockchain.
+
+    columns:
+      - name: ADDRESS
+        description: 'The address of the contract.'
+      - name: SYMBOL
+        description: 'The symbol of the contract.'
+      - name: NAME
+        description: 'The name of the contract.'
+      - name: DECIMALS
+        description: 'The number of decimals used to adjust amount for this contract.'

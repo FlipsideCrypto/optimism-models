@@ -26,6 +26,7 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_blocks](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_blocks)
 - [fact_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_event_logs)
 - [fact_decoded_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_decoded_event_logs)
+- [fact_hourly_token_prices](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_hourly_token_prices)
 - [fact_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_token_transfers)
 - [fact_traces](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_traces)
 - [fact_transactions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_transactions)
@@ -37,8 +38,13 @@ There is more information on how to use dbt docs in the last section of this doc
 **Convenience Tables:**
 - [ez_dex_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_dex_swaps)
 - [ez_eth_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_eth_transfers)
+- [ez_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_token_transfers)
 - [ez_nft_sales](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_sales)
 - [ez_decoded_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_decoded_event_logs)
+- [ez_nft_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_transfers)
+
+### DeFi Tables (optimism.defi)
+- [dim_dex_liquidity_pools](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__dim_dex_liquidity_pools)
 
 **Velodrome**
  - [ez_claimed_rewards](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_claimed_rewards)
@@ -51,13 +57,9 @@ There is more information on how to use dbt docs in the last section of this doc
 
 ## **Helpful User-Defined Functions (UDFs)**
 
-UDFs are custom functions built by the Flipside team that can be used in your queries to make your life easier.
+UDFs are custom functions built by the Flipside team that can be used in your queries to make your life easier. 
 
-Helpful UDFs for working with EVM data:
-```sql
--- Convert a hex encoded value to an integer with ethereum.public.udf_hex_to_int(FIELD::string)
-select '0xFC3C88'::string as hex_value, ethereum.public.udf_hex_to_int('0xFC3C88') as int_value
-```
+Please visit [LiveQuery Functions Overview](https://flipsidecrypto.github.io/livequery-models/#!/overview) for a full list of helpful UDFs.
 
 ## **Data Model Overview**
 

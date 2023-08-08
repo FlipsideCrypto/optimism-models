@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
     unique_key = "contract_address",
-    full_refresh = false
+    full_refresh = false,
+    tags = ['non_realtime']
 ) }}
 
 WITH api_keys AS (
@@ -32,20 +33,28 @@ WHERE
     abi_data :data :result :: STRING <> 'Max rate limit reached'
 {% endif %}
 LIMIT
-    300
-), row_nos AS (
+    50
+), all_contracts AS (
+    SELECT
+        contract_address
+    FROM
+        base
+    UNION
+    SELECT
+        contract_address
+    FROM
+        {{ ref('_retry_abis') }}
+),
+row_nos AS (
     SELECT
         contract_address,
         ROW_NUMBER() over (
             ORDER BY
                 contract_address
         ) AS row_no,
-        FLOOR(
-            row_no / 2
-        ) + 1 AS batch_no,
         api_key
     FROM
-        base
+        all_contracts
         JOIN api_keys
         ON 1 = 1
 ),
@@ -55,14 +64,9 @@ SELECT
 FROM
     row_nos rn
 WHERE
-    batch_no = {{ item }} + 1
-    AND EXISTS (
-SELECT
-    1
-FROM
-    row_nos
-LIMIT
-    1) {% if not loop.last %}
+    row_no = {{ item }}
+
+    {% if not loop.last %}
     UNION ALL
     {% endif %}
 {% endfor %})

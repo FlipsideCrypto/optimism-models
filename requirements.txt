@@ -1,4 +1,4 @@
-dbt-snowflake~=1.4.0
+dbt-snowflake>=1.4,<1.5
 requests~=2.26.0
 click~=8.0.4
 cli_passthrough~=0.1.3
