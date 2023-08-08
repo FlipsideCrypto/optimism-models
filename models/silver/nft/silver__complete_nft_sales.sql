@@ -274,31 +274,6 @@ eth_price AS (
     WHERE
         token_address = '0x4200000000000000000000000000000000000006'
 ),
-nft_labels AS (
-    SELECT
-        contract_address,
-        token_name
-    FROM
-        {{ ref('silver__contracts') }}
-    WHERE
-        contract_address IS NOT NULL
-        AND token_name IS NOT NULL
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
-
-qualify ROW_NUMBER() over (
-    PARTITION BY contract_address
-    ORDER BY
-        _inserted_timestamp DESC
-) = 1
-),
 final_base AS (
     SELECT
         block_number,
@@ -317,7 +292,7 @@ final_base AS (
         seller_address,
         buyer_address,
         nft_address,
-        l.token_name AS project_name,
+        C.token_name AS project_name,
         erc1155_value,
         tokenId,
         p.symbol AS currency_symbol,
@@ -398,11 +373,9 @@ final_base AS (
         nft_log_id,
         input_data,
         _log_id,
-        _inserted_timestamp
+        b._inserted_timestamp
     FROM
         nft_base_models b
-        LEFT JOIN nft_labels l
-        ON b.nft_address = l.contract_address
         LEFT JOIN all_prices p
         ON DATE_TRUNC(
             'hour',
@@ -414,10 +387,116 @@ final_base AS (
             'hour',
             b.block_timestamp
         ) = e.hour
+        LEFT JOIN {{ ref('silver__contracts') }} C
+        ON b.nft_address = C.contract_address
 )
+
+{% if is_incremental() %},
+label_fill_sales AS (
+    SELECT
+        block_number,
+        block_timestamp,
+        tx_hash,
+        event_type,
+        platform_address,
+        platform_name,
+        platform_exchange_version,
+        NULL AS aggregator_name,
+        seller_address,
+        buyer_address,
+        nft_address,
+        C.token_name AS project_name,
+        erc1155_value,
+        tokenId,
+        currency_symbol,
+        currency_address,
+        total_price_raw,
+        total_fees_raw,
+        platform_fee_raw,
+        creator_fee_raw,
+        price,
+        price_usd,
+        total_fees,
+        total_fees_usd,
+        platform_fee,
+        platform_fee_usd,
+        creator_fee,
+        creator_fee_usd,
+        tx_fee,
+        tx_fee_usd,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        input_data,
+        nft_log_id,
+        _log_id,
+        GREATEST(
+            t._inserted_timestamp,
+            C._inserted_timestamp
+        ) AS _inserted_timestamp
+    FROM
+        {{ this }}
+        t
+        INNER JOIN {{ ref('silver__contracts') }} C
+        ON t.nft_address = C.contract_address
+    WHERE
+        t.project_name IS NULL
+        AND C.token_name IS NOT NULL
+)
+{% endif %},
+final_joins AS (
+    SELECT
+        *
+    FROM
+        final_base
+
+{% if is_incremental() %}
+UNION
 SELECT
     *
 FROM
-    final_base qualify(ROW_NUMBER() over(PARTITION BY nft_log_id
+    label_fill_sales
+{% endif %}
+)
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    event_type,
+    platform_address,
+    platform_name,
+    platform_exchange_version,
+    aggregator_name,
+    seller_address,
+    buyer_address,
+    nft_address,
+    project_name,
+    erc1155_value,
+    tokenId,
+    currency_symbol,
+    currency_address,
+    total_price_raw,
+    total_fees_raw,
+    platform_fee_raw,
+    creator_fee_raw,
+    price,
+    price_usd,
+    total_fees,
+    total_fees_usd,
+    platform_fee,
+    platform_fee_usd,
+    creator_fee,
+    creator_fee_usd,
+    tx_fee,
+    tx_fee_usd,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    nft_log_id,
+    input_data,
+    _log_id,
+    _inserted_timestamp
+FROM
+    final_joins qualify(ROW_NUMBER() over(PARTITION BY nft_log_id
 ORDER BY
     _inserted_timestamp DESC)) = 1

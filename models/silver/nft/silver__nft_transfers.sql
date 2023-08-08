@@ -299,30 +299,100 @@ all_transfers AS (
     WHERE
         erc1155_value > 0
 ),
-nft_project_name AS (
+transfer_base AS (
     SELECT
+        block_number,
+        block_timestamp,
+        tx_hash,
+        event_index,
         contract_address,
-        token_name AS project_name
+        C.token_name AS project_name,
+        from_address,
+        to_address,
+        A.token_id AS tokenId,
+        erc1155_value,
+        CASE
+            WHEN from_address = '0x0000000000000000000000000000000000000000' THEN 'mint'
+            ELSE 'other'
+        END AS event_type,
+        token_transfer_type,
+        A._log_id,
+        A._inserted_timestamp
     FROM
-        {{ ref('silver__contracts') }}
+        all_transfers A
+        LEFT JOIN {{ ref('silver__contracts') }} C USING (contract_address)
+    WHERE
+        to_address IS NOT NULL
+)
+
+{% if is_incremental() %},
+fill_transfers AS (
+    SELECT
+        t.block_number,
+        t.block_timestamp,
+        t.tx_hash,
+        t.event_index,
+        t.contract_address,
+        C.token_name AS project_name,
+        t.from_address,
+        t.to_address,
+        t.tokenId,
+        t.erc1155_value,
+        t.event_type,
+        t.token_transfer_type,
+        t._log_id,
+        GREATEST(
+            t._inserted_timestamp,
+            C._inserted_timestamp
+        ) AS _inserted_timestamp
+    FROM
+        {{ this }}
+        t
+        INNER JOIN {{ ref('silver__contracts') }} C USING (contract_address)
+    WHERE
+        t.project_name IS NULL
+        AND C.token_name IS NOT NULL
+)
+{% endif %},
+final_base AS (
+    SELECT
+        block_number,
+        block_timestamp,
+        tx_hash,
+        event_index,
+        contract_address,
+        project_name,
+        from_address,
+        to_address,
+        tokenId,
+        erc1155_value,
+        event_type,
+        token_transfer_type,
+        _log_id,
+        _inserted_timestamp
+    FROM
+        transfer_base
 
 {% if is_incremental() %}
-WHERE
-    TO_TIMESTAMP_NTZ(_inserted_timestamp) >= (
-        SELECT
-            MAX(
-                _inserted_timestamp
-            )
-        FROM
-            {{ this }}
-    )
+UNION
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    event_index,
+    contract_address,
+    project_name,
+    from_address,
+    to_address,
+    tokenId,
+    erc1155_value,
+    event_type,
+    token_transfer_type,
+    _log_id,
+    _inserted_timestamp
+FROM
+    fill_transfers
 {% endif %}
-
-qualify ROW_NUMBER() over (
-    PARTITION BY contract_address
-    ORDER BY
-        _inserted_timestamp DESC
-) = 1
 )
 SELECT
     block_number,
@@ -333,20 +403,14 @@ SELECT
     project_name,
     from_address,
     to_address,
-    token_id AS tokenid,
+    tokenId,
     erc1155_value,
-    CASE
-        WHEN from_address = '0x0000000000000000000000000000000000000000' THEN 'mint'
-        ELSE 'other'
-    END AS event_type,
+    event_type,
     token_transfer_type,
     _log_id,
     _inserted_timestamp
 FROM
-    all_transfers
-    LEFT JOIN nft_project_name USING (contract_address)
-WHERE
-    to_address IS NOT NULL qualify ROW_NUMBER() over (
+    final_base qualify ROW_NUMBER() over (
         PARTITION BY _log_id
         ORDER BY
             _inserted_timestamp DESC
