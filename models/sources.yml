@@ -62,3 +62,8 @@ sources:
     schema: silver
     tables:
       - name: verified_abis
+  - name: optimism_bronze_api
+    database: optimism
+    schema: bronze_api
+    tables:
+      - name: contract_abis
