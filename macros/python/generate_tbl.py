@@ -28,6 +28,7 @@ def get_key_types(conn, contract_address, topic_0):
     """
     Execute a Snowflake SQL query to fetch the keys and their types.
     """
+
     query = f"""
     WITH base_data AS (
         SELECT 
@@ -75,7 +76,17 @@ def generate_sql(contract_address, topic_0, keys_types):
     """
     Generate the desired SQL based on the contract_address, topic_0, and keys_types.
     """
+    materialized = "incremental"
+    unique_key = "_log_id"
+    tags = "['non_realtime']"
+
     base_query = f"""
+    {{{{ config(
+    materialized = '{materialized}',
+    unique_key = '{unique_key}',
+    tags = {tags}
+    ) }}}}
+    
     SELECT 
         block_number,
         block_timestamp,
@@ -95,12 +106,17 @@ def generate_sql(contract_address, topic_0, keys_types):
         _log_id,
         _inserted_timestamp
     FROM 
-        optimism.silver.decoded_logs
+        {{{{ ref('silver__decoded_logs') }}}}
     WHERE 
         --contract_address = '{contract_address}'
         --AND 
         topics[0] :: STRING = '{topic_0}'
-    LIMIT 10
+    {{% if is_incremental() %}}
+    AND _inserted_timestamp >= (
+    SELECT MAX(_inserted_timestamp) :: DATE
+    FROM {{{{ this }}}}
+    )
+    {{% endif %}}
     """
     
     return base_query
@@ -113,6 +129,7 @@ def main(config_file, output_dir):
         config = json.load(file)
 
     for item in config:
+        contract_name = item['contract_name']
         contract_address = item['contract_address']
         topic_0 = item['topic_0']
         
@@ -126,7 +143,7 @@ def main(config_file, output_dir):
         sql_query = generate_sql(contract_address, topic_0, keys_types)
 
         # Create a unique filename based on the contract and topic
-        filename = f"{contract_address}_{topic_0}.sql".replace('0x', '')
+        filename = f"{contract_name}_{contract_address}_{topic_0}.sql".replace('0x', '')
 
         # Write the SQL query to the file
         with open(f"{output_dir}/{filename}", 'w') as file:
