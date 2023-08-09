@@ -158,6 +158,9 @@ def generate_tbl(config_file, output_dir, target):
     with open(config_file, 'r') as file:
         config = json.load(file)
 
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        
     for item in config:
         blockchain = item.get('blockchain','')
         contract_name = item.get('contract_name','')
