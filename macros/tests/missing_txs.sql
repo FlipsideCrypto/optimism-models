@@ -30,6 +30,13 @@ WHERE
         model_tx_hash IS NULL
         OR model_block_number IS NULL
     )
+    AND
+    base_block_number NOT IN (
+    SELECT
+        block_number
+    FROM
+        {{ ref('silver_observability__excluded_receipt_blocks') }}
+)
 {% endmacro %}
 
 {% macro recent_missing_txs(
@@ -60,8 +67,15 @@ FROM
     ON base_block_number = model_block_number
     AND base_tx_hash = model_tx_hash
 WHERE
-    model_tx_hash IS NULL
-    OR model_block_number IS NULL
+    (model_tx_hash IS NULL
+    OR model_block_number IS NULL)
+    AND
+    base_block_number NOT IN (
+    SELECT
+        block_number
+    FROM
+        {{ ref('silver_observability__excluded_receipt_blocks') }}
+)
 {% endmacro %}
 
 {% macro missing_confirmed_txs(
@@ -100,4 +114,11 @@ WHERE
         FROM
             txs_base
     )
+    AND
+    base_block_number NOT IN (
+    SELECT
+        block_number
+    FROM
+        {{ ref('silver_observability__excluded_receipt_blocks') }}
+)
 {% endmacro %}
