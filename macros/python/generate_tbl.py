@@ -1,45 +1,74 @@
 import snowflake.connector
 import yaml
+import argparse
+import os
 import json
+import subprocess
 
-def load_snowflake_config(profile_name):
-    with open('/Users/trevor/.dbt/profiles.yml', 'r') as f:
+def get_dbt_profile():
+    """
+    Get the directory where dbt looks for profiles.yml using dbt debug and
+    the profile name from dbt_project.yml.
+    """
+    try:
+        output = subprocess.check_output(['dbt', 'debug']).decode('utf-8')
+        profiles_dir = None
+        for line in output.splitlines():
+            if 'Using profiles.yml file at' in line:
+                profiles_dir = os.path.dirname(line.replace('Using profiles.yml file at', '').strip())
+                break
+        if not profiles_dir:
+            raise ValueError("dbt_profiles_dir not found in dbt debug output")
+
+        with open("dbt_project.yml", 'r') as f:
+            dbt_config = yaml.safe_load(f)
+            profile_name = dbt_config.get('profile')
+            if not profile_name:
+                raise ValueError("Profile not found in dbt_project.yml")
+
+        return profiles_dir, profile_name
+
+    except subprocess.CalledProcessError:
+        raise ValueError("Failed to run dbt debug")   
+
+def snowflake_connection(profile_name, profiles_dir, target):
+    """
+    Define and create connection to Snowflake by accessing local database environment/profile.
+    """
+    local_profile_path = os.path.join(profiles_dir, 'profiles.yml')
+    if not os.path.exists(local_profile_path):
+        raise ValueError(f"{local_profile_path} does not exist")
+    
+    with open(local_profile_path, 'r') as f:
         profiles = yaml.safe_load(f)
 
-    # Extract Snowflake configurations for the desired profile
-    config = profiles[profile_name]['outputs']['dev']
-    return config
-
-def snowflake_connection(profile_name):
-    config = load_snowflake_config(profile_name)
-
+    config = profiles[profile_name]['outputs'][target]
     conn = snowflake.connector.connect(
         user=config['user'],
         role=config['role'],
         account=config['account'],
+        authenticator='externalbrowser',
         warehouse=config['warehouse'],
         database=config['database'],
-        schema=config['schema'],
-        authenticator='externalbrowser'
+        schema=config['schema']
     )
     return conn
 
-def get_key_types(conn, contract_address, topic_0):
+def get_key_types(conn, blockchain, contract_name, contract_address, topic_0):
     """
     Execute a Snowflake SQL query to fetch the keys and their types.
     """
-
-    query = f"""
+    key_types_query = f"""
     WITH base_data AS (
         SELECT 
             contract_address,
             topics[0] AS topic_0,
             decoded_flat
         FROM 
-            optimism.silver.decoded_logs
+            {blockchain}.silver.decoded_logs
         WHERE 
-            --contract_address = '{contract_address}'
-            --AND 
+            contract_address = '{contract_address}'
+            AND 
             topics[0] :: STRING = '{topic_0}'
     )
 
@@ -60,27 +89,27 @@ def get_key_types(conn, contract_address, topic_0):
     """
     
     cursor = conn.cursor()
-    cursor.execute(query)
+    cursor.execute(key_types_query)
     row = cursor.fetchone()
-
     if not row or not row[0]:
-        print(f"No key types found for contract: {contract_address}, topic: {topic_0}")
+        print(f"No key types found for {contract_name}, contract: {contract_address}, topic: {topic_0} on {blockchain}")
         return {}
-    
     key_types_str = row[0]
     key_types_dict = json.loads(key_types_str)
     cursor.close()
+    
     return key_types_dict
 
-def generate_sql(contract_address, topic_0, keys_types):
+def generate_sql(contract_name, contract_address, topic_0, keys_types):
     """
-    Generate the desired SQL based on the contract_address, topic_0, and keys_types.
+    Generate the desired DBT model based on the contract_address, topic_0, and keys_types. 
+    This does not execute a Snowflake SQL query, it simply creates the DBT model.
     """
     materialized = "incremental"
     unique_key = "_log_id"
     tags = "['non_realtime']"
 
-    base_query = f"""
+    base_evt_query = f"""
     {{{{ config(
     materialized = '{materialized}',
     unique_key = '{unique_key}',
@@ -95,6 +124,7 @@ def generate_sql(contract_address, topic_0, keys_types):
         origin_from_address,
         origin_to_address,
         contract_address,
+        '{contract_name}' AS contract_name,
         event_index,
         topics[0] :: STRING AS topic_0,
         event_name,      
@@ -108,8 +138,8 @@ def generate_sql(contract_address, topic_0, keys_types):
     FROM 
         {{{{ ref('silver__decoded_logs') }}}}
     WHERE 
-        --contract_address = '{contract_address}'
-        --AND 
+        contract_address = '{contract_address}'
+        AND 
         topics[0] :: STRING = '{topic_0}'
     {{% if is_incremental() %}}
     AND _inserted_timestamp >= (
@@ -118,42 +148,54 @@ def generate_sql(contract_address, topic_0, keys_types):
     )
     {{% endif %}}
     """
-    
-    return base_query
+    return base_evt_query
 
-def main(config_file, output_dir):
-    profile_name = "optimism"
-    conn = snowflake_connection(profile_name)
+def generate_tbl(config_file, output_dir, target):
+    
+    print("Starting main function...")
+    conn = snowflake_connection(profile_name, profiles_dir, target)
 
     with open(config_file, 'r') as file:
         config = json.load(file)
 
     for item in config:
-        contract_name = item['contract_name']
-        contract_address = item['contract_address']
-        topic_0 = item['topic_0']
-        
-        # Get the dynamic keys and their types
-        keys_types = get_key_types(conn, contract_address, topic_0)
+        blockchain = item.get('blockchain','')
+        contract_name = item.get('contract_name','')
+        contract_address = item.get('contract_address', '')
+        topic_0 = item.get('topic_0','')
 
+        if not contract_address or len(contract_address) < 1:
+            print(f"Skipped {contract_name} due to missing or incorrect contract address.")
+            continue
+        if not topic_0 or len(topic_0) < 1:
+            print(f"Skipped {contract_name} due to missing or incorrect event.")
+            continue
+
+        keys_types = get_key_types(conn, blockchain, contract_name, contract_address, topic_0)
         if not keys_types:
             continue
 
-        # Generate the SQL based on the dynamic keys/types
-        sql_query = generate_sql(contract_address, topic_0, keys_types)
+        sql_query = generate_sql(contract_name, contract_address, topic_0, keys_types)
 
-        # Create a unique filename based on the contract and topic
         filename = f"{contract_name}_{contract_address}_{topic_0}.sql".replace('0x', '')
 
-        # Write the SQL query to the file
         with open(f"{output_dir}/{filename}", 'w') as file:
             file.write(sql_query)
 
-        print(f"SQL file for {contract_address}, {topic_0} generated.")
+        print(f"SQL file for {contract_name}, {contract_address}, {topic_0} on {blockchain} generated.")
 
     conn.close()
 
 if __name__ == "__main__":
-    config_file = "macros/python/contract_topics.json"
-    output_dir = "models/test"
-    main(config_file, output_dir)
+    try:
+        parser = argparse.ArgumentParser(description='Generate SQL files.')
+        parser.add_argument('--config_file', default='macros/python/contracts_config.json', help='Path to the config file.')
+        parser.add_argument('--output_dir', default='models/test', help='Directory to output SQL files.')
+        parser.add_argument('--target', default='dev', help='Target environment (default: dev).')
+        args = parser.parse_args()
+
+        profiles_dir, profile_name = get_dbt_profile()
+
+        generate_tbl(args.config_file, args.output_dir, args.target)
+    except Exception as e:
+        print(f"An error occurred: {e}")
