@@ -70,6 +70,7 @@ def get_key_types(conn, blockchain, contract_name, contract_address, topic_0):
             contract_address = '{contract_address}'
             AND 
             topics[0] :: STRING = '{topic_0}'
+        LIMIT 1
     )
 
     SELECT
