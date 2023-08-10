@@ -54,6 +54,17 @@ def snowflake_connection(profile_name, profiles_dir, target):
         raise
     return conn
 
+def file_exists_in_repo(filename):
+    """
+    Check if a file exists in the given directory or its subdirectories.
+    """
+    root_dir = os.getcwd()
+
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        if filename in filenames:
+            return True
+    return False
+
 def generate_addr_clause(contract_addresses):
     if contract_addresses:
         formatted_addresses = ', '.join([f"'{address}'" for address in contract_addresses if address.startswith('0x')])
@@ -61,12 +72,12 @@ def generate_addr_clause(contract_addresses):
             return f"AND contract_address IN ({formatted_addresses})"
     return ""
 
-def get_key_types(conn, blockchain, contract_name, contract_addresses, topic_0):
+def get_key_types(conn, blockchain, schema, name, contract_addresses, topic_0):
     """
     Execute a Snowflake SQL query to fetch the keys and their types.
     """
     if not topic_0 or len(topic_0) < 1:
-        print(f"Skipped {contract_name} due to missing or incorrect event.")
+        print(f"Skipped {schema}__{name} due to missing or incorrect event.")
         return {}
 
     contract_address_clause = generate_addr_clause(contract_addresses)
@@ -105,7 +116,7 @@ def get_key_types(conn, blockchain, contract_name, contract_addresses, topic_0):
     cursor.execute(key_types_query)
     row = cursor.fetchone()
     if not row or not row[0]:
-        print(f"No key types found for {contract_name}, contract: {contract_addresses}, topic: {topic_0} on {blockchain}")
+        print(f"No key types found for {name}, contract: {contract_addresses}, topic: {topic_0} on {blockchain}")
         return {}
     key_types_str = row[0]
     key_types_dict = json.loads(key_types_str)
@@ -113,13 +124,17 @@ def get_key_types(conn, blockchain, contract_name, contract_addresses, topic_0):
     
     return key_types_dict
 
-def generate_sql(contract_name, contract_addresses, topic_0, keys_types):
+def generate_sql(name, contract_addresses, topic_0, keys_types):
     """
     Generate the desired DBT model based on the contract_address, topic_0, and keys_types. 
     This does not execute a Snowflake SQL query, it simply creates the DBT model.
     """
     contract_address_clause = generate_addr_clause(contract_addresses)
-    
+    column_exception_mapping = {
+        "from": "from_address",
+        "to": "to_address"
+    }
+
     materialized = "incremental"
     unique_key = "_log  _id"
     tags = "['non_realtime']"
@@ -139,11 +154,11 @@ def generate_sql(contract_name, contract_addresses, topic_0, keys_types):
         origin_from_address,
         origin_to_address,
         contract_address,
-        '{contract_name}' AS contract_name,
+        '{name}' AS name,
         event_index,
         topics[0] :: STRING AS topic_0,
         event_name,      
-        {', '.join([f'decoded_flat:"{key}"::{type} AS {key}' for key, type in keys_types.items()])},
+        {', '.join([f'decoded_flat:"{key}"::{type} AS {column_exception_mapping.get(key, key)}' for key, type in keys_types.items()])},
         decoded_flat,
         data,
         event_removed,
@@ -167,7 +182,7 @@ def generate_sql(contract_name, contract_addresses, topic_0, keys_types):
 
 def main(config_file, output_dir, target):
     
-    print("Starting main function...")
+    print("Generating tables...")
     conn = snowflake_connection(profile_name, profiles_dir, target)
 
     os.makedirs(output_dir, exist_ok=True)
@@ -177,25 +192,30 @@ def main(config_file, output_dir, target):
 
     for item in config:
         try:
-            blockchain = item.get('blockchain','')
-            contract_name = item.get('contract_name','')
+            blockchain = item.get('blockchain','').lower()
+            schema = item.get('schema','').lower()
+            name = item.get('name','').lower()
             contract_addresses = item.get('contract_address', [])
             if not isinstance(contract_addresses, list):
-                contract_addresses = [contract_addresses]
-            topic_0 = item.get('topic_0','')
+                contract_addresses = [contract_addresses.lower()]
+            topic_0 = item.get('topic_0','').lower()
         
-            keys_types = get_key_types(conn, blockchain, contract_name, contract_addresses, topic_0)
+            filename = f"{schema}__{name}.sql"
+            if file_exists_in_repo(filename):
+                print(f"Skipped {schema}__{name}, already exists...")
+                continue
+
+            keys_types = get_key_types(conn, blockchain, schema, name, contract_addresses, topic_0)
             if not keys_types:
                 continue
 
-            sql_query = generate_sql(contract_name, contract_addresses, topic_0, keys_types)
+            sql_query = generate_sql(name, contract_addresses, topic_0, keys_types)
 
-            filename = f"{contract_name}.sql"
 
             with open(f"{output_dir}/{filename}", 'w') as file:
                 file.write(sql_query)
 
-            print(f"SQL file for {contract_name} on {blockchain} generated.")
+            print(f"SQL file for {schema}__{name} on {blockchain} generated.")
 
         except Exception as e:
             print(f"Error processing item {item} in main function: {e}")
@@ -207,8 +227,8 @@ def main(config_file, output_dir, target):
 if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser(description='Generate SQL files.')
-        parser.add_argument('--config_file', default='macros/python/contracts_config.json', help='Path to the config file.')
-        parser.add_argument('--output_dir', default='models/test', help='Directory to output SQL files.')
+        parser.add_argument('--config_file', default='macros/python/generate_logs_config.json', help='Path to the config file.')
+        parser.add_argument('--output_dir', default='models/temp_models', help='Directory to output SQL files.')
         parser.add_argument('--target', default='dev', help='Target environment (default: dev).')
         args = parser.parse_args()
 
