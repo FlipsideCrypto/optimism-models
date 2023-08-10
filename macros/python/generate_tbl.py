@@ -128,7 +128,7 @@ def generate_sql(contract_name, contract_address, topic_0, keys_types):
         event_index,
         topics[0] :: STRING AS topic_0,
         event_name,      
-        {', '.join([f'decoded_flat:"{key}"::{type} AS "{key.upper()}"' for key, type in keys_types.items()])},
+        {', '.join([f'decoded_flat:"{key}"::{type} AS {key}' for key, type in keys_types.items()])},
         decoded_flat,
         data,
         event_removed,
@@ -160,7 +160,7 @@ def generate_tbl(config_file, output_dir, target):
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-        
+
     for item in config:
         blockchain = item.get('blockchain','')
         contract_name = item.get('contract_name','')
