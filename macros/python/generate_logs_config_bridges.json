@@ -1,16 +1,50 @@
 [
   {
-    "blockchain": "optimism",
+    "blockchain": [
+      "optimism",
+      "arbitrum",
+      "polygon",
+      "gnosis",
+      "base"
+    ],
     "schema": "silver_bridge",
     "name": "hop_transfers_sent",
     "contract_address": "",
     "topic_0": "0xe35dddd4ea75d7e9b3fe93af4f4e40e778c3da4074c9d93e7c6536f1e803c1eb"
   },
   {
+    "blockchain": "ethereum",
+    "schema": "silver_bridge",
+    "name": "hop_transfers_sent",
+    "contract_address": "",
+    "topic_0": "0x0a0607688c86ec1775abcdbab7b33a3a35a6c9cde677c9be880150c231cc6b0b"
+  },
+  {
     "blockchain": "optimism",
     "schema": "silver_bridge",
     "name": "across_deposits",
     "contract_address": "0x6f26bf09b1c792e3228e5467807a900a503c0281",
+    "topic_0": "0xafc4df6845a4ab948b492800d3d8a25d538a102a2bc07cd01f1cfa097fddcff6"
+  },
+  {
+    "blockchain": "arbitrum",
+    "schema": "silver_bridge",
+    "name": "across_deposits",
+    "contract_address": "0xe35e9842fceaCA96570B734083f4a58e8F7C5f2A",
+    "topic_0": "0xafc4df6845a4ab948b492800d3d8a25d538a102a2bc07cd01f1cfa097fddcff6"
+  },
+  {
+    "blockchain": "polygon",
+    "schema": "silver_bridge",
+    "name": "across_deposits",
+    "contract_address": "0x9295ee1d8C5b022Be115A2AD3c30C72E34e7F096",
+    "topic_0": "0xafc4df6845a4ab948b492800d3d8a25d538a102a2bc07cd01f1cfa097fddcff6"
+  },
+  {
+    "blockchain": "ethereum",
+    "schema": "silver_bridge",
+    "name": "across_deposits",
+    "contract_address": "0x5c7BCd6E7De5423a257D81B442095A1a6ced35C5",
     "topic_0": "0xafc4df6845a4ab948b492800d3d8a25d538a102a2bc07cd01f1cfa097fddcff6"
   },
   {

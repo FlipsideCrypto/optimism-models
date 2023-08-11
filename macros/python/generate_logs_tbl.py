@@ -135,7 +135,7 @@ def generate_sql(name, contract_addresses, topic_0, keys_types):
     }
 
     materialized = "incremental"
-    unique_key = "_log  _id"
+    unique_key = "_log_id"
     tags = "['non_realtime']"
 
     base_evt_query = f"""
@@ -179,19 +179,16 @@ def generate_sql(name, contract_addresses, topic_0, keys_types):
     """
     return base_evt_query
 
-def main(config_file, output_dir, target):
+def main(config_file, dynamic_output_dir, target):
     
     print("Generating tables...")
     conn = snowflake_connection(profile_name, profiles, target)
-
-    os.makedirs(output_dir, exist_ok=True)
 
     with open(config_file, 'r') as file:
         config = json.load(file)
 
     for item in config:
         try:
-            blockchains = item.get('blockchain',[])
             blockchains = item.get('blockchain', [])
             if not isinstance(blockchains, list):
                 blockchains = [blockchains.lower()]
@@ -218,11 +215,15 @@ def main(config_file, output_dir, target):
 
             sql_query = generate_sql(name, contract_addresses, topic_0, keys_types)
 
+            dynamic_output_dir = f"models/{schema.split('_')[0].lower()}/{schema.split('_')[1].lower()}/{name.split('_')[0].lower()}"
+
+            os.makedirs(dynamic_output_dir, exist_ok=True)
+
             filename = f"{schema}__{name}.sql"
             if file_exists_in_repo(filename):
                 print(f"Skipped {schema}__{name}, already exists...")
                 continue
-            with open(f"{output_dir}/{filename}", 'w') as file:
+            with open(f"{dynamic_output_dir}/{filename}", 'w') as file:
                 file.write(sql_query)
 
             print(f"SQL file for {schema}__{name} on {database} generated.")
