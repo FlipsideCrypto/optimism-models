@@ -6,7 +6,7 @@ import json
 import subprocess
 import traceback
 
-def get_dbt_profile():
+def get_dbt_profile(target):
     """
     Get the directory where dbt looks for profiles.yml using dbt debug and
     the profile name from dbt_project.yml.
@@ -26,24 +26,23 @@ def get_dbt_profile():
             profile_name = dbt_config.get('profile')
             if not profile_name:
                 raise ValueError("Profile not found in dbt_project.yml")
+            
+        with open(os.path.join(profiles_dir, 'profiles.yml'), 'r') as f:
+            profiles = yaml.safe_load(f)
+            
+        database = profiles[profile_name]['outputs'][target]['database'].lower()
 
-        return profiles_dir, profile_name
+        return profile_name, profiles, database
 
     except Exception as e:
         print(f"Error in get_dbt_profile function: {e}")
         print(traceback.format_exc())
         raise
 
-def snowflake_connection(profile_name, profiles_dir, target):
+def snowflake_connection(profile_name, profiles, target):
     """
     Define and create connection to Snowflake by accessing local database environment/profile.
     """
-    local_profile_path = os.path.join(profiles_dir, 'profiles.yml')
-    if not os.path.exists(local_profile_path):
-        raise ValueError(f"{local_profile_path} does not exist")
-    
-    with open(local_profile_path, 'r') as f:
-        profiles = yaml.safe_load(f)
 
     config = profiles[profile_name]['outputs'][target]
     try:
@@ -72,7 +71,7 @@ def generate_addr_clause(contract_addresses):
             return f"AND contract_address IN ({formatted_addresses})"
     return ""
 
-def get_key_types(conn, blockchain, schema, name, contract_addresses, topic_0):
+def get_key_types(conn, database, schema, name, contract_addresses, topic_0):
     """
     Execute a Snowflake SQL query to fetch the keys and their types.
     """
@@ -89,7 +88,7 @@ def get_key_types(conn, blockchain, schema, name, contract_addresses, topic_0):
             topics[0] AS topic_0,
             decoded_flat
         FROM 
-            {blockchain}.silver.decoded_logs
+            {database}.silver.decoded_logs
         WHERE 
             topics[0] :: STRING = '{topic_0}'
             {contract_address_clause}
@@ -116,7 +115,7 @@ def get_key_types(conn, blockchain, schema, name, contract_addresses, topic_0):
     cursor.execute(key_types_query)
     row = cursor.fetchone()
     if not row or not row[0]:
-        print(f"No key types found for {name}, contract: {contract_addresses}, topic: {topic_0} on {blockchain}")
+        print(f"No key types found for {name} on {database}")
         return {}
     key_types_str = row[0]
     key_types_dict = json.loads(key_types_str)
@@ -183,7 +182,7 @@ def generate_sql(name, contract_addresses, topic_0, keys_types):
 def main(config_file, output_dir, target):
     
     print("Generating tables...")
-    conn = snowflake_connection(profile_name, profiles_dir, target)
+    conn = snowflake_connection(profile_name, profiles, target)
 
     os.makedirs(output_dir, exist_ok=True)
 
@@ -192,30 +191,41 @@ def main(config_file, output_dir, target):
 
     for item in config:
         try:
-            blockchain = item.get('blockchain','').lower()
+            blockchains = item.get('blockchain',[])
+            blockchains = item.get('blockchain', [])
+            if not isinstance(blockchains, list):
+                blockchains = [blockchains.lower()]
+            else:
+                blockchains = [blockchain.lower() for blockchain in blockchains]
             schema = item.get('schema','').lower()
             name = item.get('name','').lower()
             contract_addresses = item.get('contract_address', [])
             if not isinstance(contract_addresses, list):
                 contract_addresses = [contract_addresses.lower()]
+            else:
+                contract_addresses = [address.lower() for address in contract_addresses]
+            if not isinstance(contract_addresses, list):
+                contract_addresses = [contract_addresses.lower()]
             topic_0 = item.get('topic_0','').lower()
-        
-            filename = f"{schema}__{name}.sql"
-            if file_exists_in_repo(filename):
-                print(f"Skipped {schema}__{name}, already exists...")
+
+            if database.lower() not in blockchains and database.split('_')[0].lower() not in blockchains:
+                print(f"Skipped {schema}__{name}, {database} not in blockchains list...")
                 continue
 
-            keys_types = get_key_types(conn, blockchain, schema, name, contract_addresses, topic_0)
+            keys_types = get_key_types(conn, database, schema, name, contract_addresses, topic_0)
             if not keys_types:
                 continue
 
             sql_query = generate_sql(name, contract_addresses, topic_0, keys_types)
 
-
+            filename = f"{schema}__{name}.sql"
+            if file_exists_in_repo(filename):
+                print(f"Skipped {schema}__{name}, already exists...")
+                continue
             with open(f"{output_dir}/{filename}", 'w') as file:
                 file.write(sql_query)
 
-            print(f"SQL file for {schema}__{name} on {blockchain} generated.")
+            print(f"SQL file for {schema}__{name} on {database} generated.")
 
         except Exception as e:
             print(f"Error processing item {item} in main function: {e}")
@@ -232,7 +242,7 @@ if __name__ == "__main__":
         parser.add_argument('--target', default='dev', help='Target environment (default: dev).')
         args = parser.parse_args()
 
-        profiles_dir, profile_name = get_dbt_profile()
+        profile_name, profiles, database = get_dbt_profile(args.target)
 
         main(args.config_file, args.output_dir, args.target)
     except Exception as e:

@@ -12,15 +12,15 @@ SELECT
     origin_from_address,
     origin_to_address,
     contract_address,
-    'multichain_bridge_v7_swapout' AS NAME,
+    'multichain_v7_swapin' AS NAME,
     event_index,
     topics [0] :: STRING AS topic_0,
     event_name,
     decoded_flat :"amount" :: INTEGER AS amount,
-    decoded_flat :"from" :: STRING AS from_address,
+    decoded_flat :"fromChainID" :: INTEGER AS fromChainID,
     decoded_flat :"receiver" :: STRING AS receiver,
+    decoded_flat :"swapID" :: STRING AS swapID,
     decoded_flat :"swapoutID" :: STRING AS swapoutID,
-    decoded_flat :"toChainID" :: INTEGER AS toChainID,
     decoded_flat :"token" :: STRING AS token,
     decoded_flat,
     DATA,
@@ -31,7 +31,7 @@ SELECT
 FROM
     {{ ref('silver__decoded_logs') }}
 WHERE
-    topics [0] :: STRING = '0x0d969ae475ff6fcaf0dcfa760d4d8607244e8d95e9bf426f8d5d69f9a3e525af'
+    topics [0] :: STRING = '0x164f647883b52834be7a5219336e455a23a358be27519d0442fc0ee5e1b1ce2e'
     AND contract_address IN ('0x1633d66ca91ce4d81f63ea047b7b19beb92df7f3')
 
 {% if is_incremental() %}

@@ -12,7 +12,7 @@ SELECT
     origin_from_address,
     origin_to_address,
     contract_address,
-    'across_bridge_deposits' AS NAME,
+    'across_deposits' AS NAME,
     event_index,
     topics [0] :: STRING AS topic_0,
     event_name,

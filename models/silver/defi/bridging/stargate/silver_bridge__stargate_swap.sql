@@ -12,18 +12,18 @@ SELECT
     origin_from_address,
     origin_to_address,
     contract_address,
-    'multichain_bridge_v6_anycall' AS NAME,
+    'stargate_swap' AS NAME,
     event_index,
     topics [0] :: STRING AS topic_0,
     event_name,
-    decoded_flat :"_fallback" :: STRING AS _fallback,
-    decoded_flat :"appID" :: STRING AS appID,
-    decoded_flat :"data" :: STRING AS DATA,
-    decoded_flat :"flags" :: INTEGER AS flags,
+    decoded_flat :"amountSD" :: INTEGER AS amountSD,
+    decoded_flat :"chainId" :: INTEGER AS chainId,
+    decoded_flat :"dstPoolId" :: INTEGER AS dstPoolId,
+    decoded_flat :"eqFee" :: INTEGER AS eqFee,
+    decoded_flat :"eqReward" :: INTEGER AS eqReward,
     decoded_flat :"from" :: STRING AS from_address,
-    decoded_flat :"nonce" :: INTEGER AS nonce,
-    decoded_flat :"to" :: STRING AS to_address,
-    decoded_flat :"toChainID" :: INTEGER AS toChainID,
+    decoded_flat :"lpFee" :: INTEGER AS lpFee,
+    decoded_flat :"protocolFee" :: INTEGER AS protocolFee,
     decoded_flat,
     DATA,
     event_removed,
@@ -33,8 +33,7 @@ SELECT
 FROM
     {{ ref('silver__decoded_logs') }}
 WHERE
-    topics [0] :: STRING = '0xa17aef042e1a5dd2b8e68f0d0d92f9a6a0b35dc25be1d12c0cb3135bfd8951c9'
-    AND contract_address IN ('0xc10ef9f491c9b59f936957026020c321651ac078')
+    topics [0] :: STRING = '0x34660fc8af304464529f48a778e03d03e4d34bcd5f9b6f0cfbf3cd238c642f7f'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
