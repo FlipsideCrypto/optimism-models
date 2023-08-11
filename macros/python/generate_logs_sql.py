@@ -5,6 +5,7 @@ import os
 import json
 import subprocess
 import traceback
+from generate_tbl_yml import generate_yml
 
 def get_dbt_profile(target):
     """
@@ -180,7 +181,7 @@ def generate_sql(name, contract_addresses, topic_0, keys_types):
     return base_evt_query
 
 def main(config_file, dynamic_output_dir, target):
-    
+
     print("Generating tables...")
     conn = snowflake_connection(profile_name, profiles, target)
 
@@ -220,13 +221,23 @@ def main(config_file, dynamic_output_dir, target):
             os.makedirs(dynamic_output_dir, exist_ok=True)
 
             filename = f"{schema}__{name}.sql"
-            if file_exists_in_repo(filename):
-                print(f"Skipped {schema}__{name}, already exists...")
-                continue
-            with open(f"{dynamic_output_dir}/{filename}", 'w') as file:
-                file.write(sql_query)
+            yml_filename = filename.replace('.sql', '.yml')
+            
+            sql_exists = file_exists_in_repo(filename)
+            yml_exists = file_exists_in_repo(yml_filename)
 
-            print(f"SQL file for {schema}__{name} on {database} generated.")
+            if sql_exists and yml_exists:
+                print(f"Both SQL and YML for {schema}__{name} already exist. Skipping...")
+                continue
+            elif sql_exists:
+                print(f"SQL for {schema}__{name} already exists. Skipping SQL generation.")
+            else:
+                with open(f"{dynamic_output_dir}/{filename}", 'w') as file:
+                    file.write(sql_query)
+                print(f"SQL file for {schema}__{name} on {database} generated.")
+            
+            if not yml_exists:
+                generate_yml(f"{dynamic_output_dir}/{filename}")
 
         except Exception as e:
             print(f"Error processing item {item} in main function: {e}")
@@ -244,7 +255,6 @@ if __name__ == "__main__":
         args = parser.parse_args()
 
         profile_name, profiles, database = get_dbt_profile(args.target)
-
         main(args.config_file, args.output_dir, args.target)
     except Exception as e:
         print(f"An error occurred in __main__ execution: {e}")
