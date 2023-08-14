@@ -1,0 +1,97 @@
+[
+  {
+    "blockchain": ["optimism", "arbitrum", "polygon", "gnosis", "base"],
+    "schema": "silver_bridge",
+    "name": "hop_transfers_sent",
+    "contract_address": "",
+    "topic_0": "0xe35dddd4ea75d7e9b3fe93af4f4e40e778c3da4074c9d93e7c6536f1e803c1eb",
+    "drop": false
+  },
+  {
+    "blockchain": "ethereum",
+    "schema": "silver_bridge",
+    "name": "hop_transfers_sent",
+    "contract_address": "",
+    "topic_0": "0x0a0607688c86ec1775abcdbab7b33a3a35a6c9cde677c9be880150c231cc6b0b",
+    "drop": false
+  },
+  {
+    "blockchain": "optimism",
+    "schema": "silver_bridge",
+    "name": "across_deposits",
+    "contract_address": "0x6f26bf09b1c792e3228e5467807a900a503c0281",
+    "topic_0": "0xafc4df6845a4ab948b492800d3d8a25d538a102a2bc07cd01f1cfa097fddcff6",
+    "drop": false
+  },
+  {
+    "blockchain": "arbitrum",
+    "schema": "silver_bridge",
+    "name": "across_deposits",
+    "contract_address": "0xe35e9842fceaCA96570B734083f4a58e8F7C5f2A",
+    "topic_0": "0xafc4df6845a4ab948b492800d3d8a25d538a102a2bc07cd01f1cfa097fddcff6",
+    "drop": false
+  },
+  {
+    "blockchain": "polygon",
+    "schema": "silver_bridge",
+    "name": "across_deposits",
+    "contract_address": "0x9295ee1d8C5b022Be115A2AD3c30C72E34e7F096",
+    "topic_0": "0xafc4df6845a4ab948b492800d3d8a25d538a102a2bc07cd01f1cfa097fddcff6",
+    "drop": false
+  },
+  {
+    "blockchain": "ethereum",
+    "schema": "silver_bridge",
+    "name": "across_deposits",
+    "contract_address": "0x5c7BCd6E7De5423a257D81B442095A1a6ced35C5",
+    "topic_0": "0xafc4df6845a4ab948b492800d3d8a25d538a102a2bc07cd01f1cfa097fddcff6",
+    "drop": false
+  },
+  {
+    "blockchain": "optimism",
+    "schema": "silver_bridge",
+    "name": "multichain_v7_swapout",
+    "contract_address": "0x1633D66Ca91cE4D81F63Ea047B7B19Beb92dF7f3",
+    "topic_0": "0x0d969ae475ff6fcaf0dcfa760d4d8607244e8d95e9bf426f8d5d69f9a3e525af",
+    "drop": false
+  },
+  {
+    "blockchain": "optimism",
+    "schema": "silver_bridge",
+    "name": "multichain_v7_swapin",
+    "contract_address": "0x1633D66Ca91cE4D81F63Ea047B7B19Beb92dF7f3",
+    "topic_0": "0x164f647883b52834be7a5219336e455a23a358be27519d0442fc0ee5e1b1ce2e",
+    "drop": false
+  },
+  {
+    "blockchain": "optimism",
+    "schema": "silver_bridge",
+    "name": "multichain_v6_anycall",
+    "contract_address": "0xC10Ef9F491C9B59f936957026020C321651ac078",
+    "topic_0": "0xa17aef042e1a5dd2b8e68f0d0d92f9a6a0b35dc25be1d12c0cb3135bfd8951c9",
+    "drop": false
+  },
+  {
+    "blockchain": "optimism",
+    "schema": "silver_bridge",
+    "name": "multichain_v7_anycall",
+    "contract_address": "0x8efd012977DD5C97E959b9e48c04eE5fcd604374",
+    "topic_0": "0x17dac14bf31c4070ebb2dc182fc25ae5df58f14162a7f24a65b103e22385af0d",
+    "drop": false
+  },
+  {
+    "blockchain": [
+      "ethereum",
+      "optimism",
+      "arbitrum",
+      "polygon",
+      "avalanche",
+      "base"
+    ],
+    "schema": "silver_bridge",
+    "name": "stargate_swap",
+    "contract_address": "",
+    "topic_0": "0x34660fc8af304464529f48a778e03d03e4d34bcd5f9b6f0cfbf3cd238c642f7f",
+    "drop": false
+  }
+]
