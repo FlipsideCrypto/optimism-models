@@ -14,7 +14,7 @@ def file_exists_in_repo(filename):
             return True
     return False
 
-def generate_yml(model_path, output_dir=None, specific_files=[]):
+def generate_yml(model_path, output_dir=None, specific_files=[], drop=False):
     """
     Generates a DBT .yml test file for each .sql file in the given directory or for a specified SQL file.
     
@@ -35,6 +35,20 @@ def generate_yml(model_path, output_dir=None, specific_files=[]):
     Returns:
     None. This function writes .yml files to the specified or default output directory.
     """
+    column_type_mapping = {
+        tuple(["number", "index", ":: INTEGER"]): "INTEGER",
+        tuple(["hash", "signature", "address", "name", "_id", ":: STRING"]): "STRING",
+        tuple(["bool", ":: BOOLEAN"]): "BOOLEAN",
+        tuple(["flat", "data", ":: VARIANT"]): "VARIANT",
+        tuple(["timestamp", ":: TIMESTAMP", ":: DATE"]): "TIMESTAMP"
+    }
+    skip_column_mapping = ["event_removed"]
+    column_test_mapping = {
+        "STRING": "dbt_expectations.expect_column_values_to_match_regex:\n              regex: 0[xX][0-9a-fA-F]+\n",
+        "INTEGER": "dbt_expectations.expect_column_values_to_be_in_type_list:\n              column_type_list:\n                - decimal\n                - float\n                - number\n",
+        "TIMESTAMP": "dbt_expectations.expect_column_values_to_be_in_type_list:\n              column_type_list:\n                - TIMESTAMP_LTZ\n"
+    }
+
     if os.path.isfile(model_path) and model_path.endswith('.sql'):
         specific_files = [os.path.basename(model_path)]
         model_path = os.path.dirname(model_path)
@@ -52,23 +66,33 @@ def generate_yml(model_path, output_dir=None, specific_files=[]):
                     if match:
                         select_content = match.group(1)
                         columns = [col.strip() for col in select_content.split(",")]
-                        columns = [re.split("::| AS ", col)[0].strip() for col in columns if not col.startswith("{")]
+                        columns = [re.split("::| AS ", col)[-1].strip().upper() for col in columns if not col.startswith("{") and col not in skip_column_mapping]
 
                 yml_content = "version: 2\nmodels:\n  - name: {}\n    tests:\n      - dbt_utils.unique_combination_of_columns:\n          combination_of_columns:\n            - _LOG_ID\n    columns:\n".format(os.path.basename(sql_filepath).replace('.sql', ''))
                 for column in columns:
-                    column_type = 'STRING' if column.endswith('_id') or column.endswith('_hash') else 'INTEGER'
+                    column_type = 'STRING'
+                    column_lower = column.lower()
+                    
+                    for key_tuple, value in column_type_mapping.items():
+                        if any(substring in column_lower for substring in key_tuple):
+                            column_type = value
+                            break
+
                     yml_content += "      - name: {}\n        tests:\n          - not_null\n".format(column)
-                    if column_type == 'STRING':
-                        yml_content += "          - dbt_expectations.expect_column_values_to_match_regex:\n              regex: 0[xX][0-9a-fA-F]+\n"
-                    elif column_type == 'INTEGER':
-                        yml_content += "          - dbt_expectations.expect_column_values_to_be_in_type_list:\n              column_type_list:\n                - decimal\n                - float\n                - number\n"
+                    if column_type in column_test_mapping:
+                        yml_content += "          - " + column_test_mapping[column_type]
 
                 yml_filename = sql_file.replace('.sql', '.yml')
 
                 if file_exists_in_repo(yml_filename):
+                    if drop:
+                        print(f"Dropped and replaced {yml_filename}.")
+                    else:
                         print(f"Skipped {yml_filename}, already exists...")
                         continue
-                
+                else:
+                    print(f"Generated {yml_filename}.")
+
                 if output_dir:
                     output_filepath = os.path.join(output_dir, sql_file.replace('.sql', '.yml'))
                 else:
@@ -82,9 +106,10 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser(description='Generate YML files.')
         parser.add_argument('--model_path', required=True, help='Path to the input SQL files.')
         parser.add_argument('--output_dir', default=None, help='Directory to output YML files.')
+        parser.add_argument('--drop', action='store_true', help='Drop and replace existing YML files.')
         args = parser.parse_args()
 
-        generate_yml(args.model_path, args.output_dir)
+        generate_yml(model_path=args.model_path, output_dir=args.output_dir, drop=args.drop)
     except Exception as e:
         print(f"An error occurred in __main__ execution: {e}")
         print(traceback.format_exc())
