@@ -53,7 +53,7 @@
     "name": "multichain_v7_swapout",
     "contract_address": "0x1633D66Ca91cE4D81F63Ea047B7B19Beb92dF7f3",
     "topic_0": "0x0d969ae475ff6fcaf0dcfa760d4d8607244e8d95e9bf426f8d5d69f9a3e525af",
-    "drop": true
+    "drop": false
   },
   {
     "blockchain": "optimism",
