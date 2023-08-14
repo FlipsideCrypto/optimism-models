@@ -13,11 +13,11 @@
         origin_from_address,
         origin_to_address,
         contract_address,
-        'multichain' AS name,
+        'celer_cbridge' AS name,
         event_index,
         topics[0] :: STRING AS topic_0,
         event_name,      
-        decoded_flat:"appID"::STRING AS appID, decoded_flat:"data"::STRING AS data, decoded_flat:"extdata"::STRING AS extdata, decoded_flat:"flags"::INTEGER AS flags, decoded_flat:"from"::STRING AS from_address, decoded_flat:"nonce"::INTEGER AS nonce, decoded_flat:"to"::STRING AS to_address, decoded_flat:"toChainID"::INTEGER AS toChainID,
+        decoded_flat:"amount"::INTEGER AS amount, decoded_flat:"dstChainId"::INTEGER AS dstChainId, decoded_flat:"maxSlippage"::INTEGER AS maxSlippage, decoded_flat:"nonce"::INTEGER AS nonce, decoded_flat:"receiver"::STRING AS receiver, decoded_flat:"sender"::STRING AS sender, decoded_flat:"token"::STRING AS token, decoded_flat:"transferId"::STRING AS transferId,
         decoded_flat,
         data,
         event_removed,
@@ -27,8 +27,8 @@
     FROM 
         {{ ref('silver__decoded_logs') }}
     WHERE 
-        topics[0] :: STRING = '0x17dac14bf31c4070ebb2dc182fc25ae5df58f14162a7f24a65b103e22385af0d'
-        AND contract_address = '0x8efd012977dd5c97e959b9e48c04ee5fcd604374'
+        topics[0] :: STRING = '0x89d8051e597ab4178a863a5190407b98abfeff406aa8db90c59af76612e58f01'
+        AND contract_address = '0x9d39fc627a6d9d9f8c831c16995b209548cc3401'
 
     {% if is_incremental() %}
     AND _inserted_timestamp >= (

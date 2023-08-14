@@ -122,5 +122,114 @@
     "contract_address": "0xaf41a65f786339e7911f4acdad6bd49426f2dc6b",
     "topic_0": "0xdc5bad4651c5fbe9977a696aadc65996c468cde1448dd468ec0d83bf61c4b57c",
     "drop": false
+  },
+  {
+    "blockchain": "optimism",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0x9d39fc627a6d9d9f8c831c16995b209548cc3401",
+    "topic_0": "0x89d8051e597ab4178a863a5190407b98abfeff406aa8db90c59af76612e58f01",
+    "drop": false
+  },
+  {
+    "blockchain": "optimism",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0x9d39fc627a6d9d9f8c831c16995b209548cc3401",
+    "topic_0": "0x79fa08de5149d912dce8e5e8da7a7c17ccdf23dd5d3bfe196802e6eb86347c7c",
+    "drop": false
+  },
+  {
+    "blockchain": "arbitrum",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0x1619DE6B6B20eD217a58d00f37B9d47C7663feca",
+    "topic_0": "0x89d8051e597ab4178a863a5190407b98abfeff406aa8db90c59af76612e58f01",
+    "drop": false
+  },
+  {
+    "blockchain": "arbitrum",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0x1619DE6B6B20eD217a58d00f37B9d47C7663feca",
+    "topic_0": "0x79fa08de5149d912dce8e5e8da7a7c17ccdf23dd5d3bfe196802e6eb86347c7c",
+    "drop": false
+  },
+  {
+    "blockchain": "avalanche",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0xef3c714c9425a8F3697A9C969Dc1af30ba82e5d4",
+    "topic_0": "0x89d8051e597ab4178a863a5190407b98abfeff406aa8db90c59af76612e58f01",
+    "drop": false
+  },
+  {
+    "blockchain": "avalanche",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0xef3c714c9425a8F3697A9C969Dc1af30ba82e5d4",
+    "topic_0": "0x79fa08de5149d912dce8e5e8da7a7c17ccdf23dd5d3bfe196802e6eb86347c7c",
+    "drop": false
+  },
+  {
+    "blockchain": "bsc",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0xdd90E5E87A2081Dcf0391920868eBc2FFB81a1aF",
+    "topic_0": "0x89d8051e597ab4178a863a5190407b98abfeff406aa8db90c59af76612e58f01",
+    "drop": false
+  },
+  {
+    "blockchain": "bsc",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0xdd90E5E87A2081Dcf0391920868eBc2FFB81a1aF",
+    "topic_0": "0x79fa08de5149d912dce8e5e8da7a7c17ccdf23dd5d3bfe196802e6eb86347c7c",
+    "drop": false
+  }
+  ,
+  {
+    "blockchain": "polygon",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0x88DCDC47D2f83a99CF0000FDF667A468bB958a78",
+    "topic_0": "0x89d8051e597ab4178a863a5190407b98abfeff406aa8db90c59af76612e58f01",
+    "drop": false
+  },
+  {
+    "blockchain": "polygon",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0x88DCDC47D2f83a99CF0000FDF667A468bB958a78",
+    "topic_0": "0x79fa08de5149d912dce8e5e8da7a7c17ccdf23dd5d3bfe196802e6eb86347c7c",
+    "drop": false
+  },
+  {
+    "blockchain": "ethereum",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0x5427FEFA711Eff984124bFBB1AB6fbf5E3DA1820",
+    "topic_0": "0x89d8051e597ab4178a863a5190407b98abfeff406aa8db90c59af76612e58f01",
+    "drop": false
+  },
+  {
+    "blockchain": "ethereum",
+    "schema": "silver_bridge",
+    "protocol": "celer_cbridge",
+    "version": "",
+    "contract_address": "0x5427FEFA711Eff984124bFBB1AB6fbf5E3DA1820",
+    "topic_0": "0x79fa08de5149d912dce8e5e8da7a7c17ccdf23dd5d3bfe196802e6eb86347c7c",
+    "drop": false
   }
 ]
