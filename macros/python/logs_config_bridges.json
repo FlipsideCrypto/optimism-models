@@ -1,12 +1,6 @@
 [
   {
-    "blockchain": [
-      "optimism",
-      "arbitrum",
-      "polygon",
-      "gnosis",
-      "base"
-    ],
+    "blockchain": ["optimism", "arbitrum", "polygon", "gnosis", "base"],
     "schema": "silver_bridge",
     "name": "hop_transfers_sent",
     "contract_address": "",

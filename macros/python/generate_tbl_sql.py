@@ -240,7 +240,7 @@ def main(config_file, dynamic_output_dir, target, drop_all=False):
                     file.write(sql_query)
                 print(f"Generated {filename}.")
             
-            generate_yml(f"{dynamic_output_dir}/{filename}", drop_all=item_drop)
+            generate_yml([f"{dynamic_output_dir}/{filename}"], drop_all=item_drop)
 
         except Exception as e:
             print(f"Error processing item {item} in main function: {e}")
@@ -252,7 +252,7 @@ def main(config_file, dynamic_output_dir, target, drop_all=False):
 if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser(description='Generate SQL files.')
-        parser.add_argument('--config_file', default='macros/python/generate_logs_config.json', help='Path to the config file.')
+        parser.add_argument('--config_file', required=True, help='Path to the config file.')
         parser.add_argument('--output_dir', default='models/temp_models', help='Directory to output SQL files.')
         parser.add_argument('--target', default='dev', help='Target environment (default: dev).')
         parser.add_argument('--drop_all', action='store_true', help='Drop and replace all SQL/YML files, ignoring individual config drop settings.')
