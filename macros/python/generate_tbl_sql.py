@@ -180,7 +180,7 @@ def generate_sql(name, contract_addresses, topic_0, keys_types):
     """
     return base_evt_query
 
-def main(config_file, dynamic_output_dir, target, drop=False):
+def main(config_file, dynamic_output_dir, target, drop_all=False):
 
     print("Generating tables...")
     conn = snowflake_connection(profile_name, profiles, target)
@@ -205,6 +205,10 @@ def main(config_file, dynamic_output_dir, target, drop=False):
             if not isinstance(contract_addresses, list):
                 contract_addresses = [contract_addresses.lower()]
             topic_0 = item.get('topic_0','').lower()
+            if args.drop_all:
+                item_drop = True
+            else:
+                item_drop = item.get('drop', False)
 
             if database.lower() not in blockchains and database.split('_')[0].lower() not in blockchains:
                 print(f"Skipped {schema}__{name}, {database} not in blockchains list...")
@@ -221,13 +225,11 @@ def main(config_file, dynamic_output_dir, target, drop=False):
             os.makedirs(dynamic_output_dir, exist_ok=True)
 
             filename = f"{schema}__{name}.sql"
-            yml_filename = filename.replace('.sql', '.yml')
             
             sql_exists = file_exists_in_repo(filename)
-            yml_exists = file_exists_in_repo(yml_filename)
 
             if sql_exists:
-                if drop:
+                if item_drop:
                     with open(f"{dynamic_output_dir}/{filename}", 'w') as file:
                         file.write(sql_query)
                     print(f"Dropped and replaced {filename}.")
@@ -238,7 +240,7 @@ def main(config_file, dynamic_output_dir, target, drop=False):
                     file.write(sql_query)
                 print(f"Generated {filename}.")
             
-            generate_yml(f"{dynamic_output_dir}/{filename}", drop=drop)
+            generate_yml(f"{dynamic_output_dir}/{filename}", drop_all=item_drop)
 
         except Exception as e:
             print(f"Error processing item {item} in main function: {e}")
@@ -253,12 +255,12 @@ if __name__ == "__main__":
         parser.add_argument('--config_file', default='macros/python/generate_logs_config.json', help='Path to the config file.')
         parser.add_argument('--output_dir', default='models/temp_models', help='Directory to output SQL files.')
         parser.add_argument('--target', default='dev', help='Target environment (default: dev).')
-        parser.add_argument('--drop', action='store_true', help='Drop and replace existing SQL/YML files.')
+        parser.add_argument('--drop_all', action='store_true', help='Drop and replace all SQL/YML files, ignoring individual config drop settings.')
         args = parser.parse_args()
 
         profile_name, profiles, database = get_dbt_profile(args.target)
 
-        main(config_file=args.config_file, dynamic_output_dir=args.output_dir, target=args.target, drop=args.drop)
+        main(config_file=args.config_file, dynamic_output_dir=args.output_dir, target=args.target, drop_all=args.drop_all)
     except Exception as e:
         print(f"An error occurred in __main__ execution: {e}")
         print(traceback.format_exc())

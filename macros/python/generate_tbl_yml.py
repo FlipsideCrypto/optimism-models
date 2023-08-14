@@ -14,14 +14,14 @@ def file_exists_in_repo(filename):
             return True
     return False
 
-def generate_yml(model_path, output_dir=None, specific_files=[], drop=False):
+def generate_yml(model_paths, output_dir=None, specific_files=[], drop_all=False):
     """
     Generates a DBT .yml test file for each .sql file in the given directory or for a specified SQL file.
     
     Parameters:
-    - model_path (str): The path to the directory containing .sql files or the path to a specific .sql file.
-                       If a directory is provided, the function will generate .yml files for all .sql files in that directory.
-                       If a specific .sql file path is provided, the function will only generate a .yml file for that file.
+    - model_paths (list of str): The paths to the directories containing .sql files or the paths to specific .sql files.
+                            If a directory is provided for each path, the function will generate .yml files for all .sql files in those directories.
+                            If specific .sql file paths are provided, the function will only generate a .yml file for those files.
     
     - output_dir (str, optional): The directory where the .yml files will be saved. If not provided, the .yml files will
                                   be saved in the same directory as the input .sql files or alongside the specified .sql file.
@@ -48,68 +48,71 @@ def generate_yml(model_path, output_dir=None, specific_files=[], drop=False):
         "INTEGER": "dbt_expectations.expect_column_values_to_be_in_type_list:\n              column_type_list:\n                - DECIMAL\n                - FLOAT\n                - NUMBER\n",
         "TIMESTAMP": "dbt_expectations.expect_column_values_to_be_in_type_list:\n              column_type_list:\n                - TIMESTAMP_LTZ\n"
     }
+    for model_path in model_paths:
+        specific_files = []
+        if os.path.isfile(model_path) and model_path.endswith('.sql'):
+            specific_files = [os.path.basename(model_path)]
+            model_path = os.path.dirname(model_path)
+        elif not specific_files:
+            specific_files = [f for f in os.listdir(model_path) if f.endswith('.sql')]
 
-    if os.path.isfile(model_path) and model_path.endswith('.sql'):
-        specific_files = [os.path.basename(model_path)]
-        model_path = os.path.dirname(model_path)
-    elif not specific_files:
-        specific_files = [f for f in os.listdir(model_path) if f.endswith('.sql')]
+        for root, _, files in os.walk(model_path):
+            for sql_file in files:
+                if sql_file.endswith('.sql') and (not specific_files or sql_file in specific_files):
+                    sql_filepath = os.path.join(root, sql_file)
+                    columns = []
+                    with open(sql_filepath, 'r') as f:
+                        sql_content = f.read()
+                        match = re.search(r"SELECT\s+(.*?)\s+FROM", sql_content, re.DOTALL)
+                        if match:
+                            select_content = match.group(1)
+                            columns = [col.strip() for col in select_content.split(",")]
+                            columns = [re.split("::| AS ", col)[-1].strip().upper() for col in columns if not col.startswith("{") and col not in skip_column_mapping]
 
-    for root, _, files in os.walk(model_path):
-        for sql_file in files:
-            if sql_file.endswith('.sql') and (not specific_files or sql_file in specific_files):
-                sql_filepath = os.path.join(root, sql_file)
-                columns = []
-                with open(sql_filepath, 'r') as f:
-                    sql_content = f.read()
-                    match = re.search(r"SELECT\s+(.*?)\s+FROM", sql_content, re.DOTALL)
-                    if match:
-                        select_content = match.group(1)
-                        columns = [col.strip() for col in select_content.split(",")]
-                        columns = [re.split("::| AS ", col)[-1].strip().upper() for col in columns if not col.startswith("{") and col not in skip_column_mapping]
+                    yml_content = "version: 2\nmodels:\n  - name: {}\n    tests:\n      - dbt_utils.unique_combination_of_columns:\n          combination_of_columns:\n            - _LOG_ID\n    columns:\n".format(os.path.basename(sql_filepath).replace('.sql', ''))
+                    for column in columns:
+                        column_type = 'STRING'
+                        column_lower = column.lower()
+                        
+                        for key_tuple, value in column_type_mapping.items():
+                            if any(substring in column_lower for substring in key_tuple):
+                                column_type = value
+                                break
 
-                yml_content = "version: 2\nmodels:\n  - name: {}\n    tests:\n      - dbt_utils.unique_combination_of_columns:\n          combination_of_columns:\n            - _LOG_ID\n    columns:\n".format(os.path.basename(sql_filepath).replace('.sql', ''))
-                for column in columns:
-                    column_type = 'STRING'
-                    column_lower = column.lower()
-                    
-                    for key_tuple, value in column_type_mapping.items():
-                        if any(substring in column_lower for substring in key_tuple):
-                            column_type = value
-                            break
+                        yml_content += "      - name: {}\n        tests:\n          - not_null\n".format(column)
+                        if column_type in column_test_mapping:
+                            yml_content += "          - " + column_test_mapping[column_type]
 
-                    yml_content += "      - name: {}\n        tests:\n          - not_null\n".format(column)
-                    if column_type in column_test_mapping:
-                        yml_content += "          - " + column_test_mapping[column_type]
+                    yml_filename = sql_file.replace('.sql', '.yml')
 
-                yml_filename = sql_file.replace('.sql', '.yml')
+                    yml_exists = file_exists_in_repo(yml_filename)
 
-                if file_exists_in_repo(yml_filename):
-                    if drop:
-                        print(f"Dropped and replaced {yml_filename}.")
+                    if yml_exists:
+                        if drop_all:
+                            print(f"Dropped and replaced {yml_filename}.")
+                        else:
+                            print(f"Skipped {yml_filename}, already exists...")
+                            continue
                     else:
-                        print(f"Skipped {yml_filename}, already exists...")
-                        continue
-                else:
-                    print(f"Generated {yml_filename}.")
+                        print(f"Generated {yml_filename}.")
 
-                if output_dir:
-                    output_filepath = os.path.join(output_dir, sql_file.replace('.sql', '.yml'))
-                else:
-                    output_filepath = sql_filepath.replace('.sql', '.yml')
+                    if output_dir:
+                        output_filepath = os.path.join(output_dir, sql_file.replace('.sql', '.yml'))
+                    else:
+                        output_filepath = sql_filepath.replace('.sql', '.yml')
 
-                with open(output_filepath, 'w') as yml_file:
-                    yml_file.write(yml_content)
+                    with open(output_filepath, 'w') as yml_file:
+                        yml_file.write(yml_content)
 
 if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser(description='Generate YML files.')
-        parser.add_argument('--model_path', required=True, help='Path to the input SQL files.')
+        parser.add_argument('--model_path', required=True, nargs='+', help='Path(s) to the input SQL files.')
         parser.add_argument('--output_dir', default=None, help='Directory to output YML files.')
-        parser.add_argument('--drop', action='store_true', help='Drop and replace existing YML files.')
+        parser.add_argument('--drop_all', action='store_true', help='Drop and replace all existing YML files.')
         args = parser.parse_args()
 
-        generate_yml(model_path=args.model_path, output_dir=args.output_dir, drop=args.drop)
+        generate_yml(model_paths=args.model_path, output_dir=args.output_dir, drop_all=args.drop_all)
     except Exception as e:
         print(f"An error occurred in __main__ execution: {e}")
         print(traceback.format_exc())
