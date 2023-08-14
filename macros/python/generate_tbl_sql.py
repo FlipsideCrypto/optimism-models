@@ -180,8 +180,22 @@ def generate_sql(name, contract_addresses, topic_0, keys_types):
     """
     return base_evt_query
 
-def main(config_file, dynamic_output_dir, target, drop_all=False):
+def main(config_file, target, drop_all=False):
+    """
+    Generates SQL/YML files based on a configuration file and stores them in the specified directory.
 
+    Parameters:
+    - config_file (str, required): Path to the JSON configuration file which contains details like blockchain, schema, 
+                         name, contract address, topic, and whether to drop the existing SQL file.
+    
+    - target (str, optional): Target environment, used for determining the DBT profile and database connection details. Default = dev.
+    
+    - drop_all (bool, optional): If set to True, it will drop and replace all SQL/YML files, ignoring the individual 
+                                 'drop' settings in the config file. Default is False.
+
+    Returns:
+    None. This function generates SQL/YML files and saves them to the specified directory.
+    """
     print("Generating tables...")
     conn = snowflake_connection(profile_name, profiles, target)
 
@@ -205,7 +219,7 @@ def main(config_file, dynamic_output_dir, target, drop_all=False):
             if not isinstance(contract_addresses, list):
                 contract_addresses = [contract_addresses.lower()]
             topic_0 = item.get('topic_0','').lower()
-            if args.drop_all:
+            if drop_all:
                 item_drop = True
             else:
                 item_drop = item.get('drop', False)
@@ -253,14 +267,13 @@ if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser(description='Generate SQL files.')
         parser.add_argument('--config_file', required=True, help='Path to the config file.')
-        parser.add_argument('--output_dir', default='models/temp_models', help='Directory to output SQL files.')
         parser.add_argument('--target', default='dev', help='Target environment (default: dev).')
         parser.add_argument('--drop_all', action='store_true', help='Drop and replace all SQL/YML files, ignoring individual config drop settings.')
         args = parser.parse_args()
 
         profile_name, profiles, database = get_dbt_profile(args.target)
 
-        main(config_file=args.config_file, dynamic_output_dir=args.output_dir, target=args.target, drop_all=args.drop_all)
+        main(config_file=args.config_file, target=args.target, drop_all=args.drop_all)
     except Exception as e:
         print(f"An error occurred in __main__ execution: {e}")
         print(traceback.format_exc())
