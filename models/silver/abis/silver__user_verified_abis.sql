@@ -1,7 +1,6 @@
 {{ config (
     materialized = "incremental",
     unique_key = "id",
-    merge_update_columns = ["id"],
     tags = ['abis']
 ) }}
 
@@ -29,7 +28,7 @@ AND contract_address NOT IN (
     FROM
         {{ this }}
 )
-AND _inserted_timestamp >= (
+AND _inserted_timestamp > (
     SELECT
         COALESCE(
             MAX(
@@ -115,19 +114,6 @@ identified_addresses AS (
     FROM
         final_groupings
 ),
-ranges AS (
-    SELECT
-        contract_address,
-        base_address,
-        MIN(block_number) AS min_block,
-        min_block + 100000 AS max_block
-    FROM
-        {{ ref('silver__logs') }}
-        JOIN identified_addresses USING (contract_address)
-    GROUP BY
-        contract_address,
-        base_address
-),
 logs AS (
     SELECT
         l.block_number,
@@ -145,10 +131,7 @@ logs AS (
     FROM
         {{ ref('silver__logs') }}
         l
-        JOIN ranges C
-        ON C.contract_address = l.contract_address
-        AND l.block_number BETWEEN C.min_block
-        AND C.max_block
+        JOIN identified_addresses C USING (contract_address)
         JOIN base b
         ON b.contract_address = C.base_address
 ),
@@ -209,4 +192,6 @@ WHERE
             successful_abis
         WHERE
             success_rate > 0.75
-    )
+    ) qualify(ROW_NUMBER() over(PARTITION BY contract_address
+ORDER BY
+    _inserted_timestamp DESC)) = 1
