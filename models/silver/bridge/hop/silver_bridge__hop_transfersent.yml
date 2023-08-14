@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver_bridge__multichain_v6_anycall
+  - name: silver_bridge__hop_transfersent
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -68,40 +68,50 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: _FALLBACK
+      - name: AMOUNT
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: APPID
+      - name: AMOUNTOUTMIN
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: DATA
-        tests:
-          - not_null
-      - name: FLAGS
+      - name: BONDERFEE
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: FROM_ADDRESS
+      - name: CHAINID
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: NONCE
+      - name: DEADLINE
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: TO_ADDRESS
+      - name: INDEX
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - DECIMAL
+                - FLOAT
+                - NUMBER
+      - name: RECIPIENT
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: TOCHAINID
+      - name: TRANSFERID
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
+      - name: TRANSFERNONCE
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:

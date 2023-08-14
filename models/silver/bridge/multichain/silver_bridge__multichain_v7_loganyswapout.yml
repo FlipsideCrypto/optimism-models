@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver_bridge__hop_transfers_sent
+  - name: silver_bridge__multichain_v7_loganyswapout
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -73,45 +73,27 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: AMOUNTOUTMIN
+      - name: FROM_ADDRESS
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: BONDERFEE
+      - name: RECEIVER
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: CHAINID
+      - name: SWAPOUTID
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: DEADLINE
+      - name: TOCHAINID
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: INDEX
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - DECIMAL
-                - FLOAT
-                - NUMBER
-      - name: RECIPIENT
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: TRANSFERID
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: TRANSFERNONCE
+      - name: TOKEN
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:

@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver_bridge__multichain_v7_swapout
+  - name: silver_bridge__multichain_v6_loganycall
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -68,7 +68,20 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: AMOUNT
+      - name: _FALLBACK
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
+      - name: APPID
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
+      - name: DATA
+        tests:
+          - not_null
+      - name: FLAGS
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
@@ -78,22 +91,17 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: RECEIVER
+      - name: NONCE
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: SWAPOUTID
+      - name: TO_ADDRESS
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: TOCHAINID
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: TOKEN
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
