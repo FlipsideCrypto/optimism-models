@@ -104,5 +104,23 @@
     "contract_address": "",
     "topic_0": "0x34660fc8af304464529f48a778e03d03e4d34bcd5f9b6f0cfbf3cd238c642f7f",
     "drop": false
+  },
+  {
+    "blockchain": "optimism",
+    "schema": "silver_bridge",
+    "protocol": "synapse",
+    "version": "",
+    "contract_address": "0xaf41a65f786339e7911f4acdad6bd49426f2dc6b",
+    "topic_0": "0x91f25e9be0134ec851830e0e76dc71e06f9dade75a9b84e9524071dbbc319425",
+    "drop": false
+  },
+  {
+    "blockchain": "optimism",
+    "schema": "silver_bridge",
+    "protocol": "synapse",
+    "version": "",
+    "contract_address": "0xaf41a65f786339e7911f4acdad6bd49426f2dc6b",
+    "topic_0": "0xdc5bad4651c5fbe9977a696aadc65996c468cde1448dd468ec0d83bf61c4b57c",
+    "drop": false
   }
 ]
