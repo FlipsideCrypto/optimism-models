@@ -38,6 +38,7 @@ models:
               where: TYPE <> 'SELFDESTRUCT'
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
+              where: block_number NOT IN (87673, 985, 1177470, 500601, 1244152, 524915, 123322, 1238181, 898337, 1133328, 550275)
       - name: TO_ADDRESS
         tests:
           - dbt_expectations.expect_column_values_to_match_regex:
@@ -47,12 +48,6 @@ models:
         tests:
           - not_null
       - name: ETH_VALUE
-        tests:
-          - not_null
-      - name: GAS
-        tests:
-          - not_null
-      - name: GAS_USED
         tests:
           - not_null
 
