@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver_bridge__stargate_swap
+  - name: silver_bridge__multichain_v7_anycall
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -68,27 +68,18 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: AMOUNTSD
+      - name: APPID
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: CHAINID
+      - name: DATA
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: DSTPOOLID
+      - name: EXTDATA
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: EQFEE
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_match_regex:
-              regex: 0[xX][0-9a-fA-F]+
-      - name: EQREWARD
+      - name: FLAGS
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
@@ -98,12 +89,17 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: LPFEE
+      - name: NONCE
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
-      - name: PROTOCOLFEE
+      - name: TO_ADDRESS
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
+      - name: TOCHAINID
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:

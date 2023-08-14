@@ -45,7 +45,7 @@ def generate_yml(model_path, output_dir=None, specific_files=[], drop=False):
     skip_column_mapping = ["event_removed"]
     column_test_mapping = {
         "STRING": "dbt_expectations.expect_column_values_to_match_regex:\n              regex: 0[xX][0-9a-fA-F]+\n",
-        "INTEGER": "dbt_expectations.expect_column_values_to_be_in_type_list:\n              column_type_list:\n                - decimal\n                - float\n                - number\n",
+        "INTEGER": "dbt_expectations.expect_column_values_to_be_in_type_list:\n              column_type_list:\n                - DECIMAL\n                - FLOAT\n                - NUMBER\n",
         "TIMESTAMP": "dbt_expectations.expect_column_values_to_be_in_type_list:\n              column_type_list:\n                - TIMESTAMP_LTZ\n"
     }
 

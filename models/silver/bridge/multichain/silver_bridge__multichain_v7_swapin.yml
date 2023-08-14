@@ -11,9 +11,9 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
-                - decimal
-                - float
-                - number
+                - DECIMAL
+                - FLOAT
+                - NUMBER
       - name: BLOCK_TIMESTAMP
         tests:
           - not_null
@@ -55,9 +55,9 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
-                - decimal
-                - float
-                - number
+                - DECIMAL
+                - FLOAT
+                - NUMBER
       - name: TOPIC_0
         tests:
           - not_null

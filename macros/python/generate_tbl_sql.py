@@ -77,7 +77,7 @@ def get_key_types(conn, database, schema, name, contract_addresses, topic_0):
     Execute a Snowflake SQL query to fetch the keys and their types.
     """
     if not topic_0 or len(topic_0) < 1:
-        print(f"Skipped {schema}__{name} due to missing or incorrect event.")
+        print(f"Skipped {schema}__{name}, missing or incorrect event...")
         return {}
 
     contract_address_clause = generate_addr_clause(contract_addresses)
@@ -180,7 +180,7 @@ def generate_sql(name, contract_addresses, topic_0, keys_types):
     """
     return base_evt_query
 
-def main(config_file, dynamic_output_dir, target):
+def main(config_file, dynamic_output_dir, target, drop=False):
 
     print("Generating tables...")
     conn = snowflake_connection(profile_name, profiles, target)
@@ -226,18 +226,19 @@ def main(config_file, dynamic_output_dir, target):
             sql_exists = file_exists_in_repo(filename)
             yml_exists = file_exists_in_repo(yml_filename)
 
-            if sql_exists and yml_exists:
-                print(f"Both SQL and YML for {schema}__{name} already exist. Skipping...")
-                continue
-            elif sql_exists:
-                print(f"SQL for {schema}__{name} already exists. Skipping SQL generation.")
+            if sql_exists:
+                if drop:
+                    with open(f"{dynamic_output_dir}/{filename}", 'w') as file:
+                        file.write(sql_query)
+                    print(f"Dropped and replaced {filename}.")
+                else:
+                    print(f"Skipped {filename}, already exists...")
             else:
                 with open(f"{dynamic_output_dir}/{filename}", 'w') as file:
                     file.write(sql_query)
-                print(f"SQL file for {schema}__{name} on {database} generated.")
+                print(f"Generated {filename}.")
             
-            if not yml_exists:
-                generate_yml(f"{dynamic_output_dir}/{filename}")
+            generate_yml(f"{dynamic_output_dir}/{filename}", drop=drop)
 
         except Exception as e:
             print(f"Error processing item {item} in main function: {e}")
@@ -252,10 +253,12 @@ if __name__ == "__main__":
         parser.add_argument('--config_file', default='macros/python/generate_logs_config.json', help='Path to the config file.')
         parser.add_argument('--output_dir', default='models/temp_models', help='Directory to output SQL files.')
         parser.add_argument('--target', default='dev', help='Target environment (default: dev).')
+        parser.add_argument('--drop', action='store_true', help='Drop and replace existing SQL/YML files.')
         args = parser.parse_args()
 
         profile_name, profiles, database = get_dbt_profile(args.target)
-        main(args.config_file, args.output_dir, args.target)
+
+        main(config_file=args.config_file, dynamic_output_dir=args.output_dir, target=args.target, drop=args.drop)
     except Exception as e:
         print(f"An error occurred in __main__ execution: {e}")
         print(traceback.format_exc())
