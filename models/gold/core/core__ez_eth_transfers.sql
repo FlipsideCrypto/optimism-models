@@ -3,7 +3,9 @@
     incremental_strategy = 'delete+insert',
     unique_key = 'block_number',
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['core','non_realtime']
+    tags = ['core','non_realtime'],
+    persist_docs ={ "relation": true,
+    "columns": true }
 ) }}
 
 WITH eth_base AS (
