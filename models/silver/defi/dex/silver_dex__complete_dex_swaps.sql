@@ -671,23 +671,23 @@ woofi_swaps AS (
     CONCAT(
       LEAST(
         COALESCE(
-          c1.symbol,
-          CONCAT(SUBSTRING(c1.address, 1, 5), '...', SUBSTRING(c1.address, 39, 42))
+          symbol_in,
+          CONCAT(SUBSTRING(token_in, 1, 5), '...', SUBSTRING(token_in, 39, 42))
         ),
         COALESCE(
-          c2.symbol,
-          CONCAT(SUBSTRING(c2.address, 1, 5), '...', SUBSTRING(c2.address, 39, 42))
+          symbol_out,
+          CONCAT(SUBSTRING(token_out, 1, 5), '...', SUBSTRING(token_out, 39, 42))
         )
       ),
       '-',
       GREATEST(
         COALESCE(
-          c1.symbol,
-          CONCAT(SUBSTRING(c1.address, 1, 5), '...', SUBSTRING(c1.address, 39, 42))
+          symbol_in,
+          CONCAT(SUBSTRING(token_in, 1, 5), '...', SUBSTRING(token_in, 39, 42))
         ),
         COALESCE(
-          c2.symbol,
-          CONCAT(SUBSTRING(c2.address, 1, 5), '...', SUBSTRING(c2.address, 39, 42))
+          symbol_out,
+          CONCAT(SUBSTRING(token_out, 1, 5), '...', SUBSTRING(token_out, 39, 42))
         )
       )
     ) AS pool_name,
