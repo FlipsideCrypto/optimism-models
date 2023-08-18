@@ -42,6 +42,7 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
+          dbt run -m tag:observability
           dbt test -m tag:recent_test
   
 
