@@ -427,8 +427,8 @@ label_fill_sales AS (
         origin_from_address,
         origin_to_address,
         origin_function_signature,
-        input_data,
         nft_log_id,
+        input_data,
         _log_id,
         GREATEST(
             t._inserted_timestamp,
