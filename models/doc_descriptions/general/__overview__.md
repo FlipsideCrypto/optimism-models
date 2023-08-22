@@ -32,7 +32,6 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_transactions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_transactions)
 - [fact_l1_state_root_submissions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_l1_state_root_submissions)
 - [fact_l1_submissions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_l1_submissions)
-- [fact_hourly_token_prices](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_hourly_token_prices)
 
 **Convenience Tables:**
 - [ez_eth_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_eth_transfers)
