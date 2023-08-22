@@ -11,7 +11,7 @@ SELECT
     is_imputed,
     _inserted_timestamp
 FROM
-    {{ ref('bronze__hourly_prices') }}
+    {{ ref('bronze__hourly_prices_priority_eth') }}
 WHERE
     1 = 1
 

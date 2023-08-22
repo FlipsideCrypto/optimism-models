@@ -2,7 +2,7 @@ version: 2
 models:
 
   - name: core__fact_hourly_token_prices
-    description: 'This table contains the hourly USD prices for tokens on the Optimism blockchain.'
+    description: Deprecating soon! This is a notice that we're replacing this table with `price__ez_hourly_token_prices`. Please migrate queries to the new table by 9/14/23. There will be no column changes or any other changes of any kind.
       
     columns:
       - name: HOUR
@@ -10,7 +10,7 @@ models:
         tests:
           - not_null
       - name: TOKEN_ADDRESS
-        description: 'The Optimism contract address for this token. This is the column used to join to token contract addresses in the other event tables.'
+        description: 'The Base contract address for this token. This is the column used to join to token contract addresses in the other event tables.'
         tests:
           - not_null
       - name: SYMBOL

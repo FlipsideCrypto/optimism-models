@@ -30,21 +30,26 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_token_transfers)
 - [fact_traces](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_traces)
 - [fact_transactions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_transactions)
-- [fact_delegations](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_delegations)
 - [fact_l1_state_root_submissions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_l1_state_root_submissions)
 - [fact_l1_submissions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_l1_submissions)
 - [fact_hourly_token_prices](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_hourly_token_prices)
 
 **Convenience Tables:**
-- [ez_dex_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_dex_swaps)
 - [ez_eth_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_eth_transfers)
 - [ez_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_token_transfers)
-- [ez_nft_sales](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_sales)
 - [ez_decoded_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_decoded_event_logs)
-- [ez_nft_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_nft_transfers)
+
+
+### Price Tables (optimism.price)
+- [fact_hourly_token_prices](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__fact_hourly_token_prices)
+- [ez_hourly_token_prices](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__ez_hourly_token_prices)
+- [dim_asset_metadata](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__dim_asset_metadata)
+- [ez_asset_metadata](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__ez_asset_metadata)
+
 
 ### DeFi Tables (optimism.defi)
 - [dim_dex_liquidity_pools](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__dim_dex_liquidity_pools)
+- [ez_dex_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_dex_swaps)
 
 **Velodrome**
  - [ez_claimed_rewards](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_claimed_rewards)
@@ -54,6 +59,14 @@ There is more information on how to use dbt docs in the last section of this doc
  - [ez_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_swaps)
  - [ez_velo_locks](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_velo_locks)
  - [ez_votes](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_votes)
+
+### NFT Tables (optimism.nft)
+
+- [ez_nft_sales](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.nft__ez_nft_sales)
+- [ez_nft_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.nft__ez_nft_transfers)
+
+### Governance Tables (optimism.gov)
+- [fact_delegations](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.gov__fact_delegations)
 
 ## **Helpful User-Defined Functions (UDFs)**
 

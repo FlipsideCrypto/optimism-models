@@ -1,21 +1,18 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'token_address',
+    unique_key = ['token_address', 'hour'],
     tags = ['non_realtime']
 ) }}
 
 SELECT
+    HOUR,
     token_address,
-    symbol,
     provider,
-    id,
-    CASE
-        WHEN provider = 'coingecko' THEN 1
-        WHEN provider = 'coinmarketcap' THEN 2
-    END AS priority,
+    price,
+    is_imputed,
     _inserted_timestamp
 FROM
-    {{ ref('bronze__asset_metadata') }}
+    {{ ref('bronze__hourly_prices_all_providers') }}
 WHERE
     1 = 1
 
@@ -29,7 +26,3 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% endif %}
-
-qualify(ROW_NUMBER() over (PARTITION BY token_address
-ORDER BY
-    priority ASC)) = 1

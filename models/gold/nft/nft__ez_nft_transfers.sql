@@ -2,10 +2,7 @@
     materialized = 'view',
     persist_docs ={ "relation": true,
     "columns": true },
-    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'NFT' 
-            }
-        }
-    }
+    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'NFT' } } }
 ) }}
 
 SELECT
@@ -22,4 +19,3 @@ SELECT
     erc1155_value
 FROM
     {{ ref('silver__nft_transfers') }}
-
