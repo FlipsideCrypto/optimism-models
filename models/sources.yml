@@ -8,11 +8,9 @@ sources:
       - name: optimism_blocks
       - name: optimism_txs
   - name: crosschain
-    database: crosschain
+    database: "{{ 'crosschain' if target.database == 'BASE' else 'crosschain_dev' }}"
     schema: core
     tables:
-      - name: address_labels
-      - name: ez_hourly_prices
       - name: dim_labels
       - name: ez_hourly_token_prices
   - name: ethereum
@@ -27,13 +25,9 @@ sources:
       - name: optimism_state_hashes
       - name: optimism_submission_hashes
   - name: silver_crosschain
-    database: crosschain
+    database: "{{ 'crosschain' if target.database == 'BASE' else 'crosschain_dev' }}"
     schema: silver
     tables:
-      - name: asset_metadata_coin_gecko
-      - name: asset_metadata_coin_market_cap
-      - name: hourly_prices_coin_gecko
-      - name: hourly_prices_coin_market_cap
       - name: apis_keys
       - name: token_prices_priority_hourly
       - name: token_prices_all_providers_hourly
