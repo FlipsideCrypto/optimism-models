@@ -109,7 +109,7 @@ Note that you can also right-click on models to interactively filter and explore
 - [Flipside](https://flipsidecrypto.xyz)
 - [Tutorials](https://docs.flipsidecrypto.com/our-data/tutorials)
 - [Github](https://github.com/FlipsideCrypto/optimism-models)
-- [Query Editor Shortcuts](https://docs.flipsidecrypto.com/velocity/query-editor-shortcuts)
+- [Data Studio](https://flipsidecrypto.xyz/edit)
 - [What is dbt?](https://docs.getdbt.com/docs/introduction)
 
 {% enddocs %}
