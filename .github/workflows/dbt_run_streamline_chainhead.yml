@@ -4,8 +4,8 @@ run-name: dbt_run_streamline_chainhead
 on:
   workflow_dispatch:
   schedule:
-    # Runs "at minute 20 and 50, every hour" (see https://crontab.guru)
-    - cron: '20,50 * * * *'
+    # Runs at minutes 0,12,24,46,48 (see https://crontab.guru)
+    - cron: '0,12,24,46,48 * * * *'
 
 env:
   DBT_PROFILES_DIR: ./
