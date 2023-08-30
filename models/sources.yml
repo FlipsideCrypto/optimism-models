@@ -8,7 +8,7 @@ sources:
       - name: optimism_blocks
       - name: optimism_txs
   - name: crosschain
-    database: "{{ 'crosschain' if target.database == 'BASE' else 'crosschain_dev' }}"
+    database: "{{ 'crosschain' if target.database == 'OPTIMISM' else 'crosschain_dev' }}"
     schema: core
     tables:
       - name: dim_labels
@@ -25,7 +25,7 @@ sources:
       - name: optimism_state_hashes
       - name: optimism_submission_hashes
   - name: silver_crosschain
-    database: "{{ 'crosschain' if target.database == 'BASE' else 'crosschain_dev' }}"
+    database: "{{ 'crosschain' if target.database == 'OPTIMISM' else 'crosschain_dev' }}"
     schema: silver
     tables:
       - name: apis_keys
