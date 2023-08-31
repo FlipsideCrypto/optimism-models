@@ -7,4 +7,4 @@
 SELECT
     *
 FROM
-    {{ ref('gov__fact_delegations') }}
+    {{ ref('price__ez_hourly_token_prices') }}

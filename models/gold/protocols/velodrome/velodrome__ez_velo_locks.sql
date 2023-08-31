@@ -33,7 +33,7 @@ SELECT
     deposit_type
 FROM
     {{ ref('silver__velodrome_locks') }}
-    LEFT JOIN {{ ref('core__fact_hourly_token_prices') }}
+    LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
     prices
     ON HOUR = DATE_TRUNC(
         'hour',

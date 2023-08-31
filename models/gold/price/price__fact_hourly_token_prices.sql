@@ -7,9 +7,8 @@
 SELECT
     HOUR,
     token_address,
-    symbol,
-    decimals,
     price,
-    is_imputed
+    is_imputed,
+    provider
 FROM
-    {{ ref('silver__prices') }}
+    {{ ref('silver__hourly_prices_all_providers') }}

@@ -98,7 +98,7 @@ SELECT
     _inserted_timestamp
 FROM
     eth_base A
-    LEFT JOIN {{ ref('silver__prices_eth') }}
+    LEFT JOIN {{ ref('silver__hourly_prices_priority_eth') }}
     ON DATE_TRUNC(
         'hour',
         A.block_timestamp

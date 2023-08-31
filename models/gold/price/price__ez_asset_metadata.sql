@@ -5,6 +5,10 @@
 ) }}
 
 SELECT
-    *
+    token_address,
+    id,
+    symbol,
+    NAME,
+    decimals
 FROM
-    {{ ref('gov__fact_delegations') }}
+    {{ ref('silver__asset_metadata_priority') }}

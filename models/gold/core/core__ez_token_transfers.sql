@@ -43,7 +43,7 @@ SELECT
 FROM
     {{ ref('core__fact_token_transfers') }}
     t
-    LEFT JOIN {{ ref('core__fact_hourly_token_prices') }}
+    LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
     p
     ON t.contract_address = p.token_address
     AND DATE_TRUNC(

@@ -70,14 +70,14 @@ FROM
     ) = LOWER(
         pools.pool_address
     )
-    LEFT JOIN {{ ref('core__fact_hourly_token_prices') }}
+    LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
     p0
     ON p0.hour = DATE_TRUNC(
         'hour',
         block_timestamp
     )
     AND token0_address = p0.token_address
-    LEFT JOIN {{ ref('core__fact_hourly_token_prices') }}
+    LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
     p1
     ON p1.hour = DATE_TRUNC(
         'hour',
