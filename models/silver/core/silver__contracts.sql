@@ -35,7 +35,7 @@ token_names AS (
         block_number,
         function_signature,
         read_output,
-        utils.udf_hex_to_string(SUBSTR(read_output,(64 * 2 + 3), len(read_output))) AS token_name,
+        utils.udf_hex_to_string(SUBSTR(read_output,(64 * 2 + 3), len(read_output))) AS token_name
     FROM
         base_metadata
     WHERE
