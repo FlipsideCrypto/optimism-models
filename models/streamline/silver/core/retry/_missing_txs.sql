@@ -18,15 +18,10 @@ WITH transactions AS (
     FROM
         {{ ref("silver__transactions") }}
     WHERE
-        block_timestamp >= DATEADD(
-            'day',
-            -2,
-            CURRENT_DATE
-        )
-)
-SELECT
-    DISTINCT block_number AS block_number
-FROM
-    transactions
-WHERE
-    POSITION - prev_POSITION <> 1
+        block_timestamp >= DATEADD('hour', -24, SYSDATE()))
+    SELECT
+        DISTINCT block_number AS block_number
+    FROM
+        transactions
+    WHERE
+        POSITION - prev_POSITION <> 1
