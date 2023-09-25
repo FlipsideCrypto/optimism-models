@@ -11,7 +11,7 @@ FROM
     tr
     ON tx.block_number = tr.block_number
     AND tx.tx_hash = tr.tx_hash
-    AND tr.block_timestamp >= DATEADD('hour', -24, SYSDATE())
+    AND tr.block_timestamp >= DATEADD('hour', -48, SYSDATE())
 WHERE
-    tx.block_timestamp >= DATEADD('hour', -24, SYSDATE())
+    tx.block_timestamp >= DATEADD('hour', -48, SYSDATE())
     AND tr.tx_hash IS NULL

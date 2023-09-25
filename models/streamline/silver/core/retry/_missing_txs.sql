@@ -18,7 +18,7 @@ WITH transactions AS (
     FROM
         {{ ref("silver__transactions") }}
     WHERE
-        block_timestamp >= DATEADD('hour', -24, SYSDATE()))
+        block_timestamp >= DATEADD('hour', -48, SYSDATE()))
     SELECT
         DISTINCT block_number AS block_number
     FROM
