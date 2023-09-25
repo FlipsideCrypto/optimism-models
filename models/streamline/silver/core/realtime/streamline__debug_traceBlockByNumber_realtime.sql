@@ -46,6 +46,11 @@ blocks AS (
                     last_3_days
             )
         )
+        AND _inserted_timestamp >= DATEADD(
+            'day',
+            -4,
+            SYSDATE()
+        )
 ),
 all_blocks AS (
     SELECT
@@ -95,3 +100,5 @@ FROM
     all_blocks
 ORDER BY
     block_number ASC
+LIMIT
+    1800

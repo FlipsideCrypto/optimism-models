@@ -44,6 +44,11 @@ tbl AS (
             FROM
                 look_back
         )
+        AND _inserted_timestamp >= DATEADD(
+            'day',
+            -4,
+            SYSDATE()
+        )
 )
 SELECT
     PARSE_JSON(
@@ -71,3 +76,5 @@ FROM
     tbl
 ORDER BY
     block_number ASC
+LIMIT
+    3600
