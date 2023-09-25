@@ -60,10 +60,7 @@ block_range AS (
     SELECT
         _id AS block_number
     FROM
-        {{ source(
-            'silver_crosschain',
-            'number_sequence'
-        ) }}
+        {{ ref('silver__number_sequence') }}
     WHERE
         _id BETWEEN (
             SELECT
