@@ -176,8 +176,8 @@ pools AS (
     
 SELECT
     d.contract_address AS pool_address,
-    MIN(CASE WHEN function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS pool_symbol,
-    MIN(CASE WHEN function_name = 'name' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS pool_name,
+    MIN(CASE WHEN function_name = 'symbol' THEN utils.udf_hex_to_string(segmented_output [2] :: STRING) END) AS pool_symbol,
+    MIN(CASE WHEN function_name = 'name' THEN utils.udf_hex_to_string(segmented_output [2] :: STRING) END) AS pool_name,
     MIN(CASE 
             WHEN read_result::STRING = '0x' THEN NULL
             ELSE utils.udf_hex_to_int(read_result::STRING)
@@ -193,8 +193,8 @@ token0 AS (
 
 SELECT
     d.contract_address AS token0_address,
-    MIN(CASE WHEN function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token0_symbol,
-    MIN(CASE WHEN function_name = 'name' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token0_name,
+    MIN(CASE WHEN function_name = 'symbol' THEN utils.udf_hex_to_string(segmented_output [2] :: STRING) END) AS token0_symbol,
+    MIN(CASE WHEN function_name = 'name' THEN utils.udf_hex_to_string(segmented_output [2] :: STRING) END) AS token0_name,
     MIN(CASE 
             WHEN function_name = 'decimals' AND read_result::STRING <> '0x' THEN utils.udf_hex_to_int(segmented_output [0] :: STRING)
             ELSE NULL
@@ -210,8 +210,8 @@ token1 AS (
 
 SELECT
     d.contract_address AS token1_address,
-    MIN(CASE WHEN function_name = 'symbol' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token1_symbol,
-    MIN(CASE WHEN function_name = 'name' THEN TRY_HEX_DECODE_STRING(segmented_output [2] :: STRING) END) AS token1_name,
+    MIN(CASE WHEN function_name = 'symbol' THEN utils.udf_hex_to_string(segmented_output [2] :: STRING) END) AS token1_symbol,
+    MIN(CASE WHEN function_name = 'name' THEN utils.udf_hex_to_string(segmented_output [2] :: STRING) END) AS token1_name,
     MIN(CASE 
             WHEN function_name = 'decimals' AND read_result::STRING <> '0x' THEN utils.udf_hex_to_int(segmented_output [0] :: STRING)
             ELSE NULL
