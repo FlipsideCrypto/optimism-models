@@ -5,7 +5,7 @@
     meta={
         'database_tags':{
             'table': {
-                'PROTOCOL': 'SUSHI, UNISWAP, CURVE, SYNTHETIX, VELODROME, WOOFI, FRAX, KYBERSWAP, DODO',
+                'PROTOCOL': 'SUSHI, UNISWAP, CURVE, SYNTHETIX, VELODROME, WOOFI, FRAX, KYBERSWAP, HASHFLOW, DODO',
                 'PURPOSE': 'DEX, SWAPS'
             }
         }
