@@ -1,8 +1,7 @@
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
-    unique_key = 'block_number',
-    post_hook = "{{ fsc_utils.block_reorg(this, 12) }}",
+    unique_key = 'created_block',
     tags = ['non_realtime'],
     full_refresh = false
 ) }}
