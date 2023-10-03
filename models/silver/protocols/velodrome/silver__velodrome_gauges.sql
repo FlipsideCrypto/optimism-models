@@ -1,6 +1,8 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'gauge_address',
+    incremental_strategy = 'delete+insert',
+    unique_key = 'block_number',
+    post_hook = "{{ fsc_utils.block_reorg(this, 12) }}",
     tags = ['non_realtime']
 ) }}
 

@@ -1,8 +1,11 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = '_log_id',
+    incremental_strategy = 'delete+insert',
+    unique_key = 'block_number',
     cluster_by = ['block_timestamp::DATE', '_inserted_timestamp::DATE'],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION on equality(contract_address, tx_hash)",
+    post_hook = [
+        "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION on equality(contract_address, tx_hash)",
+        "{{ fsc_utils.block_reorg(this, 12) }}"],
     tags = ['non_realtime']
 ) }}
 

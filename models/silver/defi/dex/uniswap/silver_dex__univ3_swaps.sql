@@ -1,8 +1,11 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = '_log_id',
+    incremental_strategy = 'delete+insert',
+    unique_key = 'block_number',
     cluster_by = ['block_timestamp::DATE'],
+    post_hook = "{{ fsc_utils.block_reorg(this, 12) }}",
     tags = ['non_realtime']
+
 ) }}
 
 WITH base_swaps AS (
@@ -45,7 +48,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE
+        ) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )

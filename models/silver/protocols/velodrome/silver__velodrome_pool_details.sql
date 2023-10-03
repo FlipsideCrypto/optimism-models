@@ -1,6 +1,8 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'pool_address',
+    incremental_strategy = 'delete+insert',
+    unique_key = 'block_number',
+    post_hook = "{{ fsc_utils.block_reorg(this, 12) }}",
     tags = ['non_realtime']
 ) }}
 
@@ -34,13 +36,13 @@ FROM
 WHERE
     p._inserted_timestamp >= (
         SELECT
-            MAX(_inserted_timestamp) :: DATE - 1
+            MAX(_inserted_timestamp) - INTERVAL '12 hours'
         FROM
             {{ this }}
     )
     AND l._inserted_timestamp >= (
         SELECT
-            MAX(_inserted_timestamp) :: DATE - 1
+            MAX(_inserted_timestamp) - INTERVAL '12 hours'
         FROM
             {{ this }}
     )

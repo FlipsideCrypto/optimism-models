@@ -1,8 +1,11 @@
 {{ config(
   materialized = 'incremental',
-  unique_key = "_id",
+  incremental_strategy = 'delete+insert',
+  unique_key = ['block_number','platform','version'],
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['non_realtime']
+  post_hook = "{{ fsc_utils.block_reorg(this, 12) }}",
+    tags = ['non_realtime']
+
 ) }}
 
 WITH contracts AS (
@@ -24,6 +27,7 @@ beethovenx AS (
     pool_address,
     pool_name,
     'beethoven-x' AS platform,
+    'v1' AS version,
     _log_id AS _id,
     _inserted_timestamp,
     token0,
@@ -41,7 +45,7 @@ beethovenx AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -56,6 +60,7 @@ curve AS (
     pool_address,
     pool_name,
     'curve' AS platform,
+    'v1' AS version,
     _call_id AS _id,
     _inserted_timestamp,
     MAX(
@@ -105,7 +110,7 @@ curve AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -124,6 +129,7 @@ dodo_v2 AS (
     base_token AS token0,
     quote_token AS token1,
     'dodo-v2' AS platform,
+    'v2' AS version,
     _id,
     _inserted_timestamp
   FROM
@@ -134,7 +140,7 @@ dodo_v2 AS (
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
   SELECT
-    MAX(_inserted_timestamp) :: DATE - 1
+    MAX(_inserted_timestamp) - INTERVAL '12 hours'
   FROM
     {{ this }}
 )
@@ -151,6 +157,7 @@ frax AS (
     token0,
     token1,
     'fraxswap' AS platform,
+    'v1' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
@@ -160,7 +167,7 @@ frax AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -177,6 +184,7 @@ velodrome_v2 AS (
     token0,
     token1,
     'velodrome-v2' AS platform,
+    'v2' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
@@ -186,7 +194,7 @@ velodrome_v2 AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -203,6 +211,7 @@ kyberswap_v1_static AS (
     token0,
     token1,
     'kyberswap-v1' AS platform,
+    'v1-static' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
@@ -212,7 +221,7 @@ kyberswap_v1_static AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -230,6 +239,7 @@ kyberswap_v2_elastic AS (
     token0,
     token1,
     'kyberswap-v2' AS platform,
+    'v2' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
@@ -239,7 +249,7 @@ kyberswap_v2_elastic AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -256,6 +266,7 @@ sushi AS (
     token0,
     token1,
     'sushiswap' AS platform,
+    'v1' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
@@ -265,7 +276,7 @@ sushi AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -283,6 +294,7 @@ uni_v3 AS (
     token0_address AS token0,
     token1_address AS token1,
     'uniswap-v3' AS platform,
+    'v3' AS version,
     _id,
     _inserted_timestamp
   FROM
@@ -292,7 +304,7 @@ uni_v3 AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -309,6 +321,7 @@ velodrome AS (
     token0_address AS token0,
     token1_address AS token1,
     'velodrome' AS platform,
+    'v1' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
@@ -318,7 +331,7 @@ velodrome AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -417,6 +430,7 @@ FINAL AS (
       c1.decimals
     ) AS decimals,
     platform,
+    version,
     _id,
     p._inserted_timestamp
   FROM
@@ -496,6 +510,7 @@ FINAL AS (
       c1.decimals
     ) AS decimals,
     platform,
+    version,
     _id,
     p._inserted_timestamp
   FROM
@@ -600,6 +615,7 @@ FINAL AS (
       c7.decimals
     ) AS decimals,
     platform,
+    version,
     _id,
     p._inserted_timestamp
   FROM
@@ -626,6 +642,7 @@ SELECT
   block_timestamp,
   tx_hash,
   platform,
+  version,
   contract_address,
   pool_address,
   pool_name,

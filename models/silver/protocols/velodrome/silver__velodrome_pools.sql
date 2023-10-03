@@ -1,6 +1,8 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'pool_address',
+    incremental_strategy = 'delete+insert',
+    unique_key = 'block_number',
+    post_hook = "{{ fsc_utils.block_reorg(this, 12) }}",
     tags = ['non_realtime'],
     full_refresh = false
 ) }}
