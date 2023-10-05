@@ -2,8 +2,7 @@
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = 'block_number',
-    post_hook = "{{ fsc_utils.block_reorg(this, 12) }}",
-    tags = ['non_realtime']
+    tags = ['non_realtime','reorg']
 ) }}
 
 WITH backfill AS (
