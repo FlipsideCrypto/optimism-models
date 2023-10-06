@@ -49,5 +49,5 @@ jobs:
   
       - name: Execute block_reorg macro
         run: |
-          dbt run-operation fsc_utils.block_reorg --args "{reorg_model_list: '${{ steps.list_models.outputs.model_list }}', hours: '12'}" && grep -E "SQL status|/* {" logs/dbt.log
+          dbt run-operation fsc_utils.block_reorg --args "{reorg_model_list: '${{ steps.list_models.outputs.model_list }}', hours: '12'}" && awk '/SQL status/ {print; next} /DELETE FROM/{getline; print} /\/\* {/ {print}' logs/dbt.log
         
