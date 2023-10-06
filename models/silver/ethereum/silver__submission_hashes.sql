@@ -1,5 +1,6 @@
 {{ config(
     materialized = 'incremental',
+    incremental_strategy = 'delete+insert',
     unique_key = "block_number",
     cluster_by = ['l1_submission_block_timestamp::DATE'],
     tags = ['ethereum','non_realtime']
