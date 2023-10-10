@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'gauge_address',
-    tags = ['non_realtime']
+    incremental_strategy = 'delete+insert',
+    unique_key = 'block_number',
+    tags = ['non_realtime','reorg']
 ) }}
 
 WITH backfill AS (

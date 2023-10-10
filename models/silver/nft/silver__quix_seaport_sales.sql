@@ -1,8 +1,10 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'nft_log_id',
+    incremental_strategy = 'delete+insert',
+    unique_key = 'block_number',
     cluster_by = ['block_timestamp::DATE', '_inserted_timestamp::DATE'],
-    tags = ['non_realtime']
+    tags = ['non_realtime','reorg']
+
 ) }}
 
 WITH seaport_fees_wallet AS (
@@ -31,7 +33,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE
+        ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
@@ -74,7 +76,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE
+        ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
@@ -1049,7 +1051,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 1
+        ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
@@ -1086,7 +1088,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 1
+        ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )

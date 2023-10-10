@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = 'block_number',
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['core','non_realtime'],
+    tags = ['core','non_realtime','reorg'],
     persist_docs ={ "relation": true,
     "columns": true }
 ) }}

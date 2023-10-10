@@ -1,9 +1,10 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = "pool_id",
+    incremental_strategy = 'delete+insert',
+    unique_key = 'block_number',
+    full_refresh = false,
     tags = ['non_realtime']
 ) }}
---    full_refresh = false,
 
 WITH contract_deployments AS (
 
@@ -30,7 +31,7 @@ WHERE
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) :: DATE - 3
+        MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )
