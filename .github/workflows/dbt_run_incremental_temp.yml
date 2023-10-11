@@ -4,8 +4,8 @@ run-name: dbt_run_scheduled_temp
 on:
   workflow_dispatch:
   schedule:
-    # Runs every 2 hours on the 10th minute
-    - cron: "10 */2 * * *"
+    # Runs every 2 hours on the 40th minute
+    - cron: "40 */2 * * *"
     
 env:
   DBT_PROFILES_DIR: ./
