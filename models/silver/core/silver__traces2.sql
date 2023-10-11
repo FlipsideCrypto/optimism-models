@@ -32,7 +32,7 @@ WHERE
                             (
                                 {{ var(
                                     'TRACES_BLOCKS',
-                                    3000000
+                                    500000
                                 ) }} / 100000
                             ) * 100000
                         )
@@ -50,7 +50,7 @@ WHERE
             SELECT
                 MAX(block_number) + {{ var(
                     'TRACES_BLOCKS',
-                    3000000
+                    500000
                 ) }}
             FROM
                 {{ this }}
@@ -59,7 +59,7 @@ WHERE
         {% else %}
             {{ ref('bronze__streamline_FR_traces') }}
         WHERE
-            _partition_by_block_id <= 20000000
+            _partition_by_block_id <= 5000000
             AND DATA :result IS NOT NULL
         {% endif %}
 
@@ -84,6 +84,7 @@ WHERE
                     'result.output',
                     'result.error',
                     'result.revertReason',
+                    'result.time',
                     'gasUsed',
                     'gas',
                     'type',
@@ -93,7 +94,8 @@ WHERE
                     'input',
                     'error',
                     'output',
-                    'revertReason'
+                    'revertReason',
+                    'time'
                 ),
                 'ORIGIN',
                 REGEXP_REPLACE(REGEXP_REPLACE(path, '[^0-9]+', '_'), '^_|_$', '')
