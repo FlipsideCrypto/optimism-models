@@ -20,21 +20,10 @@ WITH eth_base AS (
         eth_value,
         _call_id,
         _inserted_timestamp,
-        to_varchar(
-            TO_NUMBER(REPLACE(DATA :value :: STRING, '0x'), REPEAT('X', LENGTH(REPLACE(DATA :value :: STRING, '0x'))))
-        ) AS eth_value_precise_raw,
-        IFF(LENGTH(eth_value_precise_raw) > 18, LEFT(eth_value_precise_raw, LENGTH(eth_value_precise_raw) - 18) || '.' || RIGHT(eth_value_precise_raw, 18), '0.' || LPAD(eth_value_precise_raw, 18, '0')) AS rough_conversion,
-        IFF(
-            POSITION(
-                '.000000000000000000' IN rough_conversion
-            ) > 0,
-            LEFT(rough_conversion, LENGTH(rough_conversion) - 19),
-            REGEXP_REPLACE(
-                rough_conversion,
-                '0*$',
-                ''
-            )
-        ) AS eth_value_precise
+        eth_value_precise_raw,
+        eth_value_precise,
+        tx_position,
+        trace_index
     FROM
         {{ ref('silver__traces') }}
     WHERE
@@ -95,7 +84,9 @@ SELECT
         2
     ) AS amount_usd,
     _call_id,
-    _inserted_timestamp
+    _inserted_timestamp,
+    tx_position,
+    trace_index
 FROM
     eth_base A
     LEFT JOIN {{ ref('silver__hourly_prices_priority_eth') }}
