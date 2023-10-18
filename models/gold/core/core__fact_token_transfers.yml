@@ -1,30 +1,32 @@
 version: 2
 models:
   - name: core__fact_token_transfers
-    description: '{{ doc("opt_transfer_table_doc") }}'
+    description: '{{ doc("gno_transfer_table_doc") }}'
       
     columns:
       - name: BLOCK_NUMBER
-        description: '{{ doc("opt_block_number") }}'   
+        description: '{{ doc("gno_block_number") }}'   
       - name: BLOCK_TIMESTAMP
-        description: '{{ doc("opt_block_timestamp") }}'
+        description: '{{ doc("gno_block_timestamp") }}'
       - name: TX_HASH
-        description: '{{ doc("opt_transfer_tx_hash") }}'
-      - name: CONTRACT_ADDRESS
-        description: '{{ doc("opt_transfer_contract_address") }}'
-      - name: FROM_ADDRESS
-        description: '{{ doc("opt_transfer_from_address") }}'
-      - name: TO_ADDRESS
-        description: '{{ doc("opt_transfer_to_address") }}'
-      - name: RAW_AMOUNT
-        description: '{{ doc("opt_transfer_raw_amount") }}'
-      - name: RAW_AMOUNT_PRECISE
-        description: '{{ doc("precise_amount_unadjusted") }}'
-      - name: _LOG_ID
-        description: '{{ doc("opt_log_id_transfers") }}'
+        description: '{{ doc("gno_transfer_tx_hash") }}'
+      - name: EVENT_INDEX
+        description: '{{ doc("gno_event_index") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description: '{{ doc("opt_origin_sig") }}'
+        description: '{{ doc("gno_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
-        description: '{{ doc("opt_origin_from") }}'
+        description: '{{ doc("gno_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
-        description: '{{ doc("opt_origin_to") }}'
+        description: '{{ doc("gno_origin_to") }}'
+      - name: CONTRACT_ADDRESS
+        description: '{{ doc("gno_transfer_contract_address") }}'
+      - name: FROM_ADDRESS
+        description: '{{ doc("gno_transfer_from_address") }}'
+      - name: TO_ADDRESS
+        description: '{{ doc("gno_transfer_to_address") }}'
+      - name: RAW_AMOUNT
+        description: '{{ doc("gno_transfer_raw_amount") }}'
+      - name: RAW_AMOUNT_PRECISE
+        description: '{{ doc("gno_transfer_raw_amount_precise") }}'
+      - name: _LOG_ID
+        description: '{{ doc("gno_log_id_transfers") }}'
