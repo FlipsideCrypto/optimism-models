@@ -3,9 +3,9 @@
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['non_realtime','reorg']
+    tags = ['non_realtime','reorg'.'curated']
 ) }}
---Check and see where and if there are router swaps
+
 WITH pools AS (
 
     SELECT
@@ -13,6 +13,7 @@ WITH pools AS (
     FROM
         {{ ref('silver_dex__hashflow_v3_pools') }}
 ),
+
 swaps AS (
     SELECT
         l.block_number,
@@ -61,6 +62,7 @@ AND _inserted_timestamp >= (
 )
 {% endif %}
 )
+
 SELECT
     block_number,
     block_timestamp,
