@@ -19,7 +19,7 @@ WITH contract_deployments AS (
     FROM
         {{ ref('silver__logs') }}
     WHERE
-        contract_address = LOWER('0x6D551f4D999faC0984eb75B2B230ba7e7651BdE7') --does not look like any pools have been created as of 10/26/23
+        contract_address = '0x6d551f4d999fac0984eb75b2b230ba7e7651bde7'
         AND topics [0] :: STRING = '0xdbd2a1ea6808362e6adbec4db4969cbc11e3b0b28fb6c74cb342defaaf1daada'
 
 {% if is_incremental() %}
