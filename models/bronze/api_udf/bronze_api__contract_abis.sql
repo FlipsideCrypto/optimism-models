@@ -2,7 +2,7 @@
     materialized = 'incremental',
     unique_key = "contract_address",
     full_refresh = false,
-    tags = ['non_realtime']
+    tags = ['curated']
 ) }}
 
 WITH api_keys AS (
