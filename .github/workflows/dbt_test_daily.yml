@@ -42,7 +42,7 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt test --exclude tag:full_test tag:recent_test
+          dbt test --exclude "optimism_models,tag:full_test" "optimism_models,tag:recent_test" "optimism_models,tag:gha_tasks" livequery_models
   
 
 
