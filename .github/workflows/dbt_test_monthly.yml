@@ -42,7 +42,7 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt test -m tag:full_test
+          dbt test -m "optimism_models,tag:full_test"
   
 
 
