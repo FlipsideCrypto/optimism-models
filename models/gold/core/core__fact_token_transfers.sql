@@ -8,6 +8,7 @@ SELECT
     block_number,
     block_timestamp,
     tx_hash,
+    event_index,
     origin_function_signature,
     origin_from_address,
     origin_to_address,

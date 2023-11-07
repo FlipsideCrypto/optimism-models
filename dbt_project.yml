@@ -34,6 +34,17 @@ on-run-start:
 on-run-end:
   - '{{ apply_meta_as_tags(results) }}'
 
+dispatch:
+  - macro_namespace: dbt
+    search_order:
+      - optimism-models
+      - dbt_snowflake_query_tags
+      - dbt
+
+query-comment:
+  comment: '{{ dbt_snowflake_query_tags.get_query_comment(node) }}'
+  append: true # Snowflake removes prefixed comments.
+
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
@@ -52,3 +63,5 @@ vars:
   STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES: False
   WAIT: 0
   OBSERV_FULL_TEST: False
+  HEAL_MODEL: False
+  START_GHA_TASKS: False

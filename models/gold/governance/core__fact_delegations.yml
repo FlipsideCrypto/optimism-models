@@ -1,7 +1,8 @@
 version: 2
 models:
   - name: core__fact_delegations
-    description: '{{ doc("opt_delegations_table_doc") }}'
+    description: Deprecating soon! This is a notice that we're replacing this table with `gov__fact_delegations`. Please migrate queries to the new table by 9/14/23. There will be no column changes or any other changes of any kind.
+      
     columns:
       - name: BLOCK_NUMBER
         description: '{{ doc("opt_block_number") }}'   

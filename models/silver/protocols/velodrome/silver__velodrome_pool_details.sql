@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'pool_address',
-    tags = ['non_realtime']
+    incremental_strategy = 'delete+insert',
+    unique_key = 'created_block',
+    tags = ['curated']
 ) }}
 
 SELECT
@@ -34,13 +35,13 @@ FROM
 WHERE
     p._inserted_timestamp >= (
         SELECT
-            MAX(_inserted_timestamp) :: DATE - 1
+            MAX(_inserted_timestamp) - INTERVAL '12 hours'
         FROM
             {{ this }}
     )
     AND l._inserted_timestamp >= (
         SELECT
-            MAX(_inserted_timestamp) :: DATE - 1
+            MAX(_inserted_timestamp) - INTERVAL '12 hours'
         FROM
             {{ this }}
     )

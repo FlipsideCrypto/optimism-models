@@ -1,8 +1,10 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = "_log_id",
+    incremental_strategy = 'delete+insert',
+    unique_key = 'block_number',
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['non_realtime']
+    tags = ['curated','reorg']
+
 ) }}
 
 WITH pool_meta AS (
@@ -72,7 +74,7 @@ curve_base AS (
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) :: DATE
+        MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )
@@ -119,7 +121,7 @@ token_transfers AS (
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) :: DATE
+        MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )

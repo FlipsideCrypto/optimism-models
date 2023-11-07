@@ -1,0 +1,7 @@
+workflow_name,workflow_schedule
+dbt_run_scheduled_non_realtime,"4,16,28,40,52 * * * *"
+dbt_run_streamline_chainhead,"0,12,24,36,48 * * * *"
+dbt_run_streamline_decoder,"9,21,33,45,57 * * * *"
+dbt_run_scheduled_curated,"10,40 * * * *"
+dbt_test_intraday,"23 */4 * * *"
+dbt_test_tasks,"15,45 * * * *"

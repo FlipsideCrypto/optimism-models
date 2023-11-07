@@ -1,8 +1,10 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'nft_log_id',
+    incremental_strategy = 'delete+insert',
+    unique_key = ['block_number','platform_name','platform_exchange_version'],
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['non_realtime']
+    tags = ['curated','reorg']
+
 ) }}
 
 WITH nft_base_models AS (
@@ -42,7 +44,7 @@ WHERE
         SELECT
             MAX(
                 _inserted_timestamp
-            ) :: DATE - 1
+            ) - INTERVAL '36 hours'
         FROM
             {{ this }}
     )
@@ -83,7 +85,7 @@ WHERE
         SELECT
             MAX(
                 _inserted_timestamp
-            ) :: DATE - 1
+            ) - INTERVAL '36 hours'
         FROM
             {{ this }}
     )
@@ -124,7 +126,7 @@ WHERE
         SELECT
             MAX(
                 _inserted_timestamp
-            ) :: DATE - 1
+            ) - INTERVAL '36 hours'
         FROM
             {{ this }}
     )
@@ -165,7 +167,7 @@ WHERE
         SELECT
             MAX(
                 _inserted_timestamp
-            ) :: DATE - 1
+            ) - INTERVAL '36 hours'
         FROM
             {{ this }}
     )
@@ -206,7 +208,7 @@ WHERE
         SELECT
             MAX(
                 _inserted_timestamp
-            ) :: DATE - 1
+            ) - INTERVAL '36 hours'
         FROM
             {{ this }}
     )
@@ -220,7 +222,7 @@ prices_raw AS (
         decimals,
         price AS hourly_prices
     FROM
-        {{ ref('core__fact_hourly_token_prices') }}
+        {{ ref('price__ez_hourly_token_prices') }}
     WHERE
         token_address IN (
             SELECT
@@ -234,15 +236,6 @@ prices_raw AS (
             FROM
                 nft_base_models
         )
-
-{% if is_incremental() %}
-AND HOUR >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 all_prices AS (
     SELECT
@@ -427,8 +420,8 @@ label_fill_sales AS (
         origin_from_address,
         origin_to_address,
         origin_function_signature,
-        input_data,
         nft_log_id,
+        input_data,
         _log_id,
         GREATEST(
             t._inserted_timestamp,

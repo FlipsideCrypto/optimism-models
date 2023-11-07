@@ -210,9 +210,9 @@ missing_data AS (
         r.l1_fee_scalar,
         r.l1_gas_used,
         r.l1_gas_price,
-        utils.udf_decimal_adjust((r.gas_used * t.gas_price) + ((r.l1_gas_price / pow(10, 9)) * r.l1_gas_used * r.l1_fee_scalar), 9) AS tx_fee_precise,
+        utils.udf_decimal_adjust((r.gas_used * t.gas_price) + ((r.l1_gas_price / pow(10, 9)) * r.l1_gas_used * r.l1_fee_scalar), 9) AS tx_fee_precise_heal,
         COALESCE(
-            tx_fee_precise :: FLOAT,
+            tx_fee_precise_heal :: FLOAT,
             0
         ) AS tx_fee,
         r.type AS tx_type,
@@ -320,7 +320,7 @@ SELECT
     l1_gas_used,
     l1_gas_price,
     tx_fee,
-    tx_fee_precise,
+    tx_fee_precise_heal AS tx_fee_precise,
     tx_type,
     _inserted_timestamp,
     DATA
