@@ -198,8 +198,14 @@ SELECT
     contract_address,
     sender,
     tx_to,
-    token_in,
-    token_out,
+    CASE
+        WHEN token_in = '0x0000000000000000000000000000000000000000' THEN '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        ELSE token_in
+    END AS token_in,
+    CASE
+        WHEN token_out = '0x0000000000000000000000000000000000000000' THEN '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        ELSE token_out
+    END AS token_out,
     amount_in_unadj,
     amount_out_unadj,
     event_name,
@@ -208,6 +214,3 @@ SELECT
     _inserted_timestamp
 FROM
     FINAL
-WHERE
-    token_in <> '0x0000000000000000000000000000000000000000'
-    AND token_out <> '0x0000000000000000000000000000000000000000'
