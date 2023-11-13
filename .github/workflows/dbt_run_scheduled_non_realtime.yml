@@ -41,5 +41,5 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run --threads 8 --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m "optimism_models,tag:non_realtime" "optimism_models,tag:streamline_decoded_logs_complete" "optimism_models,tag:streamline_decoded_logs_realtime"
+          dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m "optimism_models,tag:non_realtime" "optimism_models,tag:streamline_decoded_logs_complete" "optimism_models,tag:streamline_decoded_logs_realtime"
           
