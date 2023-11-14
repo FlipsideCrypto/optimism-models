@@ -1,4 +1,4 @@
-{# {{ config(
+{{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
@@ -45,22 +45,21 @@ native_transfers AS (
         tx.from_address AS origin_from_address,
         tx.to_address AS origin_to_address,
         tx.origin_function_signature,
-        et.from_address,
-        et.to_address,
-        eth_value,
+        et.eth_from_address,
+        et.eth_to_address,
+        amount_precise_raw,
         identifier,
-        input,
         _call_id,
         et._inserted_timestamp
     FROM
-        {{ ref('silver__eth_transfers') }}
+        {{ ref('core__ez_eth_transfers') }}
         et
         INNER JOIN {{ ref('silver__transactions') }}
         tx
         ON et.block_number = tx.block_number
         AND et.tx_hash = tx.tx_hash
     WHERE
-        et.to_address = '0x25ab3efd52e6470681ce037cd546dc60726948d3'
+        et.eth_to_address = '0x25ab3efd52e6470681ce037cd546dc60726948d3'
 
 {% if is_incremental() %}
 AND et._inserted_timestamp >= (
@@ -102,14 +101,11 @@ all_transfers AS (
         tx_hash,
         NULL AS event_index,
         NULL AS event_name,
-        to_address AS bridge_address,
-        from_address AS sender,
-        to_address AS receiver,
-        eth_value * pow(
-            10,
-            18
-        ) AS amount_unadj,
-        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' AS token_address,
+        eth_to_address AS bridge_address,
+        eth_from_address AS sender,
+        eth_to_address AS receiver,
+        amount_precise_raw AS amount_unadj,
+        '0x4200000000000000000000000000000000000006' AS token_address,
         {{ dbt_utils.generate_surrogate_key(
             ['_call_id']
         ) }} AS _id,
@@ -173,4 +169,4 @@ FROM
 WHERE
     origin_to_address IS NOT NULL qualify (ROW_NUMBER() over (PARTITION BY _id
 ORDER BY
-    t._inserted_timestamp DESC)) = 1 #}
+    t._inserted_timestamp DESC)) = 1
