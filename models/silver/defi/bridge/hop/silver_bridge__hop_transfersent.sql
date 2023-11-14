@@ -16,7 +16,7 @@ WITH base_evt AS (
         origin_from_address,
         origin_to_address,
         contract_address,
-        'synapse' AS NAME,
+        'hop' AS NAME,
         event_index,
         topics [0] :: STRING AS topic_0,
         event_name,
@@ -24,10 +24,23 @@ WITH base_evt AS (
             decoded_flat :"amount" :: STRING
         ) AS amount,
         TRY_TO_NUMBER(
+            decoded_flat :"amountOutMin" :: STRING
+        ) AS amountOutMin,
+        TRY_TO_NUMBER(
+            decoded_flat :"bonderFee" :: STRING
+        ) AS bonderFee,
+        TRY_TO_NUMBER(
             decoded_flat :"chainId" :: STRING
         ) AS chainId,
-        decoded_flat :"to" :: STRING AS to_address,
-        decoded_flat :"token" :: STRING AS token,
+        TRY_TO_TIMESTAMP(
+            decoded_flat :"deadline" :: STRING
+        ) AS deadline,
+        TRY_TO_TIMESTAMP(
+            decoded_flat :"index" :: STRING
+        ) AS index,
+        decoded_flat :"recipient" :: STRING AS recipient,
+        decoded_flat :"transferId" :: STRING AS transferId,
+        decoded_flat :"transferNonce" :: STRING AS transferNonce,
         decoded_flat,
         event_removed,
         tx_status,
@@ -36,8 +49,7 @@ WITH base_evt AS (
     FROM
         {{ ref('silver__decoded_logs') }}
     WHERE
-        topics [0] :: STRING = '0xda5273705dbef4bf1b902a131c2eac086b7e1476a8ab0cb4da08af1fe1bd8e3b'
-        AND contract_address = '0xaf41a65f786339e7911f4acdad6bd49426f2dc6b'
+        topics [0] :: STRING = '0xe35dddd4ea75d7e9b3fe93af4f4e40e778c3da4074c9d93e7c6536f1e803c1eb'
         AND origin_to_address IS NOT NULL
 
 {% if is_incremental() %}
@@ -48,6 +60,16 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% endif %}
+),
+hop_tokens AS (
+    SELECT
+        block_number,
+        contract_address,
+        amm_wrapper_address,
+        token_address,
+        _inserted_timestamp
+    FROM
+        {{ ref('silver_bridge__hop_l2canonicaltoken') }}
 )
 SELECT
     block_number,
@@ -62,13 +84,21 @@ SELECT
     event_removed,
     tx_status,
     contract_address AS bridge_address,
+    amm_wrapper_address, 
     NAME AS platform,
-    amount,
     origin_from_address AS sender,
-    to_address AS receiver,
+    recipient AS receiver,
     chainId AS destination_chain_id,
-    token AS token_address,
+    token_address,
+    amount,
+    amountOutMin AS amount_out_min,
+    bonderFee AS bonder_fee,
+    deadline,
+    index,
+    transferId AS transfer_id,
+    transferNonce AS transfer_nonce,   
     _log_id,
     _inserted_timestamp
 FROM
-    base_evt
+    base_evt b
+    LEFT JOIN hop_tokens h USING(contract_address)

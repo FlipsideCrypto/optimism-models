@@ -1,4 +1,4 @@
-{# {{ config(
+{{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
@@ -9,40 +9,32 @@ WITH base_contracts AS (
 
     SELECT
         contract_address,
-        MAX(block_number) AS block_number
+        amm_wrapper_address,
+        block_number
     FROM
-        {{ ref('silver__logs') }}
-    WHERE
-        topics [0] :: STRING = '0x0a0607688c86ec1775abcdbab7b33a3a35a6c9cde677c9be880150c231cc6b0b'
+        {{ ref('silver_bridge__hop_ammwrapper') }}
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp) - INTERVAL '12 hours'
-    FROM
-        {{ this }}
-)
-AND contract_address NOT IN (
-    SELECT
-        DISTINCT contract_address
-    FROM
-        {{ this }}
-)
+WHERE
+    amm_wrapper_address NOT IN (
+        SELECT
+            DISTINCT amm_wrapper_address
+        FROM
+            {{ this }}
+    )
 {% endif %}
-GROUP BY
-    1
 ),
 function_sigs AS (
     SELECT
-        '0xb7a0bda6' AS function_sig,
-        'l1CanonicalToken' AS function_name
+        '0x1ee1bf67' AS function_sig,
+        'l2CanonicalToken' AS function_name
 ),
 inputs_contracts AS (
     SELECT
-        contract_address,
+        amm_wrapper_address,
         block_number,
         function_sig,
-        (ROW_NUMBER() over (PARTITION BY contract_address
+        (ROW_NUMBER() over (PARTITION BY amm_wrapper_address
     ORDER BY
         block_number)) - 1 AS function_input
     FROM
@@ -65,13 +57,13 @@ contract_reads AS (
             FROM
                 (
                     SELECT
-                        contract_address,
+                        amm_wrapper_address,
                         block_number,
                         function_sig,
                         function_input,
                         CONCAT(
                             '[\'',
-                            contract_address,
+                            amm_wrapper_address,
                             '\',',
                             block_number,
                             ',\'',
@@ -99,7 +91,7 @@ reads_flat AS (
             read_id,
             '-'
         ) AS read_id_object,
-        read_id_object [0] :: STRING AS contract_address,
+        read_id_object [0] :: STRING AS amm_wrapper_address,
         read_id_object [1] :: STRING AS block_number,
         read_id_object [2] :: STRING AS function_sig,
         read_id_object [3] :: STRING AS function_input,
@@ -112,22 +104,19 @@ reads_flat AS (
 )
 SELECT
     contract_address,
+    amm_wrapper_address,
     block_number,
     function_sig,
     function_name,
     CASE
-        WHEN read_result IS NULL
-        AND contract_address IN (
-            '0xb8901acb165ed027e32754e0ffe830802919727f',
-            '0x236fe0ffa7118505f2a1c35a039f6a219308b1a7'
-        ) --eth_bridge
-        THEN '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        WHEN contract_address = '0x03d7f750777ec48d39d080b020d83eb2cb4e3547' THEN '0xc5102fe9359fd9a28f877a67e36b0f050d81a3cc'
         ELSE CONCAT('0x', SUBSTR(read_result, 27, 40))
     END AS token_address,
     _inserted_timestamp
 FROM
     reads_flat
     LEFT JOIN function_sigs USING(function_sig)
+    LEFT JOIN base_contracts USING(amm_wrapper_address)
 WHERE
     token_address <> '0x'
-    AND token_address IS NOT NULL #}
+    AND token_address IS NOT NULL

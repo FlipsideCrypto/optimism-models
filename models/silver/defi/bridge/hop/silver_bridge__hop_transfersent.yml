@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver_bridge__hop_transfersenttol2
+  - name: silver_bridge__hop_transfersent
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
