@@ -73,69 +73,7 @@ AND tr._inserted_timestamp >= (
 )
 {% endif %}
 ),
-native_transfers AS (
-    SELECT
-        et.block_number,
-        et.block_timestamp,
-        et.tx_hash,
-        tx.from_address AS origin_from_address,
-        tx.to_address AS origin_to_address,
-        tx.origin_function_signature,
-        et.eth_from_address,
-        et.eth_to_address,
-        amount_precise_raw,
-        identifier,
-        regexp_substr_all(SUBSTR(input_data, 11, len(input_data)), '.{64}') AS segmented_data,
-        TRY_TO_NUMBER(
-            utils.udf_hex_to_int(
-                segmented_data [0] :: STRING
-            )
-        ) AS destination_chain_id,
-        CONCAT(
-            '0x',
-            segmented_data [1] :: STRING
-        ) AS recipient1,
-        CONCAT('0x', SUBSTR(segmented_data [1] :: STRING, 25, 40)) AS recipient2,
-        LENGTH(
-            REGEXP_SUBSTR(
-                segmented_data [1] :: STRING,
-                '^(0*)'
-            )
-        ) AS len,
-        CASE
-            WHEN len >= 24 THEN recipient2
-            ELSE recipient1
-        END AS destination_recipient_address,
-        utils.udf_hex_to_int(
-            segmented_data [2] :: STRING
-        ) AS arbiterFee,
-        utils.udf_hex_to_int(
-            segmented_data [3] :: STRING
-        ) AS nonce,
-        _call_id,
-        et._inserted_timestamp
-    FROM
-        {{ ref('core__ez_eth_transfers') }}
-        et
-        INNER JOIN {{ ref('silver__transactions') }}
-        tx
-        ON et.block_number = tx.block_number
-        AND et.tx_hash = tx.tx_hash
-    WHERE
-        et.eth_to_address = '0x1d68124e65fafc907325e3edbf8c4d84499daa8b'
-        AND tx.origin_function_signature = '0x9981509f' -- wrapAndTransfer
-        AND destination_chain_id <> 0
-
-{% if is_incremental() %}
-AND et._inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp) - INTERVAL '12 hours'
-    FROM
-        {{ this }}
-)
-{% endif %}
-),
-all_transfers AS (
+FINAL AS (
     SELECT
         block_number,
         block_timestamp,
@@ -158,29 +96,6 @@ all_transfers AS (
         _inserted_timestamp
     FROM
         token_transfers
-    UNION ALL
-    SELECT
-        block_number,
-        block_timestamp,
-        origin_from_address,
-        origin_to_address,
-        origin_function_signature,
-        tx_hash,
-        NULL AS event_index,
-        NULL AS event_name,
-        eth_to_address AS bridge_address,
-        eth_from_address AS sender,
-        eth_to_address AS receiver,
-        amount_precise_raw AS amount_unadj,
-        destination_chain_id,
-        '0x4200000000000000000000000000000000000006' AS token_address,
-        destination_recipient_address,
-        {{ dbt_utils.generate_surrogate_key(
-            ['_call_id']
-        ) }} AS _id,
-        _inserted_timestamp
-    FROM
-        native_transfers
 )
 SELECT
     block_number,
@@ -204,7 +119,7 @@ SELECT
     _id,
     _inserted_timestamp
 FROM
-    all_transfers t
+    FINAL t
     LEFT JOIN {{ ref('silver_bridge__wormhole_chain_id_seed') }}
     s
     ON t.destination_chain_id :: STRING = s.wormhole_chain_id :: STRING
