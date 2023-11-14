@@ -1,4 +1,4 @@
-{# {{ config(
+{{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
@@ -88,7 +88,7 @@ SELECT
     event_name,
     event_removed,
     tx_status,
-    '0x296f55f8fb28e498b858d0bcda06d955b2cb3f97' AS bridge_address,
+    '0x701a95707a0290ac8b90b3719e8ee5b210360883' AS bridge_address,
     NAME AS platform,
     from_address AS sender,
     from_address AS receiver,
@@ -107,4 +107,4 @@ FROM
     base_evt b
     LEFT JOIN {{ ref('silver_bridge__stargate_chain_id_seed') }}
     s
-    ON b.destination_chain_id :: STRING = s.chain_id :: STRING #}
+    ON b.destination_chain_id :: STRING = s.chain_id :: STRING

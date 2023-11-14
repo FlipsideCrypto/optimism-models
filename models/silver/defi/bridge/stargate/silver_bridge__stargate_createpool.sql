@@ -1,4 +1,4 @@
-{# {{ config(
+{{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
@@ -18,7 +18,7 @@ WITH pool_creation AS (
     FROM
         {{ ref('silver__traces') }}
     WHERE
-        from_address = '0x06d538690af257da524f25d0cd52fd85b1c2173e'
+        from_address = '0xe3b53af74a4bf62ae5511055290838050bf764df'
         AND TYPE ILIKE 'create%'
         AND tx_status ILIKE 'success'
 
@@ -124,4 +124,4 @@ SELECT
     _inserted_timestamp
 FROM
     reads_flat
-    LEFT JOIN function_sigs USING(function_sig) #}
+    LEFT JOIN function_sigs USING(function_sig)
