@@ -1,4 +1,4 @@
-{# {{ config(
+{{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = ['block_number','platform','version'],
@@ -30,40 +30,6 @@ WITH across AS (
         _inserted_timestamp
     FROM
         {{ ref('silver_bridge__across_fundsdeposited') }}
-
-{% if is_incremental() %}
-WHERE
-    _inserted_timestamp >= (
-        SELECT
-            MAX(_inserted_timestamp) - INTERVAL '36 hours'
-        FROM
-            {{ this }}
-    )
-{% endif %}
-),
-allbridge AS (
-    SELECT
-        block_number,
-        block_timestamp,
-        origin_from_address,
-        origin_to_address,
-        origin_function_signature,
-        tx_hash,
-        event_index,
-        bridge_address,
-        event_name,
-        platform,
-        'v1' AS version,
-        sender,
-        receiver,
-        NULL AS destination_chain_id,
-        destination_chain,
-        token_address,
-        amount AS amount_unadj,
-        _log_id AS _id,
-        _inserted_timestamp
-    FROM
-        {{ ref('silver_bridge__allbridge_sent') }}
 
 {% if is_incremental() %}
 WHERE
@@ -165,7 +131,7 @@ hop AS (
         _log_id AS _id,
         _inserted_timestamp
     FROM
-        {{ ref('silver_bridge__hop_transfersenttol2') }}
+        {{ ref('silver_bridge__hop_transfersent') }}
 
 {% if is_incremental() %}
 WHERE
@@ -313,7 +279,7 @@ WHERE
     )
 {% endif %}
 ),
-synapse_td AS (
+synapse_tr AS (
     SELECT
         block_number,
         block_timestamp,
@@ -335,7 +301,7 @@ synapse_td AS (
         _log_id AS _id,
         _inserted_timestamp
     FROM
-        {{ ref('silver_bridge__synapse_tokendeposit') }}
+        {{ ref('silver_bridge__synapse_tokenredeem') }}
 
 {% if is_incremental() %}
 WHERE
@@ -347,7 +313,7 @@ WHERE
     )
 {% endif %}
 ),
-synapse_tds AS (
+synapse_trs AS (
     SELECT
         block_number,
         block_timestamp,
@@ -369,7 +335,7 @@ synapse_tds AS (
         _log_id AS _id,
         _inserted_timestamp
     FROM
-        {{ ref('silver_bridge__synapse_tokendepositandswap') }}
+        {{ ref('silver_bridge__synapse_tokenredeemandswap') }}
 
 {% if is_incremental() %}
 WHERE
@@ -424,11 +390,6 @@ all_protocols AS (
     SELECT
         *
     FROM
-        allbridge
-    UNION ALL
-    SELECT
-        *
-    FROM
         axelar
     UNION ALL
     SELECT
@@ -464,68 +425,17 @@ all_protocols AS (
     SELECT
         *
     FROM
-        synapse_td
+        synapse_tr
     UNION ALL
     SELECT
         *
     FROM
-        synapse_tds
+        synapse_trs
     UNION ALL
     SELECT
         *
     FROM
         wormhole
-),
-native_bridges AS (
-    SELECT
-        block_number,
-        block_timestamp,
-        origin_from_address,
-        origin_to_address,
-        origin_function_signature,
-        tx_hash,
-        event_index,
-        bridge_address,
-        event_name,
-        bridge_name AS platform,
-        'v1-native' AS version,
-        sender,
-        receiver,
-        NULL AS destination_chain_id,
-        destination_chain,
-        token_address,
-        amount_unadj,
-        _id,
-        _inserted_timestamp
-    FROM
-        {{ ref('silver_bridge__native_bridges_transfers_out') }}
-    WHERE
-        tx_hash NOT IN (
-            SELECT
-                DISTINCT tx_hash
-            FROM
-                all_protocols
-        )
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp) - INTERVAL '36 hours'
-    FROM
-        {{ this }}
-)
-{% endif %}
-),
-all_bridges AS (
-    SELECT
-        *
-    FROM
-        all_protocols
-    UNION ALL
-    SELECT
-        *
-    FROM
-        native_bridges
 ),
 FINAL AS (
     SELECT
@@ -580,7 +490,7 @@ FINAL AS (
         _id,
         b._inserted_timestamp
     FROM
-        all_bridges b
+        all_protocols b
         LEFT JOIN {{ ref('core__dim_contracts') }} C
         ON b.token_address = C.address
         LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
@@ -632,4 +542,4 @@ SELECT
 FROM
     FINAL qualify (ROW_NUMBER() over (PARTITION BY _id
 ORDER BY
-    _inserted_timestamp DESC)) = 1 #}
+    _inserted_timestamp DESC)) = 1
