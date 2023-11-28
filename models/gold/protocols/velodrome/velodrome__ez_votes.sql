@@ -42,7 +42,41 @@ SELECT
     from_address,
     token_id,
     vote_amount,
-    vote_action
+    vote_action,
+    COALESCE (
+        votes_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_hash', 'event_index']
+        ) }}
+    ) AS ez_votes_id,
+    GREATEST(
+        COALESCE(
+            base.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            g1.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            g0.inserted_timestamp,
+            '2000-01-01'
+        )
+    ) AS inserted_timestamp,
+    GREATEST(
+        COALESCE(
+            base.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            g1.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            g0.inserted_timestamp,
+            '2000-01-01'
+        )
+    ) AS modified_timestamp
 FROM
     {{ ref('silver__velodrome_votes') }}
     base

@@ -12,6 +12,8 @@ models:
         description: '{{ doc("nft_tx_hash") }}'
       - name: EVENT_INDEX
         description: '{{ doc("nft_event_index") }}'
+      - name: INTRA_EVENT_INDEX
+        description: '{{ doc("nft_intra_event_index") }}'
       - name: EVENT_TYPE
         description: '{{ doc("nft_event_type") }}'
       - name: NFT_ADDRESS
@@ -26,3 +28,9 @@ models:
         description: '{{ doc("nft_tokenid") }}'
       - name: ERC1155_VALUE
         description: '{{ doc("nft_erc1155_value") }}'
+      - name: EZ_NFT_TRANSFERS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 

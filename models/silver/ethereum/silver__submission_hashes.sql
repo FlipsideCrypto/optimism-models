@@ -51,7 +51,13 @@ SELECT
     l1_submission_prev_total_elements,
     sub_min_block,
     sub_max_block,
-    _inserted_timestamp
+    _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['block_number']
+    ) }} AS submission_hashes_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     blocks
     INNER JOIN base

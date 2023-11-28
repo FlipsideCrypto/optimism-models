@@ -22,7 +22,13 @@ SELECT
     token0_decimals,
     token1_decimals,
     l._log_id,
-    p._inserted_timestamp
+    p._inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['pool_address']
+    ) }} AS pool_details_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     {{ ref('silver__velodrome_pools') }}
     p

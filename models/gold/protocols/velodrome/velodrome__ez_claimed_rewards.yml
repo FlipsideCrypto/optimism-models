@@ -40,4 +40,9 @@ models:
         description: 'The claim epoch, only applicable to veNFT distributions.'
       - name: MAX_EPOCH
         description: 'The max epoch, only applicable to veNFT distributions.'
-     
+      - name: EZ_CLAIMED_REWARDS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 

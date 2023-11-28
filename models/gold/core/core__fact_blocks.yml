@@ -48,3 +48,9 @@ models:
         description: '{{ doc("op_l1_sub_batch") }}'
       - name: L1_SUBMISSION_DETAILS
         description: Variant column that includes details regarding state and submission root, index and tx_hash information for when the block is submitted to Ethereum Mainnet.
+      - name: FACT_BLOCKS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'

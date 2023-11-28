@@ -17,7 +17,13 @@ SELECT
     state_prev_total_elements,
     state_min_block,
     state_max_block,
-    _inserted_timestamp
+    _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['state_block_number']
+    ) }} AS state_hashes_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     {{ source(
         'ethereum_silver',

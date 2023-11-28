@@ -36,6 +36,20 @@ SELECT
   token_out,
   symbol_in,
   symbol_out,
-  _log_id
+  _log_id,
+    COALESCE (
+        complete_dex_swaps_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_hash','event_index']
+        ) }}
+    ) AS ez_dex_swaps_id,
+    COALESCE(
+        inserted_timestamp,
+        '2000-01-01'
+    ) AS inserted_timestamp,
+    COALESCE(
+        modified_timestamp,
+        '2000-01-01'
+    ) AS modified_timestamp
 FROM
   {{ ref('silver_dex__complete_dex_swaps') }}

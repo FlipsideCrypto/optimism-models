@@ -21,10 +21,16 @@ models:
       - name: TO_ADDRESS
         description: '{{ doc("opt_to_address") }}' 
       - name: ETH_VALUE
-        description: '{{ doc("opt_value") }}' 
+        description: '{{ doc("amount_deprecation") }}'
       - name: ETH_VALUE_PRECISE_RAW
-        description: '{{ doc("precise_amount_unadjusted") }}'
+        description: '{{ doc("amount_deprecation") }}'
       - name: ETH_VALUE_PRECISE
+        description: '{{ doc("amount_deprecation") }}'
+      - name: VALUE
+        description: '{{ doc("opt_value") }}' 
+      - name: VALUE_PRECISE_RAW
+        description: '{{ doc("precise_amount_unadjusted") }}'
+      - name: VALUE_PRECISE
         description: '{{ doc("precise_amount_adjusted") }}'
       - name: TX_FEE
         description: '{{ doc("opt_tx_fee") }}' 
@@ -76,3 +82,9 @@ models:
         description: The v value of the transaction signature.
       - name: TX_TYPE
         description: The type of the transaction, 2 for EIP-1559 transactions and 0 for legacy transactions.
+      - name: FACT_TRANSACTIONS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 

@@ -4,7 +4,6 @@
   unique_key = ['block_number','platform','version'],
   cluster_by = ['block_timestamp::DATE'],
   tags = ['curated','reorg']
-
 ) }}
 
 WITH contracts AS (
@@ -649,6 +648,12 @@ SELECT
   symbols,
   decimals,
   _id,
-  _inserted_timestamp
+  _inserted_timestamp,
+  {{ dbt_utils.generate_surrogate_key(
+    ['block_number','platform','version']
+  ) }} AS complete_dex_liquidity_pools_id,
+  SYSDATE() AS inserted_timestamp,
+  SYSDATE() AS modified_timestamp,
+  '{{ invocation_id }}' AS _invocation_id
 FROM
   FINAL
