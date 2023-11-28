@@ -237,9 +237,9 @@ missing_data AS (
                 r.l1_gas_price * r.l1_gas_used * r.l1_fee_scalar
             ),
             18
-        ) AS tx_fee_precise,
+        ) AS tx_fee_precise_heal,
         COALESCE(
-            tx_fee_precise :: FLOAT,
+            tx_fee_precise_heal :: FLOAT,
             0
         ) AS tx_fee,
         r.type AS tx_type,
