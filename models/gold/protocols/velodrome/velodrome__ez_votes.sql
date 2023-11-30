@@ -2,14 +2,8 @@
     materialized = 'view',
     persist_docs ={ "relation": true,
     "columns": true },
-    meta={
-        'database_tags':{
-            'table': {
-                'PROTOCOL': 'VELODROME',
-                'PURPOSE': 'DEFI, DEX'
-            }
-        }
-    }
+    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'VELODROME',
+    'PURPOSE': 'DEFI, DEX' }}}
 ) }}
 
 SELECT
@@ -46,7 +40,7 @@ SELECT
     COALESCE (
         votes_id,
         {{ dbt_utils.generate_surrogate_key(
-            ['tx_hash', 'event_index']
+            ['base.tx_hash', 'base.event_index']
         ) }}
     ) AS ez_votes_id,
     GREATEST(
