@@ -85,7 +85,8 @@ FINAL AS (
         COALESCE(
             g1.pool_address,
             g0.pool_address
-        ) AS pool_address
+        ) AS pool_address,
+        votes_base.event_index AS event_index
     FROM
         votes_base
         LEFT JOIN gauges g1
@@ -105,6 +106,7 @@ SELECT
     block_number,
     block_timestamp,
     tx_hash,
+    event_index,
     origin_function_signature,
     origin_from_address,
     origin_to_address,
