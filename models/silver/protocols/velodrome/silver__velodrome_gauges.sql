@@ -95,7 +95,13 @@ SELECT
     internal_bribe_address,
     pool_address,
     creator_address,
-    _inserted_timestamp
+    _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['tx_hash', 'event_index']
+    ) }} AS gauges_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     all_gauges qualify(ROW_NUMBER() over(PARTITION BY gauge_address
 ORDER BY

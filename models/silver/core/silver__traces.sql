@@ -384,7 +384,13 @@ FROM
 {% endif %}
 )
 SELECT
-    *
+    *,
+    {{ dbt_utils.generate_surrogate_key(
+        ['tx_hash', 'trace_index']
+    ) }} AS traces_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     FINAL qualify(ROW_NUMBER() over(PARTITION BY block_number, tx_position, trace_index
 ORDER BY

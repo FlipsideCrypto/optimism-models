@@ -171,7 +171,49 @@ SELECT
         AND pool_address <> '0xce9accfbb25eddce91845c3a7c3d1613d1d7081f' THEN token_address_in
         ELSE fee_currency
     END AS lp_fee_token_address,
-    _log_id
+    _log_id,
+    COALESCE (
+        swaps_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_hash', 'event_index']
+        ) }}
+    ) AS fact_blocks_id,
+    GREATEST(
+        COALESCE(
+            base.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            p0.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            p1.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            p2.inserted_timestamp,
+            '2000-01-01'
+        )
+    ) AS inserted_timestamp,
+    GREATEST(
+        COALESCE(
+            base.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            p0.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            p1.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            p2.modified_timestamp,
+            '2000-01-01'
+        )
+    ) AS modified_timestamp
 FROM
     {{ ref('silver__velodrome_swaps') }}
     base

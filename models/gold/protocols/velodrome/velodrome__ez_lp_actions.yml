@@ -54,3 +54,9 @@ models:
           - not_null
       - name: LP_TOKEN_AMOUNT_USD
         description: 'The amount of LP tokens minted or burned in USD.'
+      - name: EZ_LP_ACTIONS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'

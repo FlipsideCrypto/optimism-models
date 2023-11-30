@@ -31,7 +31,33 @@ SELECT
     token0_symbol,
     token1_symbol,
     token0_address,
-    token1_address
+    token1_address,
+    COALESCE (
+        locks_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_hash', 'event_index']
+        ) }}
+    ) AS ez_staking_actions_id,
+    GREATEST(
+        COALESCE(
+            base.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            pools.inserted_timestamp,
+            '2000-01-01'
+        )
+    ) AS inserted_timestamp,
+    GREATEST(
+        COALESCE(
+            base.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            pools.modified_timestamp,
+            '2000-01-01'
+        )
+    ) AS modified_timestamp
 FROM
     {{ ref('silver__velodrome_staking_actions') }}
     base

@@ -5,34 +5,27 @@
 ) }}
 
 SELECT
+    tx_hash,
     block_number,
     block_timestamp,
-    tx_hash,
-    event_index,
-    origin_function_signature,
+    tx_position,
+    trace_index,
+    identifier,
     origin_from_address,
     origin_to_address,
-    contract_address,
+    origin_function_signature,
     from_address,
     to_address,
-    raw_amount_precise,
-    raw_amount,
-    amount_precise,
     amount,
+    amount_precise_raw,
+    amount_precise,
     amount_usd,
-    decimals,
-    symbol,
-    token_price,
-    has_decimal,
-    has_price,
-    _log_id,
-    _inserted_timestamp,
     COALESCE (
-        transfers_id,
+        native_transfers_id,
         {{ dbt_utils.generate_surrogate_key(
-            ['tx_hash', 'event_index']
+            ['tx_hash', 'trace_index']
         ) }}
-    ) AS ez_token_transfers_id,
+    ) AS ez_native_transfers_id,
     COALESCE(
         inserted_timestamp,
         '2000-01-01'
@@ -42,4 +35,4 @@ SELECT
         '2000-01-01'
     ) AS modified_timestamp
 FROM
-    {{ ref('silver__transfers') }}
+    {{ ref('silver__native_transfers') }}

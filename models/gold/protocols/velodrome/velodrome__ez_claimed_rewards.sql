@@ -87,7 +87,40 @@ SELECT
     ) AS token_symbol,
     base.token_address AS token_address,
     claim_epoch,
-    max_epoch
+    max_epoch,
+    COALESCE (
+        claimed_rewards_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_hash', 'event_index']
+        ) }}
+    ) AS ez_claimed_rewards_id,
+    greatest(
+    COALESCE(
+        base.inserted_timestamp,
+        '2000-01-01'
+    ),
+    COALESCE(
+        prices.inserted_timestamp,
+        '2000-01-01'
+    ),
+    COALESCE(
+        C.inserted_timestamp,
+        '2000-01-01'
+    )
+    ) AS inserted_timestamp,
+    greatest(
+    COALESCE(
+        base.modified_timestamp,
+        '2000-01-01'
+    ),
+    COALESCE(
+        prices.modified_timestamp,
+        '2000-01-01'
+    ),
+    COALESCE(
+        C.modified_timestamp,
+        '2000-01-01'
+    )) AS modified_timestamp
 FROM
     {{ ref('silver__velodrome_claimed_rewards') }}
     base

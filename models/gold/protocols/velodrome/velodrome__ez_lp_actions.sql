@@ -59,7 +59,49 @@ SELECT
     token1_address,
     lp_token_action,
     lp_token_amount,
-    token0_amount_usd + token1_amount_usd AS lp_token_amount_usd
+    token0_amount_usd + token1_amount_usd AS lp_token_amount_usd,
+    COALESCE (
+        lp_actions_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_hash', 'event_index']
+        ) }}
+    ) AS ez_lp_actions_id,
+    GREATEST(
+        COALESCE(
+            base.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            pools.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            p0.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            p1.inserted_timestamp,
+            '2000-01-01'
+        )
+    ) AS inserted_timestamp,
+    GREATEST(
+        COALESCE(
+            base.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            pools.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            p0.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            p1.modified_timestamp,
+            '2000-01-01'
+        )
+    ) AS modified_timestamp
 FROM
     {{ ref('silver__velodrome_LP_actions') }}
     base

@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'contract_address',
+    merge_exclude_columns = ["inserted_timestamp"],
     tags = ['non_realtime']
 ) }}
 
@@ -81,7 +82,13 @@ token_names AS (
                 token_name,
                 token_decimals :: INTEGER AS token_decimals,
                 token_symbol,
-                _inserted_timestamp
+                _inserted_timestamp,
+                {{ dbt_utils.generate_surrogate_key(
+                    ['c1.contract_address']
+                ) }} AS contracts_id,
+                SYSDATE() AS inserted_timestamp,
+                SYSDATE() AS modified_timestamp,
+                '{{ invocation_id }}' AS _invocation_id
             FROM
                 contracts c1
                 LEFT JOIN token_names
