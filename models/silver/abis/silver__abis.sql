@@ -1,6 +1,7 @@
 {{ config (
     materialized = "incremental",
     unique_key = "contract_address",
+    merge_exclude_columns = ["inserted_timestamp"],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION on equality(contract_address)",
     tags = ['abis']
 ) }}
@@ -17,6 +18,8 @@ WITH override_abis AS (
         1 AS priority
     FROM
         {{ ref('silver__override_abis') }}
+    WHERE
+        contract_address IS NOT NULL
 ),
 verified_abis AS (
     SELECT
@@ -62,12 +65,15 @@ user_abis AS (
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        COALESCE(MAX(_inserted_timestamp), '1970-01-01' :: TIMESTAMP)
+        MAX(
+            _inserted_timestamp
+        )
     FROM
         {{ this }}
     WHERE
-        abi_source = 'user')
-    {% endif %}
+        abi_source = 'user'
+)
+{% endif %}
 ),
 bytecode_abis AS (
     SELECT
@@ -81,7 +87,7 @@ bytecode_abis AS (
     FROM
         {{ ref('silver__bytecode_abis') }}
     WHERE
-        NOT bytecode_dupe
+        1 = 1
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -162,10 +168,14 @@ SELECT
     p.abi_source,
     p.discord_username,
     p.abi_hash,
-    created_contract_input AS bytecode
+    created_contract_input AS bytecode,
+    {{ dbt_utils.generate_surrogate_key(
+        ['contract_address']
+    ) }} AS abis_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     priority_abis p
     LEFT JOIN {{ ref('silver__created_contracts') }}
     ON p.contract_address = created_contract_address
-WHERE
-    p.contract_address IS NOT NULL

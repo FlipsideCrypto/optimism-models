@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver__decoded_logs
+  - name: test_silver__decoded_logs_full
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -44,3 +44,9 @@ models:
               column_type_list:
                 - STRING    
                 - VARCHAR
+           
+
+
+
+
+
