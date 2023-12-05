@@ -51,7 +51,7 @@ WHERE
     )
     AND (
         SELECT
-            ROUND(MAX(block_number), -4) + 2500000
+            ROUND(MAX(block_number), -4) + 1000000
         FROM
             {{ this }})
     AND DATA NOT ILIKE '%Event topic is not present in given ABI%'
