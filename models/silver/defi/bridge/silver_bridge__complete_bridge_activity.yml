@@ -45,6 +45,9 @@ models:
               regex: 0[xX][0-9a-fA-F]+
       - name: DESTINATION_CHAIN
           - not_null
+      - name: DESTINATION_CHAIN_RECEIVER
+        tests:
+          - not_null
       - name: PLATFORM
           - not_null
       - name: VERSION
