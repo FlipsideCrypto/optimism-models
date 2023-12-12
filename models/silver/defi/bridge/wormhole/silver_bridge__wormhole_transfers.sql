@@ -101,7 +101,11 @@ base_near AS (
     SELECT
         near_address,
         addr_encoded
-    FROM {{ ref('silver_bridge__near_address_encoded')}}
+    FROM
+        {{ source(
+            'silver_crosschain',
+            'near_address_encoded'
+        ) }}
 )
 SELECT
     block_number,
@@ -143,7 +147,7 @@ SELECT
     _id,
     _inserted_timestamp
 FROM
-    FINAL t
+    all_transfers t
     LEFT JOIN {{ ref('silver_bridge__wormhole_chain_id_seed') }}
     s
     ON t.destination_chain_id :: STRING = s.wormhole_chain_id :: STRING
