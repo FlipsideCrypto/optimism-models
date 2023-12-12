@@ -85,7 +85,8 @@ FINAL AS (
         COALESCE(
             g1.pool_address,
             g0.pool_address
-        ) AS pool_address
+        ) AS pool_address,
+        votes_base.event_index AS event_index
     FROM
         votes_base
         LEFT JOIN gauges g1
@@ -105,6 +106,7 @@ SELECT
     block_number,
     block_timestamp,
     tx_hash,
+    event_index,
     origin_function_signature,
     origin_from_address,
     origin_to_address,
@@ -115,7 +117,13 @@ SELECT
     vote_amount,
     vote_action,
     _log_id,
-    _inserted_timestamp
+    _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['tx_hash', 'event_index']
+    ) }} AS votes_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     FINAL
 WHERE

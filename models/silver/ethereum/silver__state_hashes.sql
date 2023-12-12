@@ -40,7 +40,16 @@ blocks AS (
     SELECT
         SEQ4() AS block_number
     FROM
-        TABLE(GENERATOR(rowcount => (SELECT max(block_number) as max_block FROM {{ref ('silver__blocks')}}) ))
+        TABLE(
+            GENERATOR(
+                rowcount => (
+                    SELECT
+                        MAX(block_number) AS max_block
+                    FROM
+                        {{ ref ('silver__blocks') }}
+                )
+            )
+        )
 )
 SELECT
     block_number,
@@ -55,7 +64,13 @@ SELECT
     state_prev_total_elements,
     state_min_block,
     state_max_block,
-    _inserted_timestamp
+    _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['block_number']
+    ) }} AS state_hashes_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     blocks
     INNER JOIN base

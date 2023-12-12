@@ -4,7 +4,6 @@
     unique_key = 'block_number',
     cluster_by = ['block_timestamp::DATE'],
     tags = ['curated','reorg']
-
 ) }}
 
 WITH velo_distributions AS (
@@ -154,7 +153,13 @@ SELECT
     claim_epoch,
     max_epoch,
     _log_id,
-    _inserted_timestamp
+    _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['tx_hash', 'event_index']
+    ) }} AS claimed_rewards_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     FINAL qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY

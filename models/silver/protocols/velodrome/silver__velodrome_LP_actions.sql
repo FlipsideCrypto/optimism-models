@@ -123,7 +123,13 @@ SELECT
     function_type,
     _log_id,
     _inserted_timestamp,
-    b.lp_token_amount AS lp_token_amount
+    b.lp_token_amount AS lp_token_amount,
+    {{ dbt_utils.generate_surrogate_key(
+        ['a.tx_hash', 'event_index']
+    ) }} AS lp_actions_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     lp_actions A
     LEFT JOIN lp_tokens_actions b

@@ -56,3 +56,9 @@ models:
         description: 'The amount of tokens voted.'
       - name: VOTE_ACTION
         description: 'The type of action, either vote or unvote.'
+      - name: EZ_VOTES_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'

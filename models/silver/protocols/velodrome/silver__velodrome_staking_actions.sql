@@ -120,7 +120,13 @@ SELECT
     A.gauge_address AS gauge_address,
     b.pool_address AS pool_address,
     _inserted_timestamp,
-    _log_id
+    _log_id,
+    {{ dbt_utils.generate_surrogate_key(
+        ['a.tx_hash', 'a.event_index']
+    ) }} AS locks_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     staking_actions A
     LEFT JOIN token_transfer b

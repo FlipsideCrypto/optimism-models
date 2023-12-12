@@ -80,7 +80,49 @@ SELECT
         l1_submission_batch_root,
         'l1_submission_tx_hash',
         l1_submission_tx_hash
-    ) AS l1_submission_details
+    ) AS l1_submission_details,
+    COALESCE (
+        blocks_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['a.block_number']
+        ) }}
+    ) AS fact_blocks_id,
+    GREATEST(
+        COALESCE(
+            A.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            b.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            C.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            d.inserted_timestamp,
+            '2000-01-01'
+        )
+    ) AS inserted_timestamp,
+    GREATEST(
+        COALESCE(
+            A.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            b.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            C.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            d.modified_timestamp,
+            '2000-01-01'
+        )
+    ) AS modified_timestamp
 FROM
     {{ ref('silver__blocks') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}

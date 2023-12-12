@@ -62,9 +62,9 @@ WITH base AS (
         _inserted_timestamp,
         event_index,
         CASE
-            WHEN topics[0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' THEN 'Transfer'
-            WHEN topics[0] :: STRING = '0x112c256902bf554b6ed882d2936687aaeb4225e8cd5b51303c90ca6cf43a8602' THEN 'Fees'
-            WHEN topics[0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN 'Swap'
+            WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' THEN 'Transfer'
+            WHEN topics [0] :: STRING = '0x112c256902bf554b6ed882d2936687aaeb4225e8cd5b51303c90ca6cf43a8602' THEN 'Fees'
+            WHEN topics [0] :: STRING = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' THEN 'Swap'
         END AS event_name,
         'velodrome' AS platform,
         topics [0] :: STRING AS function_type
@@ -186,11 +186,16 @@ SELECT
         fees_adj,
         0
     ) AS lp_fee_unadj,
-    fee_currency
+    fee_currency,
+    {{ dbt_utils.generate_surrogate_key(
+        ['b.tx_hash', 'event_index']
+    ) }} AS swaps_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     swaps b
     LEFT JOIN lp_fees l
     ON b.contract_address = l.contract_address
     AND b.tx_hash = l.tx_hash
     AND b.agg_id = l.agg_id
-    
