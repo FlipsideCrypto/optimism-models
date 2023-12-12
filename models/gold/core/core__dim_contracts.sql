@@ -23,3 +23,15 @@ FROM
     ) = LOWER(
         c1.contract_address
     )
+UNION
+SELECT
+    contract_address AS address,
+    token_symbol AS symbol,
+    token_name AS NAME,
+    token_decimals AS decimals,
+    0 AS created_block_number,
+    '1970-01-01 00:00:00' :: TIMESTAMP AS created_block_timestamp,
+    'GENESIS' AS created_tx_hash,
+    'GENESIS' AS creator_address
+FROM
+    {{ ref ('silver__ovm1_contracts') }}
