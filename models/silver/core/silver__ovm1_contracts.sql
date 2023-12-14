@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'contract_address',
+    merge_exclude_columns = ["inserted_timestamp"],
     tags = ['stale']
 ) }}
 
@@ -9,7 +10,13 @@ SELECT
     token_name,
     token_decimals,
     token_symbol,
-    _inserted_timestamp
+    _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['contract_address']
+    ) }} AS ovm1_contracts_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     {{ ref('silver__contracts') }}
     c1

@@ -40,6 +40,14 @@ SELECT
     0 AS created_block_number,
     '1970-01-01 00:00:00' :: TIMESTAMP AS created_block_timestamp,
     'GENESIS' AS created_tx_hash,
-    'GENESIS' AS creator_address
+    'GENESIS' AS creator_address,
+    COALESCE (
+        ovm1_contracts_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['contract_address']
+        ) }}
+    ) AS dim_contracts_id,
+    GREATEST(COALESCE(inserted_timestamp, '2000-01-01'), COALESCE(inserted_timestamp, '2000-01-01')) AS inserted_timestamp,
+    GREATEST(COALESCE(modified_timestamp, '2000-01-01'), COALESCE(modified_timestamp, '2000-01-01')) AS modified_timestamp
 FROM
     {{ ref ('silver__ovm1_contracts') }}
