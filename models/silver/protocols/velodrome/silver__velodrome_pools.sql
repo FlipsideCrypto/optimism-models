@@ -31,12 +31,7 @@ WITH pool_creation AS (
         AND contract_address = '0x25cbddb98b35ab1ff77413456b31ec81a6b6b746' --velo deployer
 
 {% if is_incremental() %}
-AND pool_address NOT IN (
-    SELECT
-        DISTINCT pool_address
-    FROM
-        {{ this }}
-)
+
 {% endif %}
 ),
 function_sigs AS (

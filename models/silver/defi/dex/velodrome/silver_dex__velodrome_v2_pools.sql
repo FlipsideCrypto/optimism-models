@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
-    unique_key = 'block_number',
+    unique_key = 'pool_address',
     cluster_by = ['block_timestamp::DATE'],
     tags = ['curated']
 ) }}
@@ -42,3 +42,7 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% endif %}
+
+qualify(ROW_NUMBER() over (PARTITION BY pool_address
+ORDER BY
+    _inserted_timestamp DESC)) = 1
