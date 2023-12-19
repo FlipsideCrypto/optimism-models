@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
-    unique_key = 'block_number',
+    unique_key = 'pool_address',
     full_refresh = false,
     tags = ['curated']
 ) }}
@@ -35,12 +35,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-AND to_address NOT IN (
-    SELECT
-        DISTINCT pool_address
-    FROM
-        {{ this }}
-)
+
 {% endif %}
 QUALIFY(ROW_NUMBER() OVER(PARTITION BY to_address ORDER BY block_timestamp ASC)) = 1
 ),

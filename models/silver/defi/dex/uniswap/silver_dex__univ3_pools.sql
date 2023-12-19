@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
-    unique_key = 'block_number',
+    unique_key = 'pool_address',
     cluster_by = ['block_timestamp::DATE'],
     tags = ['curated']
 ) }}
