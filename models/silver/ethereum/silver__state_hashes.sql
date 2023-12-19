@@ -77,4 +77,4 @@ FROM
     ON block_number BETWEEN state_min_block
     AND state_max_block QUALIFY(ROW_NUMBER() over(PARTITION BY block_number
     ORDER BY
-    _inserted_timestamp DESC)) = 1
+    state_block_timestamp DESC)) = 1
