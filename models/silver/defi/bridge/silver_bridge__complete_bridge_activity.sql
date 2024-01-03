@@ -26,6 +26,7 @@ WITH across AS (
         destination_chain_id :: STRING AS destination_chain_id,
         NULL AS destination_chain,
         token_address,
+        NULL AS token_symbol,
         amount AS amount_unadj,
         _log_id AS _id,
         _inserted_timestamp
@@ -61,6 +62,7 @@ axelar AS (
         NULL AS destination_chain_id,
         destination_chain,
         token_address,
+        token_symbol,
         amount AS amount_unadj,
         _log_id AS _id,
         _inserted_timestamp
@@ -96,6 +98,7 @@ celer_cbridge AS (
         destination_chain_id :: STRING AS destination_chain_id,
         NULL AS destination_chain,
         token_address,
+        NULL AS token_symbol,
         amount AS amount_unadj,
         _log_id AS _id,
         _inserted_timestamp
@@ -131,6 +134,7 @@ hop AS (
         destination_chain_id :: STRING AS destination_chain_id,
         NULL AS destination_chain,
         token_address,
+        NULL AS token_symbol,
         amount AS amount_unadj,
         _log_id AS _id,
         _inserted_timestamp
@@ -166,6 +170,7 @@ meson AS (
         destination_chain_id :: STRING AS destination_chain_id,
         destination_chain,
         token_address,
+        NULL AS token_symbol,
         amount_unadj,
         _id,
         _inserted_timestamp
@@ -201,6 +206,7 @@ multichain AS (
         destination_chain_id :: STRING AS destination_chain_id,
         NULL AS destination_chain,
         token_address,
+        NULL AS token_symbol,
         amount AS amount_unadj,
         _log_id AS _id,
         _inserted_timestamp
@@ -236,6 +242,7 @@ stargate AS (
         destination_chain_id :: STRING AS destination_chain_id,
         destination_chain,
         token_address,
+        NULL AS token_symbol,
         amount_unadj,
         _log_id AS _id,
         _inserted_timestamp
@@ -271,6 +278,7 @@ symbiosis AS (
         destination_chain_id :: STRING AS destination_chain_id,
         NULL AS destination_chain,
         token_address,
+        NULL AS token_symbol,
         amount AS amount_unadj,
         _log_id AS _id,
         _inserted_timestamp
@@ -306,6 +314,7 @@ synapse_tb AS (
         destination_chain_id :: STRING AS destination_chain_id,
         NULL AS destination_chain,
         token_address,
+        NULL AS token_symbol,
         amount AS amount_unadj,
         _log_id AS _id,
         _inserted_timestamp
@@ -341,6 +350,7 @@ synapse_tbs AS (
         destination_chain_id :: STRING AS destination_chain_id,
         NULL AS destination_chain,
         token_address,
+        NULL AS token_symbol,
         amount AS amount_unadj,
         _log_id AS _id,
         _inserted_timestamp
@@ -376,6 +386,7 @@ wormhole AS (
         destination_chain_id :: STRING AS destination_chain_id,
         destination_chain,
         token_address,
+        NULL AS token_symbol,
         amount_unadj,
         _id,
         _inserted_timestamp
@@ -485,7 +496,13 @@ FINAL AS (
             )
         END AS destination_chain,
         b.token_address,
-        C.token_symbol AS token_symbol,
+        CASE
+            WHEN platform = 'axelar' THEN COALESCE(
+                C.token_symbol,
+                b.token_symbol
+            )
+            ELSE C.token_symbol
+        END AS token_symbol,
         C.token_decimals AS token_decimals,
         amount_unadj,
         CASE
