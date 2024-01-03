@@ -36,7 +36,11 @@ WITH base_evt AS (
     FROM
         {{ ref('silver__decoded_logs') }}
     WHERE
-        topics [0] :: STRING = '0xdc5bad4651c5fbe9977a696aadc65996c468cde1448dd468ec0d83bf61c4b57c'
+        topics [0] :: STRING IN (
+            '0xdc5bad4651c5fbe9977a696aadc65996c468cde1448dd468ec0d83bf61c4b57c',
+            --redeem
+            '0xda5273705dbef4bf1b902a131c2eac086b7e1476a8ab0cb4da08af1fe1bd8e3b' --deposit
+        )
         AND contract_address = '0xaf41a65f786339e7911f4acdad6bd49426f2dc6b'
         AND origin_to_address IS NOT NULL
 
