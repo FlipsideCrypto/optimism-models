@@ -34,7 +34,9 @@ WITH bronze_overflowed_traces AS (
                 'input',
                 'error',
                 'output',
-                'revertReason'
+                'revertReason',
+                'txHash',
+                'result.txHash'
             ),
             'ORIGIN',
             REGEXP_REPLACE(REGEXP_REPLACE(path, '[^0-9]+', '_'), '^_|_$', '')
