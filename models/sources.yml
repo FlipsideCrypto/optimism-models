@@ -61,11 +61,6 @@ sources:
     tables:
       - name: verified_abis
       - name: overflowed_traces
-  - name: optimism_silver_dev
-    database: optimism_dev
-    schema: silver
-    tables:
-      - name: overflowed_traces
   - name: optimism_bronze_api
     database: optimism
     schema: bronze_api
