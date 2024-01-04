@@ -4,8 +4,7 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - BLOCK_NUMBER
-            - TX_POSITION
+            - TX_HASH
             - TRACE_INDEX
     columns:
       - name: BLOCK_NUMBER
@@ -17,8 +16,7 @@ models:
                 - FLOAT    
       - name: BLOCK_TIMESTAMP
         tests:
-          - not_null:
-              where: NOT IS_PENDING
+          - not_null
           - dbt_expectations.expect_row_values_to_have_recent_data:
               datepart: day
               interval: 1
@@ -28,8 +26,7 @@ models:
                 - TIMESTAMP_NTZ
       - name: TX_HASH
         tests:
-          - not_null:
-              where: NOT IS_PENDING
+          - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
      
