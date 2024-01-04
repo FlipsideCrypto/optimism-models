@@ -85,6 +85,6 @@ SELECT
     eth_value_precise
 FROM
     {{ source(
-        'optimism_silver_dev',
+        'optimism_silver',
         'overflowed_traces'
     ) }}
