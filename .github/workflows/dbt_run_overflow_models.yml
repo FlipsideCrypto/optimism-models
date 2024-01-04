@@ -41,4 +41,4 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run -m "bsc_models,tag:overflow"
+          dbt run -m "optimism_models,tag:overflow"
