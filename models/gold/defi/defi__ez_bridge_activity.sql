@@ -24,7 +24,10 @@ SELECT
     sender,
     receiver,
     destination_chain_receiver,
-    destination_chain,
+    COALESCE(
+        standard_destination_chain,
+        b.destination_chain
+    ) AS destination_chain,
     destination_chain_id,
     token_address,
     token_symbol,
@@ -47,3 +50,6 @@ SELECT
     ) AS modified_timestamp
 FROM
     {{ ref('silver_bridge__complete_bridge_activity') }}
+    b
+    LEFT JOIN {{ ref('silver_bridge__standard_dst_chain_seed') }} C
+    ON b.destination_chain = C.destination_chain
