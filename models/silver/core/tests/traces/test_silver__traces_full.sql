@@ -6,11 +6,11 @@
 SELECT
     *
 FROM
-    {{ ref('silver__traces') }}
+    {{ ref('core__fact_traces') }}
 WHERE
     block_number NOT IN (
-    SELECT
-        block_number
-    FROM
-        {{ ref('silver_observability__excluded_receipt_blocks') }}
+        SELECT
+            block_number
+        FROM
+            {{ ref('silver_observability__excluded_receipt_blocks') }}
     )
