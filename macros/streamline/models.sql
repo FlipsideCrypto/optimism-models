@@ -26,7 +26,8 @@
                 )
             ) AS id,
             s.{{ partition_name }},
-            s.value AS VALUE
+            s.value AS VALUE,
+            file_name
         FROM
             {{ source(
                 "bronze_streamline",
@@ -85,7 +86,8 @@ SELECT
         )
     ) AS id,
     s.{{ partition_name }},
-    s.value AS VALUE
+    s.value AS VALUE,
+    file_name
 FROM
     {{ source(
         "bronze_streamline",
