@@ -119,7 +119,7 @@ SELECT
         blocks_impacted_count > 0,
         github_actions.workflow_dispatches(
             'FlipsideCrypto',
-            'bsc-models',
+            'optimism-models',
             'dbt_run_overflow_models.yml',
             NULL
         ) :status_code :: INT,
