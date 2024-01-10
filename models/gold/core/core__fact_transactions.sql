@@ -67,7 +67,9 @@ SELECT
     GREATEST(COALESCE(A.modified_timestamp, '2000-01-01'), COALESCE(b.modified_timestamp, '2000-01-01'), COALESCE(C.modified_timestamp, '2000-01-01')) AS modified_timestamp,
     VALUE AS eth_value,
     value_precise_raw AS eth_value_precise_raw,
-    value_precise AS eth_value_precise
+    value_precise AS eth_value_precise,
+    deposit_nonce,
+    deposit_receipt_version
 FROM
     {{ ref('silver__transactions') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}
