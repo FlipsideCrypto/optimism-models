@@ -43,8 +43,11 @@ SELECT
     block_number,
     block_timestamp,
     deployer_address,
-    contract_address AS pool_address,
+    C.token_name as pool_name,
+    d.contract_address AS pool_address,
     _call_id,
-    _inserted_timestamp
+    d._inserted_timestamp
 FROM
-    contract_deployments
+    contract_deployments d
+    LEFT JOIN {{ ref('silver__contracts') }} C
+    ON pool_address = c.contract_address
