@@ -109,7 +109,13 @@ FINAL AS (
         utils.udf_hex_to_int(
             DATA :type :: STRING
         ) :: INT AS TYPE,
-        _inserted_timestamp
+        _inserted_timestamp,
+        utils.udf_hex_to_int(
+            DATA :depositNonce :: STRING
+        ) :: INT AS deposit_nonce,
+        utils.udf_hex_to_int(
+            DATA: depositReceiptVersion :: STRING
+        ) :: INT AS deposit_receipt_version
     FROM
         base
 )

@@ -88,3 +88,7 @@ models:
         description: '{{ doc("inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
         description: '{{ doc("modified_timestamp") }}' 
+      - name: DEPOSIT_NONCE
+        description: The nonce of the deposit transaction.
+      - name: DEPOSIT_RECEIPT_VERSION
+        description: The version of the deposit receipt.

@@ -122,7 +122,9 @@ SELECT
             d.modified_timestamp,
             '2000-01-01'
         )
-    ) AS modified_timestamp
+    ) AS modified_timestamp,
+    withdrawals,
+    withdrawals_root
 FROM
     {{ ref('silver__blocks') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}

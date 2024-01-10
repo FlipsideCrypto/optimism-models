@@ -172,7 +172,9 @@ new_records AS (
         effective_gas_price,
         r.type AS tx_type,
         t._inserted_timestamp,
-        t.data
+        t.data,
+        r.deposit_nonce,
+        r.deposit_receipt_version
     FROM
         base_tx t
         LEFT OUTER JOIN {{ ref('silver__blocks') }}
@@ -248,7 +250,9 @@ missing_data AS (
             b._inserted_timestamp,
             r._inserted_timestamp
         ) AS _inserted_timestamp,
-        t.data
+        t.data,
+        r.deposit_nonce,
+        r.deposit_receipt_version
     FROM
         {{ this }}
         t
@@ -311,7 +315,9 @@ FINAL AS (
         tx_fee_precise,
         tx_type,
         _inserted_timestamp,
-        DATA
+        DATA,
+        deposit_nonce,
+        deposit_receipt_version
     FROM
         new_records
 
@@ -354,7 +360,9 @@ SELECT
     tx_fee_precise_heal AS tx_fee_precise,
     tx_type,
     _inserted_timestamp,
-    DATA
+    DATA,
+    deposit_nonce,
+    deposit_receipt_version
 FROM
     missing_data
 {% endif %}
@@ -421,7 +429,9 @@ SELECT
     ) }} AS transactions_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
-    '{{ invocation_id }}' AS _invocation_id
+    '{{ invocation_id }}' AS _invocation_id,
+    deposit_nonce,
+    deposit_receipt_version
 FROM
     FINAL
 WHERE
