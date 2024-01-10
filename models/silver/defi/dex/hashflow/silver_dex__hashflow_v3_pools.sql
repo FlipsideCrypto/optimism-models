@@ -21,7 +21,7 @@ WITH logs_pull AS (
         {{ ref('silver__logs') }}
     WHERE
         (
-            contract_address = LOWER('0xdE828fdc3F497F16416D1bB645261C7C6a62DAb5')
+            contract_address = LOWER('0x6d551f4d999fac0984eb75b2b230ba7e7651bde7')
             AND topics [0] :: STRING = '0xdbd2a1ea6808362e6adbec4db4969cbc11e3b0b28fb6c74cb342defaaf1daada'
         )
         OR tx_hash = '0x7e34cd22200c7f85e40c654cbb6db0bccf168e645e09958faf8154a3e2768e3d'
@@ -51,7 +51,7 @@ contract_deployments AS (
         LEFT JOIN {{ ref('silver__contracts') }} C
         ON pool_address = c.contract_address
     WHERE
-        l.contract_address = '0xde828fdc3f497f16416d1bb645261c7c6a62dab5'
+        l.contract_address = '0x6d551f4d999fac0984eb75b2b230ba7e7651bde7'
 )
 SELECT
     tx_hash,
