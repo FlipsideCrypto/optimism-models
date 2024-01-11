@@ -48,8 +48,8 @@ SELECT
     ) :: INT AS total_difficulty,
     DATA :transactionsRoot :: STRING AS transactions_root,
     DATA :uncles AS uncles,
-    DATA :result :withdrawals AS withdrawals,
-    DATA :result :withdrawalsRoot :: STRING AS withdrawals_root,
+    DATA :withdrawals AS withdrawals,
+    DATA :withdrawalsRoot :: STRING AS withdrawals_root,
     _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
         ['block_number']
