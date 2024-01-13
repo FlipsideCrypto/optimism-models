@@ -6,8 +6,7 @@
     tags = ['non_realtime','reorg','curated']
 ) }}
 
-WITH --borrows from Aave LendingPool contracts
-borrow AS (
+WITH liquidation AS(
 
     SELECT
         tx_hash,
@@ -19,26 +18,20 @@ borrow AS (
         origin_function_signature,
         contract_address,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS aave_market,
-        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS onBehalfOf,
+        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS collateral_asset,
+        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS debt_asset,
+        CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS borrower_address,
         utils.udf_hex_to_int(
-            topics [3] :: STRING
-        ) :: INTEGER AS refferal,
-        CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS userAddress,
+            segmented_data [0] :: STRING
+        ) :: INTEGER AS debt_to_cover_amount,
         utils.udf_hex_to_int(
             segmented_data [1] :: STRING
-        ) :: INTEGER AS borrow_quantity,
-        utils.udf_hex_to_int(
-            segmented_data [2] :: STRING
-        ) :: INTEGER AS borrow_rate_mode,
-        utils.udf_hex_to_int(
-            segmented_data [3] :: STRING
-        ) :: INTEGER AS borrowrate,
+        ) :: INTEGER AS liquidated_amount,
+        CONCAT('0x', SUBSTR(segmented_data [2] :: STRING, 25, 40)) AS liquidator_address,
         CASE
-            WHEN contract_address = LOWER('0x794a61358D6845594F94dc1DB02A252b5b4814aD') THEN 'Aave V3'
+            WHEN contract_address = LOWER('0x8FD4aF47E4E63d1D2D45582c3286b4BD9Bb95DfE') THEN 'Granary'
             ELSE 'ERROR'
-        END AS aave_version,
-        origin_from_address AS borrower_address,
+        END AS granary_version,
         COALESCE(
             origin_to_address,
             contract_address
@@ -48,7 +41,7 @@ borrow AS (
     FROM
         {{ ref('silver__logs') }}
     WHERE
-        topics [0] :: STRING = '0xb3d084820fb1a9decffb176436bd02558d15fac9b0ddfed8c465bc7359d7dce0'
+        topics [0] :: STRING = '0xe413a321e8681d831f4dbccbca790d2952b56f977908e45be37335533e005286'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -60,7 +53,7 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% endif %}
-AND contract_address = LOWER('0x794a61358D6845594F94dc1DB02A252b5b4814aD')
+AND contract_address = LOWER('0x8FD4aF47E4E63d1D2D45582c3286b4BD9Bb95DfE')
 AND tx_status = 'SUCCESS' --excludes failed txs
 ),
 atoken_meta AS (
@@ -78,7 +71,7 @@ atoken_meta AS (
         atoken_stable_debt_address,
         atoken_variable_debt_address
     FROM
-        {{ ref('silver__aave_tokens') }}
+        {{ ref('silver__granary_tokens') }}
 )
 SELECT
     tx_hash,
@@ -89,28 +82,28 @@ SELECT
     origin_to_address,
     origin_function_signature,
     contract_address,
-    aave_market,
-    atoken_meta.atoken_address AS aave_token,
-    borrow_quantity AS amount_unadj,
-    borrow_quantity / pow(
+    collateral_asset,
+    amc.atoken_address AS collateral_granary_token,
+    liquidated_amount AS amount_unadj,
+    liquidated_amount / pow(
         10,
-        atoken_meta.underlying_decimals
+        amc.atoken_decimals
     ) AS amount,
-    borrower_address,
-    CASE
-        WHEN borrow_rate_mode = 2 THEN 'Variable Rate'
-        ELSE 'Stable Rate'
-    END AS borrow_rate_mode,
-    lending_pool_contract,
-    aave_version AS platform,
-    atoken_meta.underlying_symbol AS symbol,
-    atoken_meta.underlying_decimals AS underlying_decimals,
+    debt_asset,
+    amd.atoken_address AS debt_granary_token,
+    liquidator_address AS liquidator,
+    borrower_address AS borrower,
+    granary_version AS platform,
+    amc.underlying_symbol AS collateral_token_symbol,
+    amd.underlying_symbol AS debt_token_symbol,
     'optimism' AS blockchain,
     _log_id,
     _inserted_timestamp
 FROM
-    borrow
-    LEFT JOIN atoken_meta
-    ON borrow.aave_market = atoken_meta.underlying_address qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    liquidation
+    LEFT JOIN atoken_meta amc
+    ON liquidation.collateral_asset = amc.underlying_address
+    LEFT JOIN atoken_meta amd
+    ON liquidation.debt_asset = amd.underlying_address qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY
     _inserted_timestamp DESC)) = 1
