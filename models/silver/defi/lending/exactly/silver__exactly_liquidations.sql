@@ -41,7 +41,7 @@ exactly_liquidations AS (
     utils.udf_hex_to_int(
       segmented_data [1] :: STRING
     ) :: INTEGER AS repayAmount_raw,
-    CONCAT('0x', SUBSTR(segmented_data [3] :: STRING, 25, 40)) AS tokenCollateral,
+    CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS tokenCollateral,
     'Exactly' AS platform,
     _inserted_timestamp,
     _log_id
