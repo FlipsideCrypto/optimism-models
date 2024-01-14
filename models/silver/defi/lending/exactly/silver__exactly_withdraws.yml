@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver__sonne_withdraws
+  - name: silver__exactly_withdraws
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
