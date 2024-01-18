@@ -116,7 +116,8 @@ transfers AS (
         from_address = '0xce16f69375520ab01377ce7b88f5ba8c48f8d666'
         AND to_address IN (
             '0xe19bb3b98f7727c520c757b8a00753eb47358b14',
-            '0xe432150cce91c13a887f7d836923d5597add8e31'
+            '0xe432150cce91c13a887f7d836923d5597add8e31',
+            '0x0000000000000000000000000000000000000000'
         )
 
 {% if is_incremental() %}
@@ -143,7 +144,7 @@ FINAL AS (
         b.tx_status,
         b.contract_address AS bridge_address,
         b.name AS platform,
-        b.sender,
+        b.origin_from_address AS sender,
         CASE
             WHEN b.recipient = '0x0000000000000000000000000000000000000000' THEN refundAddress
             ELSE b.recipient
