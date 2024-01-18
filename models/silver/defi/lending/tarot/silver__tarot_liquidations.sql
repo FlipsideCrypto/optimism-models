@@ -102,8 +102,8 @@ select
       10,
       a.underlying_decimals
     ) AS amount,
-    a.underlying_asset_address as received_contract_address,
-    a.underlying_asset_symbol as received_contract_symbol,
+    a.underlying_asset_address as liquidation_contract_address,
+    a.underlying_asset_symbol as liquidation_contract_symbol,
     'Tarot' as platform,
     _inserted_timestamp,
     _log_id

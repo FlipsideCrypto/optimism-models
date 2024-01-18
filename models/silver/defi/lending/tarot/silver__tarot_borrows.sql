@@ -83,7 +83,7 @@ SELECT
     borrower,
     A.token_address AS borrows_contract_address,
     'bTAROT' AS borrows_contract_symbol,
-    underlying_asset_address AS token_addres,
+    underlying_asset_address AS token_address,
     underlying_asset_symbol AS token_symbol,
     loan_amount_raw AS amount_unadj,
     loan_amount_raw / pow(

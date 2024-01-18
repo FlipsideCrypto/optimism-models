@@ -82,7 +82,7 @@ SELECT
     origin_function_signature,
     contract_address,
     borrower,
-    A.token_address AS token_addres,
+    A.token_address AS token_address,
     'bTAROT' AS token_symbol,
     underlying_asset_address AS repay_contract_address,
     underlying_asset_symbol AS repay_contract_symbol,
@@ -91,6 +91,7 @@ SELECT
         10,
         underlying_decimals
     ) AS amount,
+    payer,
     'Tarot' AS platform,
     _inserted_timestamp,
     _log_id

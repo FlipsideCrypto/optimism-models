@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver__sonne_repayments
+  - name: silver__tarot_repayments
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:

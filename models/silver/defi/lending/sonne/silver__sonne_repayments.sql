@@ -98,7 +98,7 @@ SELECT
   origin_function_signature,
   contract_address,
   borrower,
-  token,
+  token as token_address,
   token_symbol,
   payer,
   repay_contract_address,
