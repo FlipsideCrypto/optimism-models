@@ -16,7 +16,8 @@ with asset_details as (
         ctarot,
         lp_token_address,
         lp_token_name,
-        lp_token_name,
+        lp_token_symbol,
+        lp_token_decimals
     from 
         {{ ref('silver__tarot_liquidity_pools') }}
     group by all
@@ -26,7 +27,11 @@ with asset_details as (
         token1_name as underlying_asset_address, 
         token1_symbol as underlying_asset_symbol,  
         token1_decimals as underlying_decimals,
-        ctarot
+        ctarot,
+        lp_token_address,
+        lp_token_name,
+        lp_token_symbol,
+        lp_token_decimals
     from 
         {{ ref('silver__tarot_liquidity_pools') }}
     group by all
@@ -43,9 +48,9 @@ log_pull as (
         origin_function_signature,
         contract_address,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-        CONCAT('0x', SUBSTR(topics[1] :: STRING, 25, 40)) AS sender,
-        CONCAT('0x', SUBSTR(topics[2] :: STRING, 25, 40)) AS borrower,
-        CONCAT('0x', SUBSTR(topics[3] :: STRING, 25, 40)) AS liquidator,
+        CONCAT('0x', SUBSTR(topics[1] :: STRING, 27, 40)) AS sender,
+        CONCAT('0x', SUBSTR(topics[2] :: STRING, 27, 40)) AS borrower,
+        CONCAT('0x', SUBSTR(topics[3] :: STRING, 27, 40)) AS liquidator,
         utils.udf_hex_to_int(
         segmented_data [0] :: STRING
         ) :: INTEGER AS seizeTokens_raw,
@@ -81,24 +86,24 @@ select
     origin_function_signature,
     contract_address,
     borrower,
-    a.ctarot as token,
-    'cTAROT' AS token_symbol,
+    a.token_address as token,
+    'bTarot' AS token_symbol,
     liquidator,
     seizeTokens_raw / pow(
       10,
       18
-    ) AS tokens_seized,
+    ) AS tokens_seized,--cTarot amount, which is based on the amount of LP tokens deposited
     contract_address as protocol_market,
-    asd2.token_symbol AS collateral_token_symbol,
-    asd2.underlying_asset_address AS collateral_token,
-    asd2.underlying_symbol AS collateral_symbol,
+    'cTarot' AS collateral_token_symbol,
+    a.lp_token_address AS collateral_token,
+    a.lp_token_symbol AS collateral_symbol,
     repayAmount_raw AS amount_unadj,
     repayAmount_raw / pow(
       10,
       a.underlying_decimals
     ) AS amount,
-    underlying_asset_address as received_contract_address,
-    underlying_asset_symbol as received_contract_symbol,
+    a.underlying_asset_address as received_contract_address,
+    a.underlying_asset_symbol as received_contract_symbol,
     'Tarot' as platform,
     _inserted_timestamp,
     _log_id
@@ -107,6 +112,6 @@ FROM
 LEFT JOIN 
     asset_details a
 ON
-    a.token_addres = l.contract_address  qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    a.token_address = l.contract_address  qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY
   _inserted_timestamp DESC)) = 1
