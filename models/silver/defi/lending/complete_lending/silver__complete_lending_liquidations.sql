@@ -270,9 +270,8 @@ FINAL AS (
     origin_function_signature,
     A.contract_address,
     CASE
-      WHEN platform = 'Compound V3' THEN 'AbsorbCollateral'
-      WHEN platform = 'Lodestar' THEN 'LiquidateBorrow'
-      WHEN platform = 'Silo' THEN 'Liquidate'
+      WHEN platform = 'Sonne' THEN 'LiquidateBorrow'
+      WHEN platform IN ('Tarot','Exactly') THEN 'Liquidate'
       ELSE 'LiquidationCall'
     END AS event_name,
     liquidator,

@@ -221,10 +221,7 @@ FINAL AS (
         origin_to_address,
         origin_function_signature,
         b.contract_address,
-        CASE
-            WHEN platform = 'Compound V3' THEN 'Withdraw'
-            ELSE 'Borrow'
-        END AS event_name,
+        'Borrow' AS event_name,
         borrower,
         protocol_market,
         b.token_address,

@@ -210,7 +210,7 @@ FINAL AS (
     origin_function_signature,
     A.contract_address,
     CASE
-      WHEN platform = 'Tarot' THEN 'Mint'
+      WHEN platform IN ('Tarot','Sonne') THEN 'Mint'
       WHEN platform = 'Aave V3' THEN 'Supply'
       ELSE 'Deposit'
     END AS event_name,

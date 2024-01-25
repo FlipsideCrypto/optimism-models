@@ -229,8 +229,7 @@ FINAL AS (
         origin_function_signature,
         A.contract_address,
         CASE
-            WHEN platform = 'Compound V3' THEN 'WithdrawCollateral'
-            WHEN platform = 'Lodestar' THEN 'Redeem'
+            WHEN platform IN ('Tarot','Sonne') THEN 'Redeem'
             ELSE 'Withdraw'
         END AS event_name,
         protocol_market,

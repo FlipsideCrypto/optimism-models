@@ -221,8 +221,7 @@ FINAL AS (
     origin_function_signature,
     A.contract_address,
     CASE
-      WHEN platform = 'Compound V3' THEN 'Supply'
-      WHEN platform = 'Lodestar' THEN 'RepayBorrow'
+      WHEN platform = 'Sonne' THEN 'RepayBorrow'
       ELSE 'Repay'
     END AS event_name,
     protocol_market,
