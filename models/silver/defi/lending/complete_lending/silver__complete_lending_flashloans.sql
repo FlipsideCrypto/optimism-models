@@ -6,7 +6,7 @@
   tags = ['non_realtime','reorg','curated']
 ) }}
 
-WITH flashloans AS (
+WITH aave_flashloans AS (
 
   SELECT
     tx_hash,
@@ -33,42 +33,7 @@ WITH flashloans AS (
   FROM
     {{ ref('silver__aave_flashloans') }}
 
-{% if is_incremental() %}
-WHERE
-  _inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
-    FROM
-      {{ this }}
-  )
-{% endif %}
-UNION ALL
-SELECT
-  tx_hash,
-  block_number,
-  block_timestamp,
-  event_index,
-  origin_from_address,
-  origin_to_address,
-  origin_function_signature,
-  contract_address,
-  radiant_market AS token_address,
-  radiant_token AS protocol_token,
-  flashloan_amount_unadj,
-  flashloan_amount,
-  premium_amount_unadj,
-  premium_amount,
-  initiator_address,
-  target_address,
-  platform,
-  symbol AS token_symbol,
-  blockchain,
-  _LOG_ID,
-  _INSERTED_TIMESTAMP
-FROM
-  {{ ref('silver__radiant_flashloans') }}
-
-{% if is_incremental() %}
+{% if is_incremental() and 'aave' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -78,6 +43,56 @@ WHERE
   )
 {% endif %}
 ),
+
+granary_flashloans as (
+  SELECT
+    tx_hash,
+    block_number,
+    block_timestamp,
+    event_index,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    contract_address,
+    granary_market AS token_address,
+    granary_token AS protocol_token,
+    flashloan_amount_unadj,
+    flashloan_amount,
+    premium_amount_unadj,
+    premium_amount,
+    initiator_address,
+    target_address,
+    platform,
+    symbol AS token_symbol,
+    blockchain,
+    _LOG_ID,
+    _INSERTED_TIMESTAMP
+  FROM
+    {{ ref('silver__granary_flashloans') }}
+
+{% if is_incremental() and 'granary' not in var('HEAL_CURATED_MODEL') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+
+flashloan_union as (
+  SELECT
+    *
+  FROM
+    aave_flashloans
+  UNION ALL
+  SELECT
+    *
+  FROM
+    granary_flashloans
+),
+
 FINAL AS (
   SELECT
     tx_hash,
@@ -111,7 +126,7 @@ FINAL AS (
     f._LOG_ID,
     f._INSERTED_TIMESTAMP
   FROM
-    flashloans f
+    flashloan_union f
     LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
     p
     ON f.token_address = p.token_address

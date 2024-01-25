@@ -6,82 +6,7 @@
   tags = ['non_realtime','reorg','curated']
 ) }}
 
-WITH liquidation_union AS (
-
-  SELECT
-    tx_hash,
-    block_number,
-    block_timestamp,
-    event_index,
-    origin_from_address,
-    origin_to_address,
-    origin_function_signature,
-    contract_address,
-    liquidator,
-    borrower,
-    amount_unadj,
-    liquidation_amount AS liquidated_amount,
-    NULL AS liquidated_amount_usd,
-    itoken AS protocol_collateral_asset,
-    liquidation_contract_address AS collateral_asset,
-    liquidation_contract_symbol AS collateral_asset_symbol,
-    collateral_token AS debt_asset,
-    collateral_symbol AS debt_asset_symbol,
-    platform,
-    'arbitrum' AS blockchain,
-    l._LOG_ID,
-    l._INSERTED_TIMESTAMP
-  FROM
-    {{ ref('silver__lodestar_liquidations') }}
-    l
-
-{% if is_incremental() %}
-WHERE
-  l._inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
-    FROM
-      {{ this }}
-  )
-{% endif %}
-UNION ALL
-  SELECT
-    tx_hash,
-    block_number,
-    block_timestamp,
-    event_index,
-    origin_from_address,
-    origin_to_address,
-    origin_function_signature,
-    contract_address,
-    liquidator,
-    borrower,
-    amount_unadj,
-    amount AS liquidated_amount,
-    NULL AS liquidated_amount_usd,
-    token AS protocol_collateral_asset,
-    liquidation_contract_address AS collateral_asset,
-    liquidation_contract_symbol AS collateral_asset_symbol,
-    collateral_token AS debt_asset,
-    collateral_symbol AS debt_asset_symbol,
-    platform,
-    'arbitrum' AS blockchain,
-    l._LOG_ID,
-    l._INSERTED_TIMESTAMP
-  FROM
-    {{ ref('silver__dforce_liquidations') }}
-    l
-
-{% if is_incremental() %}
-WHERE
-  l._inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
-    FROM
-      {{ this }}
-  )
-{% endif %}
-UNION ALL
+WITH aave_liquidations AS (
 SELECT
   tx_hash,
   block_number,
@@ -108,16 +33,18 @@ SELECT
 FROM
   {{ ref('silver__aave_liquidations') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'aave' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '12 hours'
+      MAX(_inserted_timestamp) - INTERVAL '36 hours'
     FROM
       {{ this }}
   )
 {% endif %}
-UNION ALL
+),
+
+granary_liquidations AS (
 SELECT
   tx_hash,
   block_number,
@@ -132,19 +59,19 @@ SELECT
   amount_unadj,
   amount AS liquidated_amount,
   NULL AS liquidated_amount_usd,
-  collateral_radiant_token AS protocol_collateral_asset,
+  collateral_granary_token AS protocol_collateral_asset,
   collateral_asset,
   collateral_token_symbol AS collateral_asset_symbol,
   debt_asset,
   debt_token_symbol AS debt_asset_symbol,
-  platform,
+  'Granary' AS platform,
   'arbitrum' AS blockchain,
   _LOG_ID,
   _INSERTED_TIMESTAMP
 FROM
-  {{ ref('silver__radiant_liquidations') }}
+  {{ ref('silver__granary_liquidations') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'granary' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -153,71 +80,37 @@ WHERE
       {{ this }}
   )
 {% endif %}
-UNION ALL
-SELECT
-  tx_hash,
-  block_number,
-  block_timestamp,
-  event_index,
-  origin_from_address,
-  origin_to_address,
-  origin_function_signature,
-  contract_address,
-  receiver_address AS liquidator,
-  depositor_address AS borrower,
-  amount_unadj,
-  amount AS liquidated_amount,
-  NULL AS liquidated_amount_usd,
-  protocol_collateral_token AS protocol_collateral_asset,
-  token_address AS collateral_asset,
-  token_symbol AS collateral_asset_symbol,
-  debt_asset,
-  debt_asset_symbol,
-  platform,
-  'arbitrum' AS blockchain,
-  _LOG_ID,
-  _INSERTED_TIMESTAMP
-FROM
-  {{ ref('silver__silo_liquidations') }}
+),
 
-{% if is_incremental() %}
-WHERE
-  _inserted_timestamp >= (
+exactly_liquidations as (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
-    FROM
-      {{ this }}
-  )
-{% endif %}
-UNION ALL
-SELECT
-  tx_hash,
-  block_number,
-  block_timestamp,
-  event_index,
-  origin_from_address,
-  origin_to_address,
-  origin_function_signature,
-  contract_address,
-  absorber AS liquidator,
-  borrower,
-  amount_unadj,
-  amount AS liquidated_amount,
-  amount_usd AS liquidated_amount_usd,
-  compound_market AS protocol_collateral_asset,
-  token_address AS collateral_asset,
-  token_symbol AS collateral_asset_symbol,
-  debt_asset,
-  debt_asset_symbol,
-  l.compound_version AS platform,
-  'arbitrum' AS blockchain,
-  l._LOG_ID,
-  l._INSERTED_TIMESTAMP
-FROM
-  {{ ref('silver__comp_liquidations') }}
-  l
+    tx_hash,
+    block_number,
+    block_timestamp,
+    event_index,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    contract_address,
+    liquidator,
+    borrower,
+    amount_unadj,
+    amount AS liquidated_amount,
+    NULL AS liquidated_amount_usd,
+    token AS protocol_collateral_asset,
+    liquidation_contract_address AS collateral_asset,
+    liquidation_contract_symbol AS collateral_asset_symbol,
+    collateral_token AS debt_asset,
+    collateral_symbol AS debt_asset_symbol,
+    platform,
+    'arbitrum' AS blockchain,
+    l._LOG_ID,
+    l._INSERTED_TIMESTAMP
+  FROM
+    {{ ref('silver__exactly_liquidations') }}
+    l
 
-{% if is_incremental() %}
+{% if is_incremental() and 'exactly' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   l._inserted_timestamp >= (
     SELECT
@@ -227,6 +120,112 @@ WHERE
   )
 {% endif %}
 ),
+
+sonne_liquidations as (
+  SELECT
+    tx_hash,
+    block_number,
+    block_timestamp,
+    event_index,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    contract_address,
+    liquidator,
+    borrower,
+    amount_unadj,
+    amount AS liquidated_amount,
+    NULL AS liquidated_amount_usd,
+    token AS protocol_collateral_asset,
+    liquidation_contract_address AS collateral_asset,
+    liquidation_contract_symbol AS collateral_asset_symbol,
+    collateral_token AS debt_asset,
+    collateral_symbol AS debt_asset_symbol,
+    platform,
+    'arbitrum' AS blockchain,
+    l._LOG_ID,
+    l._INSERTED_TIMESTAMP
+  FROM
+    {{ ref('silver__sonne_liquidations') }}
+    l
+
+{% if is_incremental() and 'sonne' not in var('HEAL_CURATED_MODEL') %}
+WHERE
+  l._inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+
+tarot_liquidations as (
+  SELECT
+    tx_hash,
+    block_number,
+    block_timestamp,
+    event_index,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    contract_address,
+    liquidator,
+    borrower,
+    amount_unadj,
+    amount AS liquidated_amount,
+    NULL AS liquidated_amount_usd,
+    token AS protocol_collateral_asset,
+    liquidation_contract_address AS collateral_asset,
+    liquidation_contract_symbol AS collateral_asset_symbol,
+    collateral_token AS debt_asset,
+    collateral_symbol AS debt_asset_symbol,
+    platform,
+    'arbitrum' AS blockchain,
+    l._LOG_ID,
+    l._INSERTED_TIMESTAMP
+  FROM
+    {{ ref('silver__tarot_liquidations') }}
+    l
+
+{% if is_incremental() and 'tarot' not in var('HEAL_CURATED_MODEL') %}
+WHERE
+  l._inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+
+liquidation_union as (
+    SELECT
+        *
+    FROM
+        aave_liquidations
+    UNION ALL
+    SELECT
+        *
+    FROM
+        granary_liquidations
+    UNION ALL
+    SELECT
+        *
+    FROM
+        exactly_liquidations
+    UNION ALL
+    SELECT
+        *
+    FROM
+        sonne_liquidations
+    UNION ALL
+    SELECT
+        *
+    FROM
+        tarot_liquidations
+),
+
 contracts AS (
   SELECT
     *
@@ -283,16 +282,10 @@ FINAL AS (
     collateral_asset_symbol AS collateral_token_symbol,
     amount_unadj,
     liquidated_amount AS amount,
-    CASE
-      WHEN platform <> 'Compound V3' THEN ROUND(
+    ROUND(
         liquidated_amount * p.price,
         2
-      )
-      ELSE ROUND(
-        liquidated_amount_usd,
-        2
-      )
-    END AS amount_usd,
+     ) AS amount_usd,
     debt_asset AS debt_token,
     debt_asset_symbol AS debt_token_symbol,
     platform,

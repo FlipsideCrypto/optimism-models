@@ -30,7 +30,7 @@ WITH aave_borrows AS (
     FROM
         {{ ref('silver__aave_borrows') }} A
 
-{% if is_incremental() %}
+{% if is_incremental() and 'aave' not in var('HEAL_CURATED_MODEL') %}
 WHERE
     A._inserted_timestamp >= (
         SELECT
@@ -42,8 +42,8 @@ WHERE
     )
 {% endif %}
 ),
-
 granary_borrows as (
+
     SELECT
         tx_hash,
         block_number,
@@ -54,8 +54,8 @@ granary_borrows as (
         origin_function_signature,
         contract_address,
         borrower_address AS borrower,
-        radiant_token AS protocol_market,
-        radiant_market AS token_address,
+        granary_token AS protocol_market,
+        granary_market AS token_address,
         symbol AS token_symbol,
         amount_unadj,
         amount,
@@ -64,9 +64,9 @@ granary_borrows as (
         A._LOG_ID,
         A._INSERTED_TIMESTAMP
     FROM
-        {{ ref('silver__radiant_borrows') }} A
+        {{ ref('silver__granary_borrows') }} A
 
-    {% if is_incremental() %}
+{% if is_incremental() and 'granary' not in var('HEAL_CURATED_MODEL') %}
     WHERE
         A._inserted_timestamp >= (
             SELECT
@@ -89,11 +89,11 @@ exactly_borrows as (
         origin_function_signature,
         contract_address,
         borrower,
-        itoken AS protocol_market,
+        token_address AS protocol_market,
         borrows_contract_address AS token_address,
         borrows_contract_symbol AS token_symbol,
         amount_unadj,
-        loan_amount AS amount,
+        amount,
         platform,
         'arbitrum' AS blockchain,
         A._LOG_ID,
@@ -101,7 +101,7 @@ exactly_borrows as (
     FROM
         {{ ref('silver__exactly_borrows') }} A
 
-{% if is_incremental() %}
+{% if is_incremental() and 'exactly' not in var('HEAL_CURATED_MODEL') %}
 WHERE
     A._inserted_timestamp >= (
         SELECT
@@ -137,7 +137,7 @@ sonne_borrows as (
     FROM
         {{ ref('silver__sonne_borrows') }} A
 
-{% if is_incremental() %}
+{% if is_incremental() and 'sonne' not in var('HEAL_CURATED_MODEL') %}
 WHERE
     A._inserted_timestamp >= (
         SELECT
@@ -160,22 +160,22 @@ tarot_borrows as (
         origin_function_signature,
         contract_address,
         borrower,
-        compound_market AS protocol_market,
-        token_address,
-        token_symbol,
+        token_address AS protocol_market,
+        borrows_contract_address AS token_address,
+        borrows_contract_symbol AS token_symbol,
         amount_unadj,
         amount,
-        compound_version AS platform,
+        platform,
         'arbitrum' AS blockchain,
-        l._LOG_ID,
-        l._INSERTED_TIMESTAMP
+        A._LOG_ID,
+        A._INSERTED_TIMESTAMP
     FROM
-        {{ ref('silver__tarot_borrows') }}
-        l
+        {{ ref('silver__tarot_borrows') }} A
+        
 
-{% if is_incremental() %}
+{% if is_incremental() and 'tarot' not in var('HEAL_CURATED_MODEL') %}
 WHERE
-    l._inserted_timestamp >= (
+    a._inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
@@ -184,6 +184,32 @@ WHERE
             {{ this }}
     )
 {% endif %}
+),
+borrow_union as (
+    SELECT
+        *
+    FROM
+        aave_borrows
+    UNION ALL
+    SELECT
+        *
+    FROM
+        granary_borrows
+    UNION ALL
+    SELECT
+        *
+    FROM
+        exactly_borrows
+    UNION ALL
+    SELECT
+        *
+    FROM
+        sonne_borrows
+    UNION ALL
+    SELECT
+        *
+    FROM
+        tarot_borrows
 ),
 FINAL AS (
     SELECT
