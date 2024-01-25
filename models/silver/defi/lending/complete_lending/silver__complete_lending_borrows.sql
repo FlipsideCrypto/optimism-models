@@ -95,7 +95,7 @@ exactly_borrows as (
         amount_unadj,
         amount,
         platform,
-        'arbitrum' AS blockchain,
+        'optimism' AS blockchain,
         A._LOG_ID,
         A._INSERTED_TIMESTAMP
     FROM
@@ -131,7 +131,7 @@ sonne_borrows as (
         amount_unadj,
         amount,
         platform,
-        'arbitrum' AS blockchain,
+        'optimism' AS blockchain,
         A._LOG_ID,
         A._INSERTED_TIMESTAMP
     FROM
@@ -166,7 +166,7 @@ tarot_borrows as (
         amount_unadj,
         amount,
         platform,
-        'arbitrum' AS blockchain,
+        'optimism' AS blockchain,
         A._LOG_ID,
         A._INSERTED_TIMESTAMP
     FROM

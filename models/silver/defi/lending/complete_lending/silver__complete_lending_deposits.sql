@@ -24,7 +24,7 @@ WITH aave_deposits AS (
     amount_unadj,
     amount,
     platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -58,7 +58,7 @@ granary_deposits as (
     amount_unadj,
     amount,
     platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -91,7 +91,7 @@ exactly_deposits as (
     amount_unadj,
     amount,
     platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -124,7 +124,7 @@ sonne_deposits as (
     amount_unadj,
     amount,
     platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -157,7 +157,7 @@ tarot_deposits as (
     amount_unadj,
     amount,
     platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM

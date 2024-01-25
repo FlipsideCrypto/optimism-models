@@ -42,7 +42,7 @@ sonne_borrows AS (
       segmented_data [3] :: STRING
     ) :: INTEGER AS totalBorrows,
     contract_address AS token,
-    'sonne' AS platform,
+    'Sonne' AS platform,
     _inserted_timestamp,
     _log_id
   FROM

@@ -42,7 +42,7 @@ sonne_liquidations AS (
       segmented_data [2] :: STRING
     ) :: INTEGER AS repayAmount_raw,
     CONCAT('0x', SUBSTR(segmented_data [3] :: STRING, 25, 40)) AS tokenCollateral,
-    'sonne' AS platform,
+    'Sonne' AS platform,
     _inserted_timestamp,
     _log_id
   FROM

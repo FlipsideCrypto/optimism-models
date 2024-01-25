@@ -25,7 +25,7 @@ WITH aave_repayments AS (
     payer AS payer_address,
     borrower,
     'Aave V3' AS platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -95,7 +95,7 @@ exactly_repayments as (
     payer AS payer_address,
     borrower,
     platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -130,7 +130,7 @@ sonne_repayments as (
     payer AS payer_address,
     borrower,
     platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -166,7 +166,7 @@ tarot_repayments as (
       payer AS payer_address,
       borrower,
       platform,
-      'arbitrum' AS blockchain,
+      'optimism' AS blockchain,
       _LOG_ID,
       _INSERTED_TIMESTAMP
   FROM

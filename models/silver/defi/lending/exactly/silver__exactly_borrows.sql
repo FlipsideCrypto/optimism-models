@@ -38,7 +38,7 @@ sonne_borrows AS (
     0 AS accountBorrows,
     0 AS totalBorrows,
     contract_address AS token,
-    'sonne' AS platform,
+    'Exactly' AS platform,
     _inserted_timestamp,
     _log_id
   FROM

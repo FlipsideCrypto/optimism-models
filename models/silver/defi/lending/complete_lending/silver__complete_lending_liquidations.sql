@@ -27,7 +27,7 @@ SELECT
   debt_asset,
   debt_token_symbol AS debt_asset_symbol,
   'Aave V3' AS platform,
-  'arbitrum' AS blockchain,
+  'optimism' AS blockchain,
   _LOG_ID,
   _INSERTED_TIMESTAMP
 FROM
@@ -65,7 +65,7 @@ SELECT
   debt_asset,
   debt_token_symbol AS debt_asset_symbol,
   'Granary' AS platform,
-  'arbitrum' AS blockchain,
+  'optimism' AS blockchain,
   _LOG_ID,
   _INSERTED_TIMESTAMP
 FROM
@@ -103,7 +103,7 @@ exactly_liquidations as (
     collateral_token AS debt_asset,
     collateral_symbol AS debt_asset_symbol,
     platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     l._LOG_ID,
     l._INSERTED_TIMESTAMP
   FROM
@@ -142,7 +142,7 @@ sonne_liquidations as (
     collateral_token AS debt_asset,
     collateral_symbol AS debt_asset_symbol,
     platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     l._LOG_ID,
     l._INSERTED_TIMESTAMP
   FROM
@@ -181,7 +181,7 @@ tarot_liquidations as (
     collateral_token AS debt_asset,
     collateral_symbol AS debt_asset_symbol,
     platform,
-    'arbitrum' AS blockchain,
+    'optimism' AS blockchain,
     l._LOG_ID,
     l._INSERTED_TIMESTAMP
   FROM
