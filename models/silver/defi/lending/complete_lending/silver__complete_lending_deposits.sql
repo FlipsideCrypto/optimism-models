@@ -163,7 +163,7 @@ tarot_deposits as (
   FROM
     {{ ref('silver__tarot_deposits') }}
 
-
+{% if is_incremental() and 'tarot' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
