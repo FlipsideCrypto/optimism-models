@@ -20,15 +20,15 @@ WITH flashloan AS (
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS target_address,
         origin_to_address AS initiator_address,
-        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS granary_market,
+        CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS granary_market,
         utils.udf_hex_to_int(
-            segmented_data [1] :: STRING
+            segmented_data [0] :: STRING
         ) :: INTEGER AS flashloan_quantity,
         utils.udf_hex_to_int(
-            segmented_data [3] :: STRING
+            segmented_data [1] :: STRING
         ) :: INTEGER AS premium_quantity,
         utils.udf_hex_to_int(
-            topics [3] :: STRING
+            topics [2] :: STRING
         ) :: INTEGER AS refferalCode,
         COALESCE(
             origin_to_address,
