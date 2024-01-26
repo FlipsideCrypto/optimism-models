@@ -50,12 +50,12 @@ There is more information on how to use dbt docs in the last section of this doc
 - [ez_bridge_activity](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_bridge_activity)
 - [dim_dex_liquidity_pools](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__dim_dex_liquidity_pools)
 - [ez_dex_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_dex_swaps)
-- [ez_borrows](https://flipsidecrypto.github.io/optimism-models/#!/model/model.arbitrum_models.defi__ez_borrows) 
-- [ez_deposits](https://flipsidecrypto.github.io/optimism-models/#!/model/model.arbitrum_models.defi__ez_deposits)
-- [ez_flashloans](https://flipsidecrypto.github.io/optimism-models/#!/model/model.arbitrum_models.defi__ez_flashloans)
-- [ez_liquidations](https://flipsidecrypto.github.io/optimism-models/#!/model/model.arbitrum_models.defi__ez_liquidations)
-- [ez_repayments](https://flipsidecrypto.github.io/optimism-models/#!/model/model.arbitrum_models.defi__ez_repayments)
-- [ez_withdraws](https://flipsidecrypto.github.io/optimism-models/#!/model/model.arbitrum_models.defi__ez_withdraws)
+- [ez_borrows](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_borrows) 
+- [ez_deposits](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_deposits)
+- [ez_flashloans](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_flashloans)
+- [ez_liquidations](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_liquidations)
+- [ez_repayments](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_repayments)
+- [ez_withdraws](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_withdraws)
 
 **Velodrome**
  - [ez_claimed_rewards](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_claimed_rewards)
