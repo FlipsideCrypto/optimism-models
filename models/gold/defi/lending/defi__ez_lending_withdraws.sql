@@ -5,7 +5,7 @@
     meta={
         'database_tags':{
             'table': {
-                'PROTOCOL': 'SONNE, AAVE, GRANARY, TAROT, EXACTLY'
+                'PROTOCOL': 'SONNE, AAVE, GRANARY, TAROT, EXACTLY',
                 'PURPOSE': 'LENDING, WITHDRAWS'
             }
         }
