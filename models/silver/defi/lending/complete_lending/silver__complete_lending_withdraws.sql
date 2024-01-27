@@ -3,10 +3,10 @@
     incremental_strategy = 'delete+insert',
     unique_key = ['block_number','platform'],
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['non_realtime','reorg','curated']
+    tags = ['reorg','curated']
 ) }}
 
-WITH aave_withdraws AS (
+WITH aave as (
 
     SELECT
         tx_hash,
@@ -43,7 +43,7 @@ WHERE
 {% endif %}
 ),
 
-granary_withdraws as (
+granary as (
 
     SELECT
         tx_hash,
@@ -80,7 +80,7 @@ granary_withdraws as (
     {% endif %}
 ),
 
-exactly_withdraws as (
+exactly as (
     SELECT
         tx_hash,
         block_number,
@@ -116,7 +116,7 @@ exactly_withdraws as (
     {% endif %}
 ),
 
-sonne_withdraws as (
+sonne as (
         
     SELECT
         tx_hash,
@@ -153,7 +153,7 @@ sonne_withdraws as (
     {% endif %}
 ),
 
-tarot_withdraws as (
+tarot as (
 
     SELECT
         tx_hash,
@@ -195,27 +195,27 @@ withdraws_union as (
     SELECT
         *
     FROM
-        aave_withdraws
+        aave
     UNION ALL
     SELECT
         *
     FROM
-        granary_withdraws
+        granary
     UNION ALL
     SELECT
         *
     FROM
-        exactly_withdraws
+        exactly
     UNION ALL
     SELECT
         *
     FROM
-        sonne_withdraws
+        sonne
     UNION ALL
     SELECT
         *
     FROM
-        tarot_withdraws
+        tarot
 ),
 
 FINAL AS (

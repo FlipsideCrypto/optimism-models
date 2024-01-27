@@ -3,10 +3,10 @@
   incremental_strategy = 'delete+insert',
   unique_key = ['block_number','platform'],
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['non_realtime','reorg','curated']
+  tags = ['reorg','curated']
 ) }}
 
-WITH aave_liquidations AS (
+WITH aave as (
 SELECT
   tx_hash,
   block_number,
@@ -44,7 +44,7 @@ WHERE
 {% endif %}
 ),
 
-granary_liquidations AS (
+granary as (
 SELECT
   tx_hash,
   block_number,
@@ -82,7 +82,7 @@ WHERE
 {% endif %}
 ),
 
-exactly_liquidations as (
+exactly as (
     SELECT
     tx_hash,
     block_number,
@@ -121,7 +121,7 @@ WHERE
 {% endif %}
 ),
 
-sonne_liquidations as (
+sonne as (
   SELECT
     tx_hash,
     block_number,
@@ -160,7 +160,7 @@ WHERE
 {% endif %}
 ),
 
-tarot_liquidations as (
+tarot as (
   SELECT
     tx_hash,
     block_number,
@@ -203,27 +203,27 @@ liquidation_union as (
     SELECT
         *
     FROM
-        aave_liquidations
+        aave
     UNION ALL
     SELECT
         *
     FROM
-        granary_liquidations
+        granary
     UNION ALL
     SELECT
         *
     FROM
-        exactly_liquidations
+        exactly
     UNION ALL
     SELECT
         *
     FROM
-        sonne_liquidations
+        sonne
     UNION ALL
     SELECT
         *
     FROM
-        tarot_liquidations
+        tarot
 ),
 
 contracts AS (

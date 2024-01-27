@@ -5,8 +5,7 @@
   cluster_by = ['block_timestamp::DATE'],
   tags = ['reorg','curated']
 ) }}
--- pull all token addresses and corresponding name
--- add the collateral liquidated here
+
 WITH asset_details AS (
 
   SELECT

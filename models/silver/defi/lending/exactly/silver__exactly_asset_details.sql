@@ -64,10 +64,6 @@ contract_pull AS (
         C.token_symbol,
         C.token_decimals,
         t.underlying_asset,
-        {# CASE
-            WHEN l.contract_address = LOWER('0xf7B5965f5C117Eb1B5450187c9DcFccc3C317e8E') THEN '0x4200000000000000000000000000000000000006' --WETH
-            ELSE t.underlying_asset
-        END AS underlying_asset, #}
         l._inserted_timestamp,
         l._log_id
     FROM

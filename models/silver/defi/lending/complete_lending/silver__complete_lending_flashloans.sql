@@ -3,10 +3,10 @@
   incremental_strategy = 'delete+insert',
   unique_key = ['block_number','platform'],
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['non_realtime','reorg','curated']
+  tags = ['reorg','curated']
 ) }}
 
-WITH aave_flashloans AS (
+WITH aave as (
 
   SELECT
     tx_hash,
@@ -44,7 +44,7 @@ WHERE
 {% endif %}
 ),
 
-granary_flashloans as (
+granary as (
   SELECT
     tx_hash,
     block_number,
@@ -85,12 +85,12 @@ flashloan_union as (
   SELECT
     *
   FROM
-    aave_flashloans
+    aave
   UNION ALL
   SELECT
     *
   FROM
-    granary_flashloans
+    granary
 ),
 
 FINAL AS (

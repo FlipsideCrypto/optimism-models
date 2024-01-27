@@ -3,10 +3,10 @@
     incremental_strategy = 'delete+insert',
     unique_key = ['block_number','platform'],
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['non_realtime','reorg','curated']
+    tags = ['reorg','curated']
 ) }}
 
-WITH aave_borrows AS (
+WITH aave AS (
 
     SELECT
         tx_hash,
@@ -42,8 +42,7 @@ WHERE
     )
 {% endif %}
 ),
-granary_borrows as (
-
+granary AS (
     SELECT
         tx_hash,
         block_number,
@@ -67,18 +66,18 @@ granary_borrows as (
         {{ ref('silver__granary_borrows') }} A
 
 {% if is_incremental() and 'granary' not in var('HEAL_CURATED_MODEL') %}
-    WHERE
-        A._inserted_timestamp >= (
-            SELECT
-                MAX(
-                    _inserted_timestamp
-                ) - INTERVAL '36 hours'
-            FROM
-                {{ this }}
-        )
-    {% endif %}
+WHERE
+    A._inserted_timestamp >= (
+        SELECT
+            MAX(
+                _inserted_timestamp
+            ) - INTERVAL '36 hours'
+        FROM
+            {{ this }}
+    )
+{% endif %}
 ),
-exactly_borrows as (
+exactly AS (
     SELECT
         tx_hash,
         block_number,
@@ -112,9 +111,8 @@ WHERE
             {{ this }}
     )
 {% endif %}
-
 ),
-sonne_borrows as (
+sonne AS (
     SELECT
         tx_hash,
         block_number,
@@ -149,7 +147,7 @@ WHERE
     )
 {% endif %}
 ),
-tarot_borrows as (
+tarot AS (
     SELECT
         tx_hash,
         block_number,
@@ -171,11 +169,10 @@ tarot_borrows as (
         A._INSERTED_TIMESTAMP
     FROM
         {{ ref('silver__tarot_borrows') }} A
-        
 
 {% if is_incremental() and 'tarot' not in var('HEAL_CURATED_MODEL') %}
 WHERE
-    a._inserted_timestamp >= (
+    A._inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
@@ -185,31 +182,31 @@ WHERE
     )
 {% endif %}
 ),
-borrow_union as (
+borrow_union AS (
     SELECT
         *
     FROM
-        aave_borrows
+        aave
     UNION ALL
     SELECT
         *
     FROM
-        granary_borrows
+        granary
     UNION ALL
     SELECT
         *
     FROM
-        exactly_borrows
+        exactly
     UNION ALL
     SELECT
         *
     FROM
-        sonne_borrows
+        sonne
     UNION ALL
     SELECT
         *
     FROM
-        tarot_borrows
+        tarot
 ),
 FINAL AS (
     SELECT

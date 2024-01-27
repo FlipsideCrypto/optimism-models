@@ -3,10 +3,10 @@
   incremental_strategy = 'delete+insert',
   unique_key = ['block_number','platform'],
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['non_realtime','reorg','curated']
+  tags = ['reorg','curated']
 ) }}
 
-WITH aave_deposits AS (
+WITH aave AS (
 
   SELECT
     tx_hash,
@@ -40,8 +40,7 @@ WHERE
   )
 {% endif %}
 ),
-granary_deposits as (
-
+granary AS (
   SELECT
     tx_hash,
     block_number,
@@ -74,7 +73,7 @@ WHERE
   )
 {% endif %}
 ),
-exactly_deposits as (
+exactly AS (
   SELECT
     tx_hash,
     block_number,
@@ -107,7 +106,7 @@ WHERE
   )
 {% endif %}
 ),
-sonne_deposits as (
+sonne AS (
   SELECT
     tx_hash,
     block_number,
@@ -140,7 +139,7 @@ WHERE
   )
 {% endif %}
 ),
-tarot_deposits as (
+tarot AS (
   SELECT
     tx_hash,
     block_number,
@@ -173,31 +172,31 @@ WHERE
   )
 {% endif %}
 ),
-deposit_union as (
-    SELECT
-        *
-    FROM
-        aave_deposits
-    UNION ALL
-    SELECT
-        *
-    FROM
-        granary_deposits
-    UNION ALL
-    SELECT
-        *
-    FROM
-        exactly_deposits
-    UNION ALL
-    SELECT
-        *
-    FROM
-        sonne_deposits
-    UNION ALL
-    SELECT
-        *
-    FROM
-        tarot_deposits
+deposit_union AS (
+  SELECT
+    *
+  FROM
+    aave
+  UNION ALL
+  SELECT
+    *
+  FROM
+    granary
+  UNION ALL
+  SELECT
+    *
+  FROM
+    exactly
+  UNION ALL
+  SELECT
+    *
+  FROM
+    sonne
+  UNION ALL
+  SELECT
+    *
+  FROM
+    tarot
 ),
 FINAL AS (
   SELECT
@@ -210,7 +209,10 @@ FINAL AS (
     origin_function_signature,
     A.contract_address,
     CASE
-      WHEN platform IN ('Tarot','Sonne') THEN 'Mint'
+      WHEN platform IN (
+        'Tarot',
+        'Sonne'
+      ) THEN 'Mint'
       WHEN platform = 'Aave V3' THEN 'Supply'
       ELSE 'Deposit'
     END AS event_name,
@@ -241,13 +243,13 @@ FINAL AS (
     ON A.token_address = C.contract_address
 )
 SELECT
-      *,
-    {{ dbt_utils.generate_surrogate_key(
-        ['tx_hash','event_index']
-    ) }} AS complete_lending_deposits_id,
-    SYSDATE() AS inserted_timestamp,
-    SYSDATE() AS modified_timestamp,
-    '{{ invocation_id }}' AS _invocation_id
+  *,
+  {{ dbt_utils.generate_surrogate_key(
+    ['tx_hash','event_index']
+  ) }} AS complete_lending_deposits_id,
+  SYSDATE() AS inserted_timestamp,
+  SYSDATE() AS modified_timestamp,
+  '{{ invocation_id }}' AS _invocation_id
 FROM
   FINAL qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY

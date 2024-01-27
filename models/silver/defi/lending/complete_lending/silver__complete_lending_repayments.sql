@@ -3,10 +3,10 @@
   incremental_strategy = 'delete+insert',
   unique_key = ['block_number','platform'],
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['non_realtime','reorg','curated']
+  tags = ['reorg','curated']
 ) }}
 
-WITH aave_repayments AS (
+WITH aave as (
 
   SELECT
     tx_hash,
@@ -41,7 +41,7 @@ WHERE
 {% endif %}
 ),
 
-granary_repayments as (
+granary as (
 
   SELECT
     tx_hash,
@@ -77,7 +77,7 @@ granary_repayments as (
   {% endif %}
 ),
 
-exactly_repayments as (
+exactly as (
   SELECT
     tx_hash,
     block_number,
@@ -112,7 +112,7 @@ exactly_repayments as (
   {% endif %}
 ),
 
-sonne_repayments as (
+sonne as (
   SELECT
     tx_hash,
     block_number,
@@ -147,7 +147,7 @@ sonne_repayments as (
   {% endif %}
 ),
 
-tarot_repayments as (
+tarot as (
 
   SELECT
       tx_hash,
@@ -188,27 +188,27 @@ repayments_union as (
     SELECT
         *
     FROM
-        aave_repayments
+        aave
     UNION ALL
     SELECT
         *
     FROM
-        granary_repayments
+        granary
     UNION ALL
     SELECT
         *
     FROM
-        exactly_repayments
+        exactly
     UNION ALL
     SELECT
         *
     FROM
-        sonne_repayments
+        sonne
     UNION ALL
     SELECT
         *
     FROM
-        tarot_repayments
+        tarot
 ),
 FINAL AS (
   SELECT
