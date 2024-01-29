@@ -10,7 +10,7 @@ with asset_details as (
 
     select 
         borrowable1 as token_address,
-        token0_name as underlying_asset_address, 
+        token0 as underlying_asset_address, 
         token0_symbol as underlying_asset_symbol,  
         token0_decimals as underlying_decimals,
         ctarot,
@@ -24,7 +24,7 @@ with asset_details as (
     UNION ALL
     select 
         borrowable2 as token_address,
-        token1_name as underlying_asset_address, 
+        token1 as underlying_asset_address, 
         token1_symbol as underlying_asset_symbol,  
         token1_decimals as underlying_decimals,
         ctarot,

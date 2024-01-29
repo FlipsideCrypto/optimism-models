@@ -10,7 +10,7 @@ WITH asset_details AS (
 
     SELECT
         borrowable1 AS token_address,
-        token0_name AS underlying_asset_address,
+        token0 AS underlying_asset_address,
         token0_symbol AS underlying_asset_symbol,
         token0_decimals AS underlying_decimals
     FROM
@@ -20,7 +20,7 @@ WITH asset_details AS (
     UNION ALL
     SELECT
         borrowable2 AS token_address,
-        token1_name AS underlying_asset_address,
+        token1 AS underlying_asset_address,
         token1_symbol AS underlying_asset_symbol,
         token1_decimals AS underlying_decimals
     FROM
