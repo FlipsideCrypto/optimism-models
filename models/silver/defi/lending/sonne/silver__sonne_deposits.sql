@@ -33,10 +33,10 @@ sonne_deposits AS (
     contract_address AS token_address,
     regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
     utils.udf_hex_to_int(
-      segmented_data [3] :: STRING
+      segmented_data [2] :: STRING
     ) :: INTEGER AS minttokens_raw,
     utils.udf_hex_to_int(
-      segmented_data [2] :: STRING
+      segmented_data [1] :: STRING
     ) :: INTEGER AS mintAmount_raw,
     CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS supplier,
     'Sonne' AS platform,
