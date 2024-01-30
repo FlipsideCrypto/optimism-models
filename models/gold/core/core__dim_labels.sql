@@ -12,12 +12,7 @@ SELECT
     label_type,
     label_subtype,
     project_name,
-    COALESCE (
-        labels_id,
-        {{ dbt_utils.generate_surrogate_key(
-            ['address']
-        ) }}
-    ) AS dim_labels_id,
+    labels_combined_id AS dim_labels_id,
     COALESCE(
         inserted_timestamp,
         '2000-01-01'
