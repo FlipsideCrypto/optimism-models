@@ -41,6 +41,12 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
+AND contract_address NOT IN (
+    SELECT
+        atoken_address
+    FROM
+        {{ this }}
+)
 {% endif %}
 ),
 a_token_step_1 AS (
