@@ -44,7 +44,7 @@ models:
       - name: IDENTIFIER
         tests:
           - not_null
-      - name: ETH_VALUE
+      - name: VALUE
         tests:
           - not_null
 
