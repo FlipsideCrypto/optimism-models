@@ -126,4 +126,6 @@ FROM
     INNER JOIN debt_tokens b
     ON A.a_token_address = b.atoken_address
     INNER JOIN {{ ref('silver__contracts') }} C
-    ON contract_address = A.underlying_asset
+    ON contract_address = A.underlying_asset qualify(ROW_NUMBER() over(PARTITION BY atoken_address
+ORDER BY
+    a.atoken_created_block DESC)) = 1
