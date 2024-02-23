@@ -109,7 +109,7 @@ SELECT
         WHEN amount1Out <> 0 THEN token1
     END AS token_out,
     'Swap' AS event_name,
-    'uniswapv2' AS platform,
+    'uniswap-v2' AS platform,
     _log_id,
     _inserted_timestamp
 FROM
