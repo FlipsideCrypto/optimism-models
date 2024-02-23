@@ -1027,6 +1027,36 @@ all_dex_standard AS (
     _log_id,
     _inserted_timestamp
   FROM
+    univ2_swaps
+  UNION ALL
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    contract_address,
+    pool_name,
+    event_name,
+    amount_in_unadj,
+    amount_in,
+    amount_out_unadj,
+    amount_out,
+    sender,
+    tx_to,
+    event_index,
+    platform,
+    version,
+    token_in,
+    token_out,
+    symbol_in,
+    symbol_out,
+    decimals_in,
+    decimals_out,
+    _log_id,
+    _inserted_timestamp
+  FROM
     synthetix_swaps
   UNION ALL
   SELECT
