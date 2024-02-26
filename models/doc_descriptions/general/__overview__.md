@@ -57,6 +57,9 @@ There is more information on how to use dbt docs in the last section of this doc
 - [ez_lending_repayments](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_lending_repayments)
 - [ez_lending_withdraws](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_lending_withdraws)
 
+### Stats Tables (ethereum.stats)
+- [ez_core_metrics_hourly](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.stats__ez_core_metrics_hourly)
+
 **Velodrome**
  - [ez_claimed_rewards](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_claimed_rewards)
  - [ez_lp_actions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_lp_actions)
