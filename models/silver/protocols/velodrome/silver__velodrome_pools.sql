@@ -2,8 +2,8 @@
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = 'created_block',
-    tags = ['curated'],
-    full_refresh = false
+    full_refresh = false,
+    tags = ['curated']
 ) }}
 
 WITH pool_creation AS (
@@ -31,7 +31,12 @@ WITH pool_creation AS (
         AND contract_address = '0x25cbddb98b35ab1ff77413456b31ec81a6b6b746' --velo deployer
 
 {% if is_incremental() %}
-
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(_inserted_timestamp) - INTERVAL '12 hours'
+    FROM
+        {{ this }}
+)
 {% endif %}
 ),
 function_sigs AS (
@@ -52,9 +57,6 @@ all_inputs AS (
         pool_address AS contract_address,
         block_number,
         function_sig,
-        (ROW_NUMBER() over (PARTITION BY pool_address
-    ORDER BY
-        block_number)) - 1 AS function_input,
         'pool' AS address_label
     FROM
         pool_creation
@@ -65,9 +67,6 @@ all_inputs AS (
         token0_address AS contract_address,
         block_number,
         function_sig,
-        (ROW_NUMBER() over (PARTITION BY token0_address
-    ORDER BY
-        block_number)) - 1 AS function_input,
         'token0' AS address_label
     FROM
         pool_creation
@@ -78,64 +77,88 @@ all_inputs AS (
         token1_address AS contract_address,
         block_number,
         function_sig,
-        (ROW_NUMBER() over (PARTITION BY token1_address
-    ORDER BY
-        block_number)) - 1 AS function_input,
         'token1' AS address_label
     FROM
         pool_creation
         JOIN function_sigs
         ON 1 = 1
 ),
-ready_reads_all AS (
+build_rpc_requests AS (
     SELECT
         contract_address,
         block_number,
         function_sig,
-        function_input,
-        CONCAT(
-            '[\'',
-            contract_address,
-            '\',',
-            block_number,
-            ',\'',
+        RPAD(
             function_sig,
-            '\',\'',
-            function_input,
-            '\']'
-        ) AS read_input
+            64,
+            '0'
+        ) AS input,
+        utils.udf_json_rpc_call(
+            'eth_call',
+            [{'to': contract_address, 'from': null, 'data': input}, utils.udf_int_to_hex(block_number)],
+            concat_ws(
+                '-',
+                contract_address,
+                input,
+                block_number
+            )
+        ) AS rpc_request,
+        ROW_NUMBER() over (
+            ORDER BY
+                block_number
+        ) AS row_no,
+        CEIL(
+            row_no / 300
+        ) AS batch_no
     FROM
         all_inputs
 ),
-batch_reads_all AS (
-    SELECT
-        CONCAT('[', LISTAGG(read_input, ','), ']') AS batch_read
-    FROM
-        ready_reads_all
-),
 all_reads AS (
+
+{% if is_incremental() %}
+{% for item in range(3) %}
+    (
     SELECT
-        ethereum.streamline.udf_json_rpc_read_calls(
-            node_url,
-            headers,
-            PARSE_JSON(batch_read)
-        ) AS read_output,
-        SYSDATE() AS _inserted_timestamp
+        live.udf_api('POST', CONCAT('{service}', '/', '{Authentication}'),{}, batch_rpc_request, 'Vault/prod/optimism/quicknode/mainnet') AS read_output, SYSDATE() AS _inserted_timestamp
     FROM
-        batch_reads_all
-        JOIN streamline.crosschain.node_mapping
-        ON 1 = 1
-        AND chain = 'optimism'
+        (
+    SELECT
+        ARRAY_AGG(rpc_request) batch_rpc_request
+    FROM
+        build_rpc_requests
     WHERE
-        EXISTS (
-            SELECT
-                1
-            FROM
-                ready_reads_all
-            LIMIT
-                1
-        )
-), reads_adjusted AS (
+        batch_no = {{ item }} + 1
+        AND batch_no IN (
+    SELECT
+        DISTINCT batch_no
+    FROM
+        build_rpc_requests))) {% if not loop.last %}
+        UNION ALL
+        {% endif %}
+    {% endfor %}
+{% else %}
+    {% for item in range(20) %}
+        (
+    SELECT
+        live.udf_api('POST', CONCAT('{service}', '/', '{Authentication}'),{}, batch_rpc_request, 'Vault/prod/optimism/quicknode/mainnet') AS read_output, SYSDATE() AS _inserted_timestamp
+    FROM
+        (
+    SELECT
+        ARRAY_AGG(rpc_request) batch_rpc_request
+    FROM
+        build_rpc_requests
+    WHERE
+        batch_no = {{ item }} + 1
+        AND batch_no IN (
+    SELECT
+        DISTINCT batch_no
+    FROM
+        build_rpc_requests))) {% if not loop.last %}
+        UNION ALL
+        {% endif %}
+    {% endfor %}
+{% endif %}),
+reads_adjusted AS (
     SELECT
         VALUE :id :: STRING AS read_id,
         VALUE :result :: STRING AS read_result,
@@ -144,14 +167,16 @@ all_reads AS (
             '-'
         ) AS read_id_object,
         read_id_object [0] :: STRING AS contract_address,
-        read_id_object [1] :: STRING AS block_number,
-        read_id_object [2] :: STRING AS function_sig,
-        read_id_object [3] :: STRING AS function_input,
+        read_id_object [2] :: STRING AS block_number,
+        LEFT(
+            read_id_object [1] :: STRING,
+            10
+        ) AS function_sig,
         _inserted_timestamp
     FROM
         all_reads,
-        LATERAL FLATTEN(
-            input => read_output [0] :data
+        LATERAL FLATTEN (
+            input => read_output :data
         )
 ),
 details AS (
