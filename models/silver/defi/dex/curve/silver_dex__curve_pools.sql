@@ -210,7 +210,7 @@ build_rpc_requests AS (
         ) AS rpc_request,
         row_num,
         CEIL(
-            row_num / 5
+            row_num / 50
         ) AS batch_no
     FROM
         all_inputs
