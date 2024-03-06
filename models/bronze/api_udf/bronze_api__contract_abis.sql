@@ -10,7 +10,9 @@ WITH base AS (
     SELECT
         contract_address
     FROM
-        {{ ref('silver__relevant_abi_contracts') }}
+        {{ ref('silver__relevant_contracts') }}
+    WHERE
+        total_interaction_count >= 100
 
 {% if is_incremental() %}
 EXCEPT
