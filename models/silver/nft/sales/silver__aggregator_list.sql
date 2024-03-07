@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'aggregator_identifier',
-    merge_update_columns = ['aggregator_identifier', 'aggregator', 'aggregator_type']
+    merge_update_columns = ['aggregator_identifier', 'aggregator', 'aggregator_type'],
+    full_refresh = false
 ) }}
 
 
