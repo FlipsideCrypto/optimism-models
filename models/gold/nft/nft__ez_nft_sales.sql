@@ -20,6 +20,7 @@ SELECT
     platform_address,
     platform_name,
     platform_exchange_version,
+    aggregator_name,
     seller_address,
     buyer_address,
     nft_address,
