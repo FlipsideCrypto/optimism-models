@@ -20,6 +20,8 @@ models:
         description: '{{ doc("nft_platform_name") }}' 
       - name: PLATFORM_EXCHANGE_VERSION
         description: '{{ doc("nft_platform_exchange_version") }}' 
+      - name: AGGREGATOR_NAME
+        description: '{{ doc("nft_aggregator_name") }}'
       - name: SELLER_ADDRESS
         description: '{{ doc("nft_seller_address") }}' 
       - name: BUYER_ADDRESS
