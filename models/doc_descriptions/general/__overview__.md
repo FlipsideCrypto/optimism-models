@@ -34,7 +34,7 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_l1_submissions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__fact_l1_submissions)
 
 **Convenience Tables:**
-- [ez_eth_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_eth_transfers)
+- [ez_native_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_native_transfers)
 - [ez_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_token_transfers)
 - [ez_decoded_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_decoded_event_logs)
 
