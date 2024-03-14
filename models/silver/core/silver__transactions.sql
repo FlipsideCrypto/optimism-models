@@ -159,6 +159,10 @@ new_records AS (
                 ) :: bigint
             ) + FLOOR(
                 r.l1_gas_price * r.l1_gas_used * r.l1_fee_scalar
+            ) + IFF(
+                r.l1_fee_scalar = 0,
+                r.l1_fee,
+                0
             ),
             18
         ) AS tx_fee_precise,
@@ -237,6 +241,10 @@ missing_data AS (
                 ) :: bigint
             ) + FLOOR(
                 r.l1_gas_price * r.l1_gas_used * r.l1_fee_scalar
+            ) + IFF(
+                r.l1_fee_scalar = 0,
+                r.l1_fee,
+                0
             ),
             18
         ) AS tx_fee_precise_heal,
