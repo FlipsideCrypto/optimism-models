@@ -37,6 +37,8 @@ SELECT
     total_fees_usd,
     platform_fee_usd,
     creator_fee_usd,
+    tx_fee, 
+    tx_fee_usd, 
     origin_from_address,
     origin_to_address,
     origin_function_signature,
