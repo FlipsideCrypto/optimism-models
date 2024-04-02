@@ -1,4 +1,4 @@
--- depends_on: {{ ref('silver__hourly_prices_priority') }}
+-- depends_on: {{ ref('silver__complete_token_prices') }}
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
@@ -203,7 +203,7 @@ heal_model AS (
                             SELECT
                                 1
                             FROM
-                                {{ ref('silver__hourly_prices_priority') }}
+                                {{ ref('silver__complete_token_prices') }}
                                 p
                             WHERE
                                 p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
