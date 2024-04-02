@@ -116,8 +116,14 @@ SELECT
     origin_to_address,
     A.contract_address AS contract_address,
     sender_address,
-    amount0_unadj,
-    amount1_unadj,
+    IFNULL(
+        amount0_unadj,
+        0
+    ) AS amount0_unadj,
+    IFNULL(
+        amount1_unadj,
+        0
+    ) AS amount1_unadj,
     lp_action,
     lp_token_action,
     function_type,
