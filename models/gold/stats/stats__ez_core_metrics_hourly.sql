@@ -32,6 +32,7 @@ SELECT
 FROM
     {{ ref('silver_stats__core_metrics_hourly') }}
     s
-    LEFT JOIN {{ ref('silver__hourly_prices_priority_eth') }}
+    LEFT JOIN {{ ref('silver__complete_token_prices') }}
     p
     ON s.block_timestamp_hour = p.hour
+    AND p.token_address = '0x4200000000000000000000000000000000000006'

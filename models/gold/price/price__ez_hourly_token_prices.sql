@@ -7,23 +7,17 @@
 SELECT
     HOUR,
     token_address,
+    id,
     symbol,
     decimals,
     price,
+    blockchain,
+    blockchain_name,
+    blockchain_id,
     is_imputed,
-	COALESCE (
-        hourly_prices_priority_id,
-        {{ dbt_utils.generate_surrogate_key(
-            ['token_address', 'hour']
-        ) }}
-    ) AS ez_hourly_token_prices_id,
-    COALESCE(
-        inserted_timestamp,
-        '2000-01-01'
-    ) AS inserted_timestamp,
-    COALESCE(
-        modified_timestamp,
-        '2000-01-01'
-    ) AS modified_timestamp
+    is_deprecated,
+    complete_token_prices_id AS ez_hourly_token_prices_id,
+    inserted_timestamp,
+    modified_timestamp
 FROM
-    {{ ref('silver__hourly_prices_priority') }}
+    {{ ref('silver__complete_token_prices') }}

@@ -34,6 +34,8 @@ sources:
       - name: asset_metadata_all_providers
       - name: near_address_encoded
       - name: labels_combined
+      - name: complete_token_asset_metadata
+      - name: complete_token_prices
   - name: crosschain_public
     database: crosschain
     schema: bronze_public
