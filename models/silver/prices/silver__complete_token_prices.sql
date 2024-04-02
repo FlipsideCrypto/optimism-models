@@ -24,9 +24,8 @@ SELECT
     modified_timestamp,
     complete_token_prices_id
 FROM
-    {{ source(
-        'silver_crosschain',
-        'complete_token_prices'
+    {{ ref(
+        'bronze__complete_token_prices'
     ) }}
 
 {% if is_incremental() %}

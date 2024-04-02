@@ -22,9 +22,8 @@ SELECT
     modified_timestamp,
     complete_token_asset_metadata_id
 FROM
-    {{ source(
-        'silver_crosschain',
-        'complete_token_asset_metadata'
+    {{ ref(
+        'bronze__complete_token_asset_metadata'
     ) }}
 
 {% if is_incremental() %}
