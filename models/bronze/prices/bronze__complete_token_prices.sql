@@ -15,6 +15,7 @@ SELECT
     is_imputed,
     is_deprecated,
     provider,
+    source,
     _inserted_timestamp,
     inserted_timestamp,
     modified_timestamp,
