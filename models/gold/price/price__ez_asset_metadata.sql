@@ -6,7 +6,6 @@
 
 SELECT
     token_address,
-    id,
     symbol,
     NAME,
     decimals,
