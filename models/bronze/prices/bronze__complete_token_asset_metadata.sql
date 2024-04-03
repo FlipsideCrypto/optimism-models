@@ -4,7 +4,7 @@
 
 SELECT
     token_address,
-    id,
+    asset_id,
     symbol,
     NAME,
     decimals,

@@ -7,7 +7,7 @@
 
 SELECT
     token_address,
-    id,
+    asset_id,
     symbol,
     NAME,
     decimals,
@@ -28,10 +28,10 @@ FROM
 
 {% if is_incremental() %}
 WHERE
-    _inserted_timestamp >= (
+    modified_timestamp >= (
         SELECT
             MAX(
-                _inserted_timestamp
+                modified_timestamp
             )
         FROM
             {{ this }}

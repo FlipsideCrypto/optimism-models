@@ -5,7 +5,7 @@
 SELECT
     HOUR,
     token_address,
-    id,
+    asset_id,
     symbol,
     decimals,
     price,
