@@ -81,7 +81,7 @@ broken_blocks AS (
     FROM
         {{ ref("silver__transactions") }}
         tx
-        LEFT JOIN {{ ref("core__fact_traces") }}
+        LEFT JOIN {{ ref("silver__traces") }}
         tr USING (
             block_number,
             tx_hash
@@ -109,22 +109,7 @@ SELECT
     blocks_tested,
     blocks_impacted_count,
     blocks_impacted_array,
-    CURRENT_TIMESTAMP() AS test_timestamp,    
-    IFF(
-        blocks_impacted_count > 0,
-        TRUE,
-        FALSE
-    ) AS overflowed,
-    IFF(
-        blocks_impacted_count > 0,
-        github_actions.workflow_dispatches(
-            'FlipsideCrypto',
-            'optimism-models',
-            'dbt_run_overflow_models.yml',
-            NULL
-        ) :status_code :: INT,
-        NULL
-    ) AS trigger_workflow
+    CURRENT_TIMESTAMP() AS test_timestamp
 FROM
     summary_stats
     JOIN impacted_blocks
