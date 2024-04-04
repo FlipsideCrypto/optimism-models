@@ -372,7 +372,11 @@ overflowed_traces AS (
         t._call_id,
         txs._inserted_timestamp AS _inserted_timestamp
     FROM
-        optimism_dev.silver.overflowed_traces_v2 t
+        {{ source(
+            'optimism_silver',
+            'overflowed_traces_v2'
+        ) }}
+        t
         LEFT JOIN {{ ref('silver__transactions') }}
         txs
         ON t.tx_position = txs.position
