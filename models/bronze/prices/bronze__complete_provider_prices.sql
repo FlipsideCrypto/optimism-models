@@ -3,26 +3,22 @@
 ) }}
 
 SELECT
-    token_address,
     asset_id,
-    symbol,
-    NAME,
-    decimals,
-    blockchain,
-    blockchain_name,
-    blockchain_id,
-    is_deprecated,
+    recorded_hour,
+    OPEN,
+    high,
+    low,
+    CLOSE,
     provider,
     source,
     _inserted_timestamp,
     inserted_timestamp,
     modified_timestamp,
-    complete_token_asset_metadata_id,
+    complete_provider_prices_id,
     _invocation_id
 FROM
     {{ source(
         'silver_crosschain',
-        'complete_token_asset_metadata'
+        'complete_provider_prices'
     ) }}
-WHERE
-    blockchain = 'optimism'
+-- prices for all ids
