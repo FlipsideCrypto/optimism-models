@@ -1,8 +1,10 @@
 {{ config (
-    materialized = "view"
+    materialized = "view",
+    tags = ['overflowed_traces']
 ) }}
 
 WITH impacted_blocks AS (
+    {#
 
     SELECT
         VALUE :: INT AS block_number
@@ -18,7 +20,15 @@ WITH impacted_blocks AS (
                 1
         ), LATERAL FLATTEN (
             input => blocks_impacted_array
-        )
+        ) #}
+    SELECT
+        DISTINCT block_number AS block_number
+    FROM
+        {{ source(
+            'optimism_silver',
+            'overflowed_traces'
+        ) }}
+        -- remove after backfill
 ),
 all_txs AS (
     SELECT
@@ -37,7 +47,7 @@ missing_txs AS (
         file_name
     FROM
         all_txs
-        LEFT JOIN {{ ref("core__fact_traces") }}
+        LEFT JOIN {{ ref("silver__traces") }}
         tr USING (
             block_number,
             tx_hash

@@ -1,5 +1,5 @@
-name: dbt_run_overflow_models
-run-name: dbt_run_overflow_models
+name: dbt_run_overflowed_traces
+run-name: dbt_run_overflowed_traces
 
 on:
   workflow_dispatch:
@@ -41,4 +41,4 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run -m "optimism_models,tag:overflow"
+          dbt run -m "optimism_models,tag:overflowed_traces" --vars '{"OVERFLOWED_TRACES":True}'

@@ -6,7 +6,7 @@
 SELECT
     *
 FROM
-    {{ ref('core__fact_traces') }}
+    {{ ref('silver__traces') }}
 WHERE
     block_number NOT IN (
         SELECT

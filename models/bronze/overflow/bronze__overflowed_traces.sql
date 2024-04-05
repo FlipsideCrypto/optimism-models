@@ -1,10 +1,11 @@
 {{ config (
-    materialized = "view"
+    materialized = "view",
+    tags = ['overflowed_traces']
 ) }}
 
 {% for item in range(
         1,
-        21
+        11
     ) %}
 
     SELECT
