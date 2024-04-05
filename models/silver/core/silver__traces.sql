@@ -374,7 +374,7 @@ overflowed_traces AS (
     FROM
         {{ source(
             'optimism_silver',
-            'overflowed_traces_v2'
+            'overflowed_traces'
         ) }}
         t
         LEFT JOIN {{ ref('silver__transactions') }}
