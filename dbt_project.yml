@@ -51,15 +51,6 @@ query-comment:
 models:
   +copy_grants: true
   +on_schema_change: "append_new_columns"
-  optimism_models:
-    silver:
-      overflow:
-        silver__overflowed_traces:
-          +snowflake_warehouse: "DBT_SNOWPARK"
-    bronze:
-      overflow:
-        bronze__overflowed_traces:
-          +snowflake_warehouse: "DBT_SNOWPARK"
 
 # In this example config, we tell dbt to build all models in the example/ directory
 # as tables. These settings can be overridden in the individual model files
