@@ -6,7 +6,9 @@
 ) }}
 
 SELECT
-    token_address,
+    LOWER(
+        A.token_address
+    ) AS token_address,
     asset_id,
     symbol,
     NAME,
@@ -25,7 +27,7 @@ SELECT
 FROM
     {{ ref(
         'bronze__complete_token_asset_metadata'
-    ) }}
+    ) }} A
 
 {% if is_incremental() %}
 WHERE
