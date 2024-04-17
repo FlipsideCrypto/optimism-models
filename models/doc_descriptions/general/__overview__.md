@@ -38,13 +38,11 @@ There is more information on how to use dbt docs in the last section of this doc
 - [ez_token_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_token_transfers)
 - [ez_decoded_event_logs](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.core__ez_decoded_event_logs)
 
-
 ### Price Tables (optimism.price)
-- [fact_hourly_token_prices](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__fact_hourly_token_prices)
-- [ez_hourly_token_prices](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__ez_hourly_token_prices)
-- [dim_asset_metadata](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__dim_asset_metadata)
+- [dim_asset_metadata_provider](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__dim_asset_metadata_provider)
+- [fact_prices_provider_hourly](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__fact_prices_provider_hourly)
 - [ez_asset_metadata](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__ez_asset_metadata)
-
+- [ez_prices_hourly](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.price__ez_prices_hourly)
 
 ### DeFi Tables (optimism.defi)
 - [ez_bridge_activity](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_bridge_activity)
