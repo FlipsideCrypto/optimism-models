@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: price__ez_prices_hourly
-    description: A convenience table for determining token prices by address and blockchain.
+    description: A convenience table for determining token prices by address and blockchain, and native asset prices by symbol and blockchain.
 
     columns:
       - name: HOUR
