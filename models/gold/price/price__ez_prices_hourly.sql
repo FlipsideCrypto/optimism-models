@@ -19,7 +19,7 @@ SELECT
     is_deprecated,
     inserted_timestamp,
     modified_timestamp,
-    complete_token_prices_id AS ez_hourly_token_prices_id
+    complete_token_prices_id AS ez_prices_hourly_id
 FROM
     {{ ref('silver__complete_token_prices') }}
 UNION ALL
@@ -38,6 +38,6 @@ SELECT
     is_deprecated,
     inserted_timestamp,
     modified_timestamp,
-    complete_native_prices_id AS ez_hourly_native_prices_id
+    complete_native_prices_id AS ez_prices_hourly_id
 FROM
     {{ ref('silver__complete_native_prices') }}
