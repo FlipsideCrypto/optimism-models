@@ -17,3 +17,9 @@ models:
       - name: RECORDED_HOUR
         tests:
           - not_null
+      - name: MODIFIED_TIMESTAMP
+        tests:
+          - not_null
+      - name: COMPLETE_PROVIDER_PRICES_ID
+        tests:
+          - unique

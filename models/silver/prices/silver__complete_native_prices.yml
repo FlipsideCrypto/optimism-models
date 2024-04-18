@@ -29,3 +29,9 @@ models:
       - name: _INSERTED_TIMESTAMP
         tests:
           - not_null
+      - name: MODIFIED_TIMESTAMP
+        tests:
+          - not_null
+      - name: COMPLETE_NATIVE_PRICES_ID
+        tests:
+          - unique

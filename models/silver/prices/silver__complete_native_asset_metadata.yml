@@ -16,3 +16,9 @@ models:
       - name: BLOCKCHAIN
         tests:
           - not_null
+      - name: MODIFIED_TIMESTAMP
+        tests:
+          - not_null
+      - name: COMPLETE_NATIVE_ASSET_METADATA_ID
+        tests:
+          - unique
