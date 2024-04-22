@@ -122,7 +122,7 @@ FINAL AS (
       2
     ) AS premium_amount_usd,
     platform,
-    blockchain,
+    f.blockchain,
     f._LOG_ID,
     f._INSERTED_TIMESTAMP
   FROM

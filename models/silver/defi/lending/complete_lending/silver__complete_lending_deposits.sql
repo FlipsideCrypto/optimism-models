@@ -227,7 +227,7 @@ FINAL AS (
       2
     ) AS amount_usd,
     platform,
-    blockchain,
+    A.blockchain,
     A._LOG_ID,
     A._INSERTED_TIMESTAMP
   FROM
