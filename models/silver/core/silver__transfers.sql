@@ -85,7 +85,7 @@ token_transfers AS (
         _inserted_timestamp
     FROM
         logs t
-        LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
+        LEFT JOIN {{ ref('price__ez_prices_hourly') }}
         p
         ON t.contract_address = p.token_address
         AND DATE_TRUNC(
@@ -147,7 +147,7 @@ heal_model AS (
     FROM
         {{ this }}
         t0
-        LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
+        LEFT JOIN {{ ref('price__ez_prices_hourly') }}
         p
         ON t0.contract_address = p.token_address
         AND DATE_TRUNC(

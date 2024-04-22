@@ -248,7 +248,7 @@ FINAL AS (
         A._inserted_timestamp
     FROM
         withdraws_union A
-        LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
+        LEFT JOIN {{ ref('price__ez_prices_hourly') }}
         p
         ON A.token_address = p.token_address
         AND DATE_TRUNC(
