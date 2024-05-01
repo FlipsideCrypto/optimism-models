@@ -59,7 +59,7 @@ SELECT
     ) AS modified_timestamp
 FROM
     {{ ref('silver__velodrome_locks') }} l 
-    LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
+    LEFT JOIN {{ ref('price__ez_prices_hourly') }}
     prices
     ON HOUR = DATE_TRUNC(
         'hour',

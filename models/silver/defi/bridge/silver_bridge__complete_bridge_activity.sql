@@ -646,7 +646,7 @@ FINAL AS (
         all_protocols b
         LEFT JOIN {{ ref('silver__contracts') }} C
         ON b.token_address = C.contract_address
-        LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
+        LEFT JOIN {{ ref('price__ez_prices_hourly') }}
         p
         ON b.token_address = p.token_address
         AND DATE_TRUNC(
