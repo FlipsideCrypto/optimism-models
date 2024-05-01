@@ -1,0 +1,8 @@
+version: 2
+models:
+  - name: github_actions__wf_in_progress
+    columns:
+      - name: DELTA_MINUTES
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 20
