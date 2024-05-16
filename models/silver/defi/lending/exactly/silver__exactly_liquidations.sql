@@ -55,6 +55,7 @@ exactly_liquidations AS (
         asset_details
     )
     AND topics [0] :: STRING = '0x67bb48f97d82192848c24158abf58ec614777328e19655e0a219652b773fd1db'
+    AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

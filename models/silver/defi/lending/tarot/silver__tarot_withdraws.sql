@@ -51,6 +51,7 @@ log_pull as (
         contract_address IN (SELECT TOKEN_ADDRESS FROM asset_details)
     AND
         topics [0] :: STRING = '0x3f693fff038bb8a046aa76d9516190ac7444f7d69cf952c4cbdc086fdef2d6fc'
+        AND tx_status = 'SUCCESS'
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
