@@ -38,13 +38,13 @@ WITH nft_base_models AS (
     FROM
         {{ ref('silver__quix_sales') }}
 
-{% if is_incremental() and 'quix' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'quix' not in var('HEAL_MODELS') %}
 WHERE
     _inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '36 hours'
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
         FROM
             {{ this }}
     )
@@ -80,13 +80,13 @@ SELECT
 FROM
     {{ ref('silver__quix_seaport_sales') }}
 
-{% if is_incremental() and 'quix_seaport' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'quix_seaport' not in var('HEAL_MODELS') %}
 WHERE
     _inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '36 hours'
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
         FROM
             {{ this }}
     )
@@ -122,13 +122,13 @@ SELECT
 FROM
     {{ ref('silver__seaport_1_1_sales') }}
 
-{% if is_incremental() and 'seaport_1_1' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seaport_1_1' not in var('HEAL_MODELS') %}
 WHERE
     _inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '36 hours'
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
         FROM
             {{ this }}
     )
@@ -164,13 +164,13 @@ SELECT
 FROM
     {{ ref('silver__seaport_1_4_sales') }}
 
-{% if is_incremental() and 'seaport_1_4' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seaport_1_4' not in var('HEAL_MODELS') %}
 WHERE
     _inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '36 hours'
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
         FROM
             {{ this }}
     )
@@ -206,13 +206,13 @@ SELECT
 FROM
     {{ ref('silver__seaport_1_5_sales') }}
 
-{% if is_incremental() and 'seaport_1_5' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seaport_1_5' not in var('HEAL_MODELS') %}
 WHERE
     _inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '36 hours'
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
         FROM
             {{ this }}
     )
@@ -248,13 +248,13 @@ SELECT
 FROM
     {{ ref('silver__seaport_1_6_sales') }}
 
-{% if is_incremental() and 'seaport_1_6' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seaport_1_6' not in var('HEAL_MODELS') %}
 WHERE
     _inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '36 hours'
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
         FROM
             {{ this }}
     )
@@ -557,7 +557,7 @@ heal_model AS (
                         SELECT
                             MAX(
                                 _inserted_timestamp
-                            ) - INTERVAL '36 hours'
+                            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
                         FROM
                             {{ this }}
                     )
@@ -585,7 +585,7 @@ heal_model AS (
                             SELECT
                                 MAX(
                                     _inserted_timestamp
-                                ) - INTERVAL '36 hours'
+                                ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
                             FROM
                                 {{ this }}
                         )
@@ -624,7 +624,7 @@ heal_model AS (
                                     SELECT
                                         MAX(
                                             _inserted_timestamp
-                                        ) - INTERVAL '36 hours'
+                                        ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
                                     FROM
                                         {{ this }}
                                 )

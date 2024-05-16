@@ -1,9 +1,10 @@
+-- depends_on: {{ ref('silver__complete_token_prices') }}
 {{ config(
-  materialized = 'incremental',
-  incremental_strategy = 'delete+insert',
-  unique_key = ['block_number','platform'],
-  cluster_by = ['block_timestamp::DATE'],
-  tags = ['reorg','curated']
+    materialized = 'incremental',
+    incremental_strategy = 'delete+insert',
+    unique_key = ['block_number','platform'],
+    cluster_by = ['block_timestamp::DATE'],
+    tags = ['reorg','curated','heal']
 ) }}
 
 WITH aave AS (
@@ -30,11 +31,11 @@ WITH aave AS (
   FROM
     {{ ref('silver__aave_deposits') }}
 
-{% if is_incremental() and 'aave' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'aave' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -63,11 +64,11 @@ granary AS (
   FROM
     {{ ref('silver__granary_deposits') }}
 
-{% if is_incremental() and 'granary' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'granary' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -96,11 +97,11 @@ exactly AS (
   FROM
     {{ ref('silver__exactly_deposits') }}
 
-{% if is_incremental() and 'exactly' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'exactly' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -129,11 +130,11 @@ sonne AS (
   FROM
     {{ ref('silver__sonne_deposits') }}
 
-{% if is_incremental() and 'sonne' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'sonne' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -162,11 +163,11 @@ tarot AS (
   FROM
     {{ ref('silver__tarot_deposits') }}
 
-{% if is_incremental() and 'tarot' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'tarot' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )

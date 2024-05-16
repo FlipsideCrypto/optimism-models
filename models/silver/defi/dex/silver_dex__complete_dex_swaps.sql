@@ -1,9 +1,10 @@
+-- depends_on: {{ ref('silver__complete_token_prices') }}
 {{ config(
   materialized = 'incremental',
   incremental_strategy = 'delete+insert',
   unique_key = ['block_number','platform','version'],
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['curated','reorg']
+  tags = ['curated','reorg','heal']
 ) }}
 
 WITH contracts AS (
@@ -123,11 +124,11 @@ univ3_swaps AS (
       block_timestamp
     ) = p2.hour
 
-{% if is_incremental() and 'univ3_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'univ3_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -175,11 +176,11 @@ univ2_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'univ2_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'univ2_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -250,11 +251,11 @@ hashflow_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'hashflow_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'hashflow_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -324,11 +325,11 @@ hashflow_v3_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'hashflow_v3_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'hashflow_v3_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -369,7 +370,7 @@ velodrome_swaps AS (
     {{ ref('velodrome__ez_swaps') }}
     s
 
-{% if is_incremental() and 'velodrome_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'velodrome_swaps' not in var('HEAL_MODELS') %}
 WHERE
   block_timestamp >= (
     SELECT
@@ -421,11 +422,11 @@ sushi_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'sushi_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'sushi_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -499,11 +500,11 @@ synthetix_swaps AS (
     ) synths_out
     ON synths_out.synth_symbol_out = s.symbol_out
 
-{% if is_incremental() and 'synthetix_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'synthetix_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -569,10 +570,10 @@ curve_swaps AS (
       'null'
     ) <> COALESCE(token_symbol_out, 'null')
 
-{% if is_incremental() and 'curve_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'curve_swaps' not in var('HEAL_MODELS') %}
 AND _inserted_timestamp >= (
   SELECT
-    MAX(_inserted_timestamp) - INTERVAL '36 hours'
+    MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
   FROM
     {{ this }}
 )
@@ -623,11 +624,11 @@ beethovenx_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'beethovenx_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'beethovenx_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -675,11 +676,11 @@ kyberswap_v1_static_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'kyberswap_v1_static_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'kyberswap_v1_static_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -727,11 +728,11 @@ kyberswap_v2_elastic_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'kyberswap_v2_elastic_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'kyberswap_v2_elastic_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -779,11 +780,11 @@ fraxswap_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'fraxswap_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'fraxswap_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -831,11 +832,11 @@ velodrome_v2_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'velodrome_v2_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'velodrome_v2_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -905,11 +906,11 @@ woofi_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'woofi_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'woofi_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -957,11 +958,11 @@ dodo_v2_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'dodo_v2_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'dodo_v2_swaps' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )

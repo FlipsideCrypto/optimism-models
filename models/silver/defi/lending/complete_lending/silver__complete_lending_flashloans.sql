@@ -1,9 +1,10 @@
+-- depends_on: {{ ref('silver__complete_token_prices') }}
 {{ config(
-  materialized = 'incremental',
-  incremental_strategy = 'delete+insert',
-  unique_key = ['block_number','platform'],
-  cluster_by = ['block_timestamp::DATE'],
-  tags = ['reorg','curated']
+    materialized = 'incremental',
+    incremental_strategy = 'delete+insert',
+    unique_key = ['block_number','platform'],
+    cluster_by = ['block_timestamp::DATE'],
+    tags = ['reorg','curated','heal']
 ) }}
 
 WITH aave as (
@@ -33,11 +34,11 @@ WITH aave as (
   FROM
     {{ ref('silver__aave_flashloans') }}
 
-{% if is_incremental() and 'aave' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'aave' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )
@@ -70,11 +71,11 @@ granary as (
   FROM
     {{ ref('silver__granary_flashloans') }}
 
-{% if is_incremental() and 'granary' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'granary' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) - INTERVAL '36 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
     FROM
       {{ this }}
   )

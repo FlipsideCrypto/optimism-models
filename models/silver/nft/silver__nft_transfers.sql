@@ -362,7 +362,7 @@ heal_model AS (
                     SELECT
                         MAX(
                             _inserted_timestamp
-                        ) - INTERVAL '36 hours'
+                        ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
                     FROM
                         {{ this }}
                 )
