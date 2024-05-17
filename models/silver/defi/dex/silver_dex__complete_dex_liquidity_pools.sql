@@ -9,9 +9,9 @@
 WITH contracts AS (
 
   SELECT
-    contract_address AS address,
-    token_symbol AS symbol,
-    token_decimals AS decimals,
+    contract_address,
+    token_symbol,
+    token_decimals,
     _inserted_timestamp
   FROM
     {{ ref('silver__contracts') }}
