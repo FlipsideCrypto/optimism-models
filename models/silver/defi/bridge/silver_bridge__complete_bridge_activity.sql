@@ -584,7 +584,7 @@ all_protocols AS (
     FROM
         wormhole
 ),
-FINAL AS (
+complete_bridge_activity AS (
     SELECT
         block_number,
         block_timestamp,
