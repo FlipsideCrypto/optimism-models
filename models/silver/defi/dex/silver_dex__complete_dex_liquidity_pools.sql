@@ -436,7 +436,7 @@ WHERE
   )
 {% endif %}
 ),
-all_pools_standard AS (
+all_pools AS (
   SELECT
     *
   FROM
@@ -471,8 +471,7 @@ all_pools_standard AS (
     *
   FROM
     velodrome
-),
-all_pools_v3 AS (
+  UNION ALL
   SELECT
     *
   FROM
@@ -482,8 +481,7 @@ all_pools_v3 AS (
     *
   FROM
     kyberswap_v2_elastic
-),
-all_pools_other AS (
+  UNION ALL
   SELECT
     *
   FROM
