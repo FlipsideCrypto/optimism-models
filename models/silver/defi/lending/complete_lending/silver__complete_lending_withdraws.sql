@@ -37,7 +37,7 @@ WHERE
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+            ) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
         FROM
             {{ this }}
     )
@@ -74,7 +74,7 @@ granary as (
             SELECT
                 MAX(
                     _inserted_timestamp
-                ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+                ) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
             FROM
                 {{ this }}
         )
@@ -110,7 +110,7 @@ exactly as (
             SELECT
                 MAX(
                     _inserted_timestamp
-                ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+                ) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
             FROM
                 {{ this }}
         )
@@ -147,7 +147,7 @@ sonne as (
             SELECT
                 MAX(
                     _inserted_timestamp
-                ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+                ) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
             FROM
                 {{ this }}
         )
@@ -184,7 +184,7 @@ tarot as (
             SELECT
                 MAX(
                     _inserted_timestamp
-                ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+                ) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
             FROM
                 {{ this }}
         )
