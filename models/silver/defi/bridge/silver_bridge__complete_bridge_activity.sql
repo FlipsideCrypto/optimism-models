@@ -639,7 +639,7 @@ complete_bridge_activity AS (
                 2
             )
             ELSE NULL
-        END AS amount_usd_unadj,
+        END AS amount_usd,
         _id,
         b._inserted_timestamp
     FROM
