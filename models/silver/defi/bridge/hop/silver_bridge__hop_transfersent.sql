@@ -51,6 +51,7 @@ WITH base_evt AS (
     WHERE
         topics [0] :: STRING = '0xe35dddd4ea75d7e9b3fe93af4f4e40e778c3da4074c9d93e7c6536f1e803c1eb'
         AND origin_to_address IS NOT NULL
+        AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

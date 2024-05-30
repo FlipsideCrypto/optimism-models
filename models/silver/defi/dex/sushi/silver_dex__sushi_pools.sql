@@ -27,6 +27,7 @@ WITH pool_creation AS (
             '0x1b02da8cb0d097eb8d57a175b88c7d8b47997506'
         )
         AND topics [0] :: STRING = '0xe469f9471ac1d98222517eb2cdff1ef4df5f7880269173bb782bb78e499d9de3' --DeployPool
+        AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

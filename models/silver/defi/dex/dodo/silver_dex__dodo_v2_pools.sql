@@ -24,7 +24,8 @@ WITH pool_tr AS (
             '0x386a28709a31532d4f68b06fd28a27e4ea378364'
         )
         AND TYPE ILIKE 'create%'
-        AND tx_status ILIKE 'success'
+        AND tx_status = 'SUCCESS'
+        AND trace_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -66,6 +67,7 @@ pool_evt AS (
             --NewDSP
             '0xaf5c5f12a80fc937520df6fcaed66262a4cc775e0f3fceaf7a7cfe476d9a751d' --NewDVM
         )
+        AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

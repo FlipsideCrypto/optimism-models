@@ -57,6 +57,7 @@ log_pull AS (
                 asset_details
         )
         AND topics [0] :: STRING = '0x2f00e3cdd69a77be7ed215ec7b2a36784dd158f921fca79ac29deffa353fe6ee'
+        AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

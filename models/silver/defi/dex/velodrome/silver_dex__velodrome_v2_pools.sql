@@ -31,6 +31,7 @@ WHERE
     AND contract_address = '0xf1046053aa5682b4f9a81b5481394da16be5ff5a'
     AND pool_address <> '0x585af0b397ac42dbef7f18395426bf878634f18d' -- velo v1/v2 converter
     AND block_number > 100000000
+    AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
