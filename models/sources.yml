@@ -12,12 +12,6 @@ sources:
     schema: core
     tables:
       - name: dim_labels
-      - name: ez_hourly_token_prices
-  - name: ethereum
-    database: ethereum
-    schema: core
-    tables:
-      - name: fact_hourly_token_prices
   - name: ethereum_silver
     database: ethereum
     schema: silver
@@ -28,10 +22,6 @@ sources:
     database: "{{ 'crosschain' if target.database == 'OPTIMISM' else 'crosschain_dev' }}"
     schema: silver
     tables:
-      - name: token_prices_priority_hourly
-      - name: token_prices_all_providers_hourly
-      - name: asset_metadata_priority
-      - name: asset_metadata_all_providers
       - name: near_address_encoded
       - name: labels_combined
       - name: complete_token_asset_metadata
