@@ -4,7 +4,7 @@ models:
     description: '{{ doc("olas_dim_registry_metadata_table_doc") }}'   
     columns:
       - name: CONTRACT_ADDRESS
-        description: '{{ doc("opt_logs_contract_address") }}'
+        description: '{{ doc("gno_logs_contract_address") }}'
       - name: NAME
         description: '{{ doc("olas_name") }}'
       - name: DESCRIPTION
@@ -17,8 +17,10 @@ models:
         description: '{{ doc("olas_trait_type") }}'
       - name: TRAIT_VALUE
         description: '{{ doc("olas_trait_value") }}'
-      - name: TOKEN_URI_LINK
-        description: '{{ doc("olas_token_uri_link") }}'
+      - name: CODE_URI_LINK
+        description: '{{ doc("olas_code_uri_link") }}'
+      - name: AGENT_IDS
+        description: '{{ doc("olas_agent_ids") }}'
       - name: IMAGE_LINK  
         description: '{{ doc("olas_image_link") }}'
       - name: DIM_REGISTRY_METADATA_ID
