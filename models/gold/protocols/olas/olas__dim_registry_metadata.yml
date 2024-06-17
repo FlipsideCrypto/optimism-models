@@ -4,7 +4,7 @@ models:
     description: '{{ doc("olas_dim_registry_metadata_table_doc") }}'   
     columns:
       - name: CONTRACT_ADDRESS
-        description: '{{ doc("gno_logs_contract_address") }}'
+        description: '{{ doc("opt_logs_contract_address") }}'
       - name: NAME
         description: '{{ doc("olas_name") }}'
       - name: DESCRIPTION

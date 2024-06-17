@@ -4,23 +4,23 @@ models:
     description: '{{ doc("olas_ez_service_registrations_table_doc") }}'   
     columns:
       - name: BLOCK_NUMBER
-        description: '{{ doc("gno_block_number") }}'   
+        description: '{{ doc("opt_block_number") }}'   
       - name: BLOCK_TIMESTAMP
-        description: '{{ doc("gno_block_timestamp") }}'
+        description: '{{ doc("opt_block_timestamp") }}'
       - name: TX_HASH
-        description: '{{ doc("gno_logs_tx_hash") }}'
+        description: '{{ doc("opt_logs_tx_hash") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description: '{{ doc("gno_tx_origin_sig") }}'
+        description: '{{ doc("opt_tx_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
-        description: '{{ doc("gno_origin_from") }}'
+        description: '{{ doc("opt_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
-        description: '{{ doc("gno_origin_to") }}'
+        description: '{{ doc("opt_origin_to") }}'
       - name: CONTRACT_ADDRESS
-        description: '{{ doc("gno_logs_contract_address") }}'
+        description: '{{ doc("opt_logs_contract_address") }}'
       - name: EVENT_INDEX
-        description: '{{ doc("gno_event_index") }}'
+        description: '{{ doc("opt_event_index") }}'
       - name: EVENT_NAME
-        description: '{{ doc("gno_event_name") }}'
+        description: '{{ doc("opt_event_name") }}'
       - name: OWNER_ADDRESS
         description: '{{ doc("olas_owner_address") }}'
       - name: MULTISIG_ADDRESS

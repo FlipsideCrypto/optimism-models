@@ -22,8 +22,14 @@ SELECT
     m.registry_metadata_id AS dim_registry_metadata_id,
     m.inserted_timestamp,
     GREATEST(
-        m.modified_timestamp,
-        s.modified_timestamp
+        COALESCE(
+            m.modified_timestamp,
+            '1970-01-01' :: TIMESTAMP
+        ),
+        COALESCE(
+            s.modified_timestamp,
+            '1970-01-01' :: TIMESTAMP
+        )
     ) AS modified_timestamp
 FROM
     {{ ref('silver_olas__registry_metadata') }}
