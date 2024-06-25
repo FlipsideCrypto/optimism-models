@@ -1,9 +1,5 @@
 {{ config(
-    materialized = 'view',
-    persist_docs ={ "relation": true,
-    "columns": true },
-    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'OLAS, AUTONOLAS, VALORY',
-    'PURPOSE': 'AI, SERVICES, REGISTRY' } } }
+    materialized = 'view'
 ) }}
 
 SELECT
@@ -19,7 +15,7 @@ SELECT
     m.code_uri_link,
     m.image_link,
     s.agent_ids,
-    m.registry_metadata_id AS dim_registry_metadata_id,
+    m.registry_metadata_id,
     m.inserted_timestamp,
     GREATEST(
         COALESCE(
