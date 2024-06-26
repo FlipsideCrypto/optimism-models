@@ -29,7 +29,7 @@ WHERE
     )
     AND (
         SELECT
-            MAX(partition_key) + 1000000
+            MAX(partition_key) + 3000000
         FROM
             {{ this }}
     )
