@@ -9,16 +9,10 @@ WITH impacted_blocks AS (
         blocks_impacted_array
     FROM
         {{ ref("silver_observability__traces_completeness") }}
-    WHERE
-        blocks_impacted_count > 0 {#
-    SELECT
-        blocks_impacted_array
-    FROM
-        {{ ref("silver_observability__traces_completeness") }}
     ORDER BY
         test_timestamp DESC
     LIMIT
-        1 #}
+        1
 ), all_missing AS (
     SELECT
         DISTINCT VALUE :: INT AS block_number
