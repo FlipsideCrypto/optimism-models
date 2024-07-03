@@ -2,6 +2,7 @@
     materialized = 'incremental',
     unique_key = 'contract_address',
     merge_exclude_columns = ["inserted_timestamp"],
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(contract_address, token_symbol, token_name), SUBSTRING(contract_address, token_symbol, token_name)",
     tags = ['non_realtime']
 ) }}
 
