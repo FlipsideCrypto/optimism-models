@@ -43,9 +43,10 @@ log_pull AS (
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 25, 40)) AS borrower,
         CONCAT('0x', SUBSTR(topics [3] :: STRING, 25, 40)) AS payer,
+        TRY_TO_NUMBER(
         utils.udf_hex_to_int(
             segmented_data [1] :: STRING
-        ) :: INTEGER AS repay_amount_raw,
+        )) :: INTEGER AS repay_amount_raw,
         _inserted_timestamp,
         _log_id
     FROM

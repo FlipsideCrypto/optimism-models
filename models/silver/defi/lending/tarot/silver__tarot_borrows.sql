@@ -42,9 +42,10 @@ log_pull AS (
         contract_address,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 25, 40)) AS borrower,
+        TRY_TO_NUMBER(
         utils.udf_hex_to_int(
             segmented_data [0] :: STRING
-        ) :: INTEGER AS loan_amount_raw,
+        )) :: INTEGER AS loan_amount_raw,
         _inserted_timestamp,
         _log_id
     FROM
@@ -59,7 +60,7 @@ log_pull AS (
         )
         AND topics [0] :: STRING = '0x33f3048bd4e6af45e53afb722adfd57dbde82da7e93e44db921fb4b8c6a70c4b'
         AND tx_status = 'SUCCESS'
-        AND loan_amount_raw > 0 --borrow and repay in same log event, value in segmented data determines what kind of event
+        AND loan_amount_raw > 0 --borrow and repay in same log event, value in segmented data determines if borrow or repay
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
