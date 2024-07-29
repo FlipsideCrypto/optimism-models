@@ -46,7 +46,7 @@ log_pull AS (
         TRY_TO_NUMBER(
         utils.udf_hex_to_int(
             segmented_data [1] :: STRING
-        )) :: INTEGER AS repay_amount_raw,
+        )) AS repay_amount_raw,
         _inserted_timestamp,
         _log_id
     FROM
