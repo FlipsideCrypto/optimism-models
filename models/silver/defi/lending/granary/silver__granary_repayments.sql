@@ -28,7 +28,10 @@ WITH repay AS(
             WHEN contract_address = LOWER('0x8FD4aF47E4E63d1D2D45582c3286b4BD9Bb95DfE') THEN 'Granary'
             ELSE 'ERROR'
         END AS granary_version,
-        origin_to_address AS lending_pool_contract,
+        COALESCE(
+            origin_to_address,
+            contract_address
+        ) AS lending_pool_contract,
         origin_from_address AS repayer_address,
         _log_id,
         _inserted_timestamp
