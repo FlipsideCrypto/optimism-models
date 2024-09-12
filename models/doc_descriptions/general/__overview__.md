@@ -57,15 +57,6 @@ There is more information on how to use dbt docs in the last section of this doc
 ### Stats Tables (optimism.stats)
 - [ez_core_metrics_hourly](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.stats__ez_core_metrics_hourly)
 
-**Velodrome**
- - [ez_claimed_rewards](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_claimed_rewards)
- - [ez_lp_actions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_lp_actions)
- - [ez_pool_details](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_pool_details)
- - [ez_staking_actions](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_staking_actions)
- - [ez_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_swaps)
- - [ez_velo_locks](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_velo_locks)
- - [ez_votes](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.velodrome__ez_votes)
-
 ### NFT Tables (optimism.nft)
 
 - [ez_nft_sales](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.nft__ez_nft_sales)

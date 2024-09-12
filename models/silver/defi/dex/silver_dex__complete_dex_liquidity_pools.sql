@@ -404,10 +404,10 @@ WHERE
 ),
 velodrome AS (
   SELECT
-    created_block AS block_number,
-    created_timestamp AS block_timestamp,
-    created_hash AS tx_hash,
-    deployer_address AS contract_address,
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
     pool_address,
     pool_name,
     NULL AS fee,
@@ -418,14 +418,14 @@ velodrome AS (
     NULL AS token5,
     NULL AS token6,
     NULL AS token7,
-    token0_address AS token0,
-    token1_address AS token1,
+    token0,
+    token1,
     'velodrome' AS platform,
     'v1' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
-    {{ ref('silver__velodrome_pool_details') }}
+    {{ ref('silver_dex__velodrome_v1_pools') }}
 
 {% if is_incremental() and 'velodrome' not in var('HEAL_MODELS') %}
 WHERE
