@@ -1,0 +1,48 @@
+version: 2
+models:
+  - name: velodrome__ez_claimed_rewards
+    description: '{{ doc("velo_claimed_table_doc") }}'
+  
+      
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("opt_block_number") }}'
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("opt_block_timestamp") }}'
+      - name: TX_HASH
+        description: '{{ doc("opt_tx_hash") }}'
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description: '{{ doc("opt_origin_sig") }}'
+      - name: ORIGIN_FROM_ADDRESS
+        description: '{{ doc("opt_origin_from") }}'
+      - name: ORIGIN_TO_ADDRESS
+        description: '{{ doc("opt_origin_to") }}'
+      - name: CONTRACT_ADDRESS
+        description: 'The contract address interacted with in this event.'
+      - name: EVENT_INDEX
+        description: 'The event index within the transaction.'
+      - name: REWARD_TYPE
+        description: 'The type of rewards claimed, either `voter_rewards`, `venft_distribution`, or `lp_reward`.'
+      - name: TOKEN_ID
+        description: 'The veNFT token ID. Only applies to veNFT distributions.'
+      - name: CLAIMED_AMOUNT
+        description: 'The amount of tokens claimed, decimal adjusted.'
+      - name: CLAIMED_AMOUNT_USD
+        description: 'The amount of tokens claimed, in USD.'
+      - name: TOKEN_SYMBOL
+        description: 'The symbol of the claimed tokens.'
+        tests:
+          - not_null:
+              where: CLAIMED_AMOUNT <> 0
+      - name: TOKEN_ADDRESS
+        description: 'The contract address of the claimed tokens'
+      - name: CLAIM_EPOCH
+        description: 'The claim epoch, only applicable to veNFT distributions.'
+      - name: MAX_EPOCH
+        description: 'The max epoch, only applicable to veNFT distributions.'
+      - name: EZ_CLAIMED_REWARDS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 
