@@ -35,7 +35,7 @@
             ) }}
             s
             JOIN meta b
-            ON b.file_name = metadata $ filename
+            ON b.file_name = metadata$filename
             AND b.{{ partition_name }} = s.{{ partition_name }}
         WHERE
             b.{{ partition_name }} = s.{{ partition_name }}
@@ -95,7 +95,7 @@ FROM
     ) }}
     s
     JOIN meta b
-    ON b.file_name = metadata $ filename
+    ON b.file_name = metadata$filename
     AND b.{{ partition_name }} = s.{{ partition_name }}
 WHERE
     b.{{ partition_name }} = s.{{ partition_name }}
