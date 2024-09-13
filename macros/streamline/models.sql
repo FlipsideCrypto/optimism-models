@@ -58,7 +58,7 @@
             )
 {% endmacro %}
 
-{% macro streamline_external_table_FR_query(
+{% macro streamline_external_table_fr_query(
         model,
         partition_function,
         partition_name,
