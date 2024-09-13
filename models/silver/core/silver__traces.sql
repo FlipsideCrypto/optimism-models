@@ -31,7 +31,7 @@ WHERE
     )
     AND DATA :result IS NOT NULL
 {% else %}
-    {{ ref('bronze__streamline_FR_traces') }}
+    {{ ref('bronze__streamline_fr_traces') }}
 WHERE
     _partition_by_block_id <= 5000000
     AND DATA :result IS NOT NULL
