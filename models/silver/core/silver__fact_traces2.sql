@@ -11,5 +11,6 @@
 {{ fsc_evm.gold_traces_v1(
     full_reload_start_block = 30000000,
     full_reload_blocks = 10000000,
-    uses_overflow_steps = true
+    uses_overflow_steps = true,
+    full_reload_mode = true
 ) }}
