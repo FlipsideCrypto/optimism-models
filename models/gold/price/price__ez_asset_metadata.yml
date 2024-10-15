@@ -1,29 +1,29 @@
 version: 2
 models:
   - name: price__ez_asset_metadata
-    description: '{{ doc("prices_ez_asset_metadata_table_doc") }}'
+    description: '{{ doc("evm_prices_ez_asset_metadata_table_doc") }}'
 
     columns:
       - name: ASSET_ID
-        description: '{{ doc("prices_asset_id") }}'
+        description: '{{ doc("evm_prices_asset_id") }}'
       - name: NAME
-        description: '{{ doc("prices_name") }}'
+        description: '{{ doc("evm_prices_name") }}'
       - name: SYMBOL
-        description: '{{ doc("prices_symbol") }}'
+        description: '{{ doc("evm_prices_symbol") }}'
       - name: TOKEN_ADDRESS
-        description: '{{ doc("prices_token_address_evm") }}'
+        description: '{{ doc("evm_prices_token_address_evm") }}'
       - name: BLOCKCHAIN
-        description: '{{ doc("prices_blockchain") }}'
+        description: '{{ doc("evm_prices_blockchain") }}'
       - name: DECIMALS
-        description: '{{ doc("prices_decimals") }}'
+        description: '{{ doc("evm_prices_decimals") }}'
       - name: IS_NATIVE
-        description: '{{ doc("prices_is_native") }}'
+        description: '{{ doc("evm_prices_is_native") }}'
       - name: IS_DEPRECATED
-        description: '{{ doc("prices_is_deprecated") }}'
+        description: '{{ doc("evm_prices_is_deprecated") }}'
       - name: EZ_ASSET_METADATA_ID
-        description: '{{ doc("pk") }}'   
+        description: '{{ doc("evm_pk") }}'   
       - name: INSERTED_TIMESTAMP
-        description: '{{ doc("inserted_timestamp") }}'   
+        description: '{{ doc("evm_inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
-        description: '{{ doc("modified_timestamp") }}' 
+        description: '{{ doc("evm_modified_timestamp") }}' 
       

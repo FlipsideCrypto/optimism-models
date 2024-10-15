@@ -5,26 +5,26 @@ models:
 
     columns:
       - name: L1_SUBMISSION_ROOT_TX_HASH 
-        description: '{{ doc("op_l1_sub_tx_hash") }}'   
+        description: '{{ doc("evm_l1_sub_tx_hash") }}'   
       - name: L1_BLOCK_NUMBER 
-        description: '{{ doc("op_l1_block_no") }}'   
+        description: '{{ doc("evm_l1_block_no") }}'   
       - name: L1_BLOCK_TIMESTAMP
-        description: '{{ doc("op_l1_block_time") }}'   
+        description: '{{ doc("evm_l1_block_time") }}'   
       - name: L1_SUBMISSION_BATCH_INDEX 
-        description: '{{ doc("op_l1_sub_batch") }}'   
+        description: '{{ doc("evm_l1_sub_batch") }}'   
       - name: BATCH_ROOT 
-        description: '{{ doc("op_batch_root") }}'   
+        description: '{{ doc("evm_batch_root") }}'   
       - name: BATCH_SIZE
-        description: '{{ doc("op_batch_size") }}'    
+        description: '{{ doc("evm_batch_size") }}'    
       - name: PREV_TOTAL_ELEMENTS
-        description: '{{ doc("op_prev_total_elements") }}'   
+        description: '{{ doc("evm_prev_total_elements") }}'   
       - name: OP_MIN_BLOCK 
-        description: '{{ doc("op_min_block") }}'   
+        description: '{{ doc("evm_min_block") }}'   
       - name: OP_MAX_BLOCK 
-        description: '{{ doc("op_max_block") }}'   
+        description: '{{ doc("evm_max_block") }}'   
       - name: FACT_L1_SUBMISSIONS_ID
-        description: '{{ doc("pk") }}'   
+        description: '{{ doc("evm_pk") }}'   
       - name: INSERTED_TIMESTAMP
-        description: '{{ doc("inserted_timestamp") }}'   
+        description: '{{ doc("evm_inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
-        description: '{{ doc("modified_timestamp") }}'
+        description: '{{ doc("evm_modified_timestamp") }}'

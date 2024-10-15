@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: core__dim_labels
-    description: '{{ doc("table_dim_labels") }}'
+    description: '{{ doc("evm_table_dim_labels") }}'
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -10,34 +10,34 @@ models:
             - ADDRESS
     columns:
       - name: BLOCKCHAIN
-        description: '{{ doc("op_label_blockchain") }}'
+        description: '{{ doc("evm_label_blockchain") }}'
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_set:
               value_set: ['optimism']
       - name: CREATOR
-        description: '{{ doc("op_label_creator") }}'
+        description: '{{ doc("evm_label_creator") }}'
         tests:
           - not_null
       - name: ADDRESS
-        description: '{{ doc("op_label_address") }}'
+        description: '{{ doc("evm_label_address") }}'
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: ADDRESS_NAME
-        description: '{{ doc("op_labels_table") }}'
+        description: '{{ doc("evm_labels_table") }}'
         tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING
                 - VARCHAR
       - name: LABEL_TYPE
-        description: '{{ doc("op_label_type") }}'
+        description: '{{ doc("evm_label_type") }}'
         tests:
           - not_null
       - name: LABEL_SUBTYPE
-        description: '{{ doc("op_label_subtype") }}'
+        description: '{{ doc("evm_label_subtype") }}'
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
@@ -45,7 +45,7 @@ models:
                 - STRING
                 - VARCHAR
       - name: PROJECT_NAME
-        description: '{{ doc("op_project_name") }}'
+        description: '{{ doc("evm_project_name") }}'
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
@@ -53,8 +53,8 @@ models:
                 - STRING
                 - VARCHAR
       - name: DIM_LABELS_ID
-        description: '{{ doc("pk") }}'   
+        description: '{{ doc("evm_pk") }}'   
       - name: INSERTED_TIMESTAMP
-        description: '{{ doc("inserted_timestamp") }}'   
+        description: '{{ doc("evm_inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
-        description: '{{ doc("modified_timestamp") }}' 
+        description: '{{ doc("evm_modified_timestamp") }}' 

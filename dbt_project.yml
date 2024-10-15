@@ -17,6 +17,7 @@ test-paths: ["tests"]
 seed-paths: ["data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
+docs-paths: ["dbt_packages/fsc_evm/doc_descriptions", "models/doc_descriptions"]
 
 target-path: "target" # directory which will store compiled SQL files
 clean-targets: # directories to be removed by `dbt clean`
@@ -25,7 +26,8 @@ clean-targets: # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 tests:
-  +store_failures: true # all tests
+  optimism_models:
+    +store_failures: true # all tests
 
 on-run-start:
   - "{{ create_sps() }}"
@@ -49,11 +51,16 @@ query-comment:
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
 models:
-  +copy_grants: true
-  +persist_docs:
-    relation: true
-    columns: true
-  +on_schema_change: "append_new_columns"
+  optimism_models:
+    +copy_grants: true
+    +persist_docs:
+      relation: true
+      columns: true
+    +on_schema_change: "append_new_columns"
+  livequery_models:
+    +materialized: ephemeral
+  fsc_evm:
+    +enabled: false
 
 # In this example config, we tell dbt to build all models in the example/ directory
 # as tables. These settings can be overridden in the individual model files

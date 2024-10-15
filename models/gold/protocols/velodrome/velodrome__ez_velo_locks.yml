@@ -5,17 +5,17 @@ models:
       
     columns:
       - name: BLOCK_NUMBER
-        description: '{{ doc("opt_block_number") }}'
+        description: '{{ doc("evm_block_number") }}'
       - name: BLOCK_TIMESTAMP
-        description: '{{ doc("opt_block_timestamp") }}'
+        description: '{{ doc("evm_block_timestamp") }}'
       - name: TX_HASH
-        description: '{{ doc("opt_tx_hash") }}' 
+        description: '{{ doc("evm_tx_hash") }}' 
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description: '{{ doc("opt_origin_sig") }}'
+        description: '{{ doc("evm_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
-        description: '{{ doc("opt_origin_from") }}'
+        description: '{{ doc("evm_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
-        description: '{{ doc("opt_origin_to") }}'
+        description: '{{ doc("evm_origin_to") }}'
       - name: CONTRACT_ADDRESS
         description: 'The address of the contract interacted with in the event.'
       - name: EVENT_INDEX
@@ -35,8 +35,8 @@ models:
       - name: DEPOSIT_TYPE
         description: 'The type of deposit.'
       - name: EZ_VELO_LOCKS_ID
-        description: '{{ doc("pk") }}'   
+        description: '{{ doc("evm_pk") }}'   
       - name: INSERTED_TIMESTAMP
-        description: '{{ doc("inserted_timestamp") }}'   
+        description: '{{ doc("evm_inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
-        description: '{{ doc("modified_timestamp") }}'
+        description: '{{ doc("evm_modified_timestamp") }}'
