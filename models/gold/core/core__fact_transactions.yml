@@ -16,6 +16,8 @@ models:
         description: '{{ doc("evm_tx_nonce") }}' 
       - name: POSITION
         description: '{{ doc("evm_tx_position") }}' 
+      - name: TX_POSITION
+        description: '{{ doc("evm_tx_position") }}' 
       - name: FROM_ADDRESS
         description: '{{ doc("evm_from_address") }}' 
       - name: TO_ADDRESS
@@ -64,6 +66,8 @@ models:
         description: The maximum priority fee per gas of the transaction, in Gwei.
       - name: STATUS
         description: '{{ doc("evm_tx_status") }}' 
+      - name: TX_SUCCEEDED
+        description: '{{ doc("evm_tx_succeeded") }}' 
       - name: INPUT_DATA
         description: '{{ doc("evm_tx_input_data") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE 

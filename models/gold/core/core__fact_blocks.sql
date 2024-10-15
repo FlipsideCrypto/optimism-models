@@ -25,7 +25,7 @@ SELECT
     state_root, --new column
     transactions_root, --new column
     logs_bloom, --new column
-        COALESCE (
+    COALESCE (
         blocks_id,
         {{ dbt_utils.generate_surrogate_key(
             ['a.block_number']

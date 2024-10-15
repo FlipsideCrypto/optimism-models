@@ -19,10 +19,10 @@ SELECT
     CASE 
         WHEN tx_status = 'SUCCESS' THEN TRUE 
         ELSE FALSE 
-    END AS tx_succeeded,
+    END AS tx_succeeded, --new column
     tx_type,
     nonce,
-    POSITION AS tx_position,
+    POSITION AS tx_position, --new column
     input_data,
     gas_price,
     gas_used,

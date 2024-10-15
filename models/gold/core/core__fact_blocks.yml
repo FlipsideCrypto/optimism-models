@@ -24,6 +24,8 @@ models:
         description: '{{ doc("evm_gas_limit") }}'
       - name: GAS_USED
         description: '{{ doc("evm_gas_used") }}'
+      - name: BLOCK_HASH
+        description: '{{ doc("evm_blocks_hash") }}'
       - name: HASH
         description: '{{ doc("evm_blocks_hash") }}'
       - name: PARENT_HASH
@@ -34,6 +36,16 @@ models:
         description: '{{ doc("evm_sha3_uncles") }}'
       - name: SIZE
         description: '{{ doc("evm_size") }}' 
+      - name: MINER
+        description: '{{ doc("evm_miner") }}'
+      - name: NONCE
+        description: '{{ doc("evm_tx_nonce") }}'
+      - name: STATE_ROOT
+        description: '{{ doc("evm_state_root") }}'
+      - name: TRANSACTIONS_ROOT
+        description: '{{ doc("evm_transactions_root") }}'
+      - name: LOGS_BLOOM
+        description: '{{ doc("evm_logs_bloom") }}'
       - name: UNCLE_BLOCKS
         description: '{{ doc("evm_uncle_blocks") }}' 
       - name: BLOCK_HEADER_JSON
