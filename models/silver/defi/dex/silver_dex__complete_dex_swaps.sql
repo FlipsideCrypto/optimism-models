@@ -166,29 +166,26 @@ velodrome AS (
     origin_from_address,
     origin_to_address,
     contract_address,
-    CASE
-      WHEN event_name IS NULL THEN 'Swap'
-      ELSE event_name
-    END AS event_name,
+    event_name,
     amount_in_unadj,
     amount_out_unadj,
-    token_address_in AS token_in,
-    token_address_out AS token_out,
-    sender_address AS sender,
-    to_address AS tx_to,
+    token_in,
+    token_out,
+    sender,
+    tx_to,
     event_index,
     platform,
     'v1' AS version,
     _log_id,
-    '1970-01-01' :: DATE AS _inserted_timestamp
+    _inserted_timestamp
   FROM
-    {{ ref('velodrome__ez_swaps') }}
+    {{ ref('silver_dex__velodrome_v1_swaps') }}
 
 {% if is_incremental() and 'velodrome' not in var('HEAL_MODELS') %}
 WHERE
-  block_timestamp >= (
+  _inserted_timestamp >= (
     SELECT
-      MAX(block_timestamp) - INTERVAL '72 hours'
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
     FROM
       {{ this }}
   )
