@@ -38,4 +38,5 @@ SELECT
     tx_status, --deprecate
     identifier --deprecate
 FROM
-    {{ ref('silver__fact_traces2') }}
+    {{ ref('silver__fact_traces2') }} 
+    --ideal state = source from silver.traces2 and materialize this model as a table (core.fact_traces2)

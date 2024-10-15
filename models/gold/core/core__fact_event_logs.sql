@@ -8,7 +8,7 @@ SELECT
     block_number,
     block_timestamp,
     tx_hash,
-    tx_position, --new column
+    tx_position, --new column, requires FR on silver.logs
     event_index,
     contract_address,
     topics,
