@@ -3,7 +3,6 @@
     incremental_strategy = 'delete+insert',
     unique_key = 'pool_address',
     cluster_by = ['block_timestamp::DATE'],
-    full_refresh = false,
     tags = ['curated']
 ) }}
 

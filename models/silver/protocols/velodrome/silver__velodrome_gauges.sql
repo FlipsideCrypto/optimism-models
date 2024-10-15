@@ -2,7 +2,7 @@
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = 'block_number',
-    tags = ['curated','reorg']
+    tags = ['stale']
 ) }}
 
 WITH backfill AS (

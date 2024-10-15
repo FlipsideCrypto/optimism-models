@@ -2,7 +2,7 @@
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = 'created_block',
-    tags = ['curated']
+    tags = ['stale']
 ) }}
 
 SELECT

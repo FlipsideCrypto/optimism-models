@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = 'created_block',
     full_refresh = false,
-    tags = ['curated']
+    tags = ['stale']
 ) }}
 
 WITH pool_creation AS (
