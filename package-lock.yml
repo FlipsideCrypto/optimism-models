@@ -1,6 +1,6 @@
 packages:
 - git: https://github.com/FlipsideCrypto/fsc-evm.git
-  revision: 3ab8965d40af74940bf75f78dcc80cc703a7e545
+  revision: 6456423f9a9fc14fcc6abd51c550d115db6cd28f
 - package: calogica/dbt_expectations
   version: 0.8.2
 - package: dbt-labs/dbt_external_tables
