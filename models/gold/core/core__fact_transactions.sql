@@ -34,8 +34,8 @@ SELECT
     l1_gas_price,
     l1_gas_used,
     l1_fee_scalar,
-    l1_fee_precise,
     l1_fee,
+    l1_fee_precise,
     r,
     s,
     v,
@@ -45,9 +45,6 @@ SELECT
             ['tx_hash']
         ) }}
     ) AS fact_transactions_id,
-    block_hash, --deprecate
-    tx_status AS status, --deprecate
-    POSITION, --deprecate
     GREATEST(
         COALESCE(A.inserted_timestamp, '2000-01-01'), 
         COALESCE(b.inserted_timestamp, '2000-01-01'), --deprecate
@@ -58,6 +55,9 @@ SELECT
         COALESCE(b.modified_timestamp, '2000-01-01'), --deprecate
         COALESCE(C.modified_timestamp, '2000-01-01') --deprecate
     ) AS modified_timestamp,
+    block_hash, --deprecate
+    tx_status AS status, --deprecate
+    POSITION, --deprecate
     l1_submission_batch_index, --deprecate, may be separate table
     l1_submission_tx_hash, --deprecate, may be separate table
     state_batch_index AS l1_state_root_batch_index, --deprecate, may be separate table
