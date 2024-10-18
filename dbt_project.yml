@@ -61,6 +61,8 @@ models:
     +materialized: ephemeral
   fsc_evm:
     +enabled: false
+    github_actions_package:
+      +enabled: true
 
 # In this example config, we tell dbt to build all models in the example/ directory
 # as tables. These settings can be overridden in the individual model files
