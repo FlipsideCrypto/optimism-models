@@ -44,4 +44,4 @@ jobs:
 
       - name: Run DBT Jobs
         run: |
-          dbt test -m "github_actions_package.github_actions__current_task_status"
+          dbt test -m "fsc_evm,tag:gha_tasks"
