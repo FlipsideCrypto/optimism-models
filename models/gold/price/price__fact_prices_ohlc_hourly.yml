@@ -1,24 +1,24 @@
 version: 2
 models:
   - name: price__fact_prices_ohlc_hourly
-    description: '{{ doc("prices_fact_prices_ohlc_hourly_table_doc") }}'
+    description: '{{ doc("evm_prices_fact_prices_ohlc_hourly_table_doc") }}'
 
     columns:
       - name: HOUR
-        description: '{{ doc("prices_hour")}}'
+        description: '{{ doc("evm_prices_hour")}}'
       - name: ASSET_ID
-        description: '{{ doc("prices_asset_id") }}'
+        description: '{{ doc("evm_prices_asset_id") }}'
       - name: OPEN
-        description: '{{ doc("prices_open") }}'
+        description: '{{ doc("evm_prices_open") }}'
       - name: HIGH
-        description: '{{ doc("prices_high") }}'
+        description: '{{ doc("evm_prices_high") }}'
       - name: LOW
-        description: '{{ doc("prices_low") }}'
+        description: '{{ doc("evm_prices_low") }}'
       - name: CLOSE
-        description: '{{ doc("prices_close") }}'
+        description: '{{ doc("evm_prices_close") }}'
       - name: FACT_PRICES_OHLC_HOURLY_ID
-        description: '{{ doc("pk") }}'   
+        description: '{{ doc("evm_pk") }}'   
       - name: INSERTED_TIMESTAMP
-        description: '{{ doc("inserted_timestamp") }}'   
+        description: '{{ doc("evm_inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
-        description: '{{ doc("modified_timestamp") }}' 
+        description: '{{ doc("evm_modified_timestamp") }}' 

@@ -27,8 +27,8 @@ models:
       - name: TOTAL_FEES_USD
         description: '{{ doc("evm_total_fees_usd") }}'
       - name: EZ_CORE_METRICS_HOURLY_ID
-        description: '{{ doc("pk") }}'   
+        description: '{{ doc("evm_pk") }}'   
       - name: INSERTED_TIMESTAMP
-        description: '{{ doc("inserted_timestamp") }}'   
+        description: '{{ doc("evm_inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
-        description: '{{ doc("modified_timestamp") }}' 
+        description: '{{ doc("evm_modified_timestamp") }}' 

@@ -1,4 +1,6 @@
 packages:
+- git: https://github.com/FlipsideCrypto/fsc-evm.git
+  revision: 26037970a580ec74904ec94b7178fae9321def47
 - package: calogica/dbt_expectations
   version: 0.8.2
 - package: dbt-labs/dbt_external_tables
@@ -6,13 +8,11 @@ packages:
 - package: dbt-labs/dbt_utils
   version: 1.0.0
 - git: https://github.com/FlipsideCrypto/fsc-utils.git
-  revision: eb33ac727af26ebc8a8cc9711d4a6ebc3790a107
+  revision: c3ab97e8e06d31e8c6f63819714e0a2d45c45e82
 - package: get-select/dbt_snowflake_query_tags
   version: 2.5.0
-- git: https://github.com/FlipsideCrypto/fsc-evm.git
-  revision: ec6adae14ab4060ad4a553fb7f32d7e57693996d
 - package: calogica/dbt_date
   version: 0.7.2
 - git: https://github.com/FlipsideCrypto/livequery-models.git
   revision: b024188be4e9c6bc00ed77797ebdc92d351d620e
-sha1_hash: 622a679ecf98e6ebf3c904241902ce5328c77e52
+sha1_hash: 2976b7495d434571280cda0acd0e5d272631eb00

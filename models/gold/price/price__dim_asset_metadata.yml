@@ -1,26 +1,26 @@
 version: 2
 models:
   - name: price__dim_asset_metadata
-    description: '{{ doc("prices_dim_asset_metadata_table_doc") }}'
+    description: '{{ doc("evm_prices_dim_asset_metadata_table_doc") }}'
 
     columns:
       - name: PROVIDER
-        description: '{{ doc("prices_provider")}}'
+        description: '{{ doc("evm_prices_provider")}}'
       - name: ASSET_ID
-        description: '{{ doc("prices_asset_id") }}'
+        description: '{{ doc("evm_prices_asset_id") }}'
       - name: NAME
-        description: '{{ doc("prices_name") }}'
+        description: '{{ doc("evm_prices_name") }}'
       - name: SYMBOL
-        description: '{{ doc("prices_symbol") }}'
+        description: '{{ doc("evm_prices_symbol") }}'
       - name: TOKEN_ADDRESS
-        description: '{{ doc("prices_token_address_evm") }}'
+        description: '{{ doc("evm_prices_token_address_evm") }}'
       - name: BLOCKCHAIN
-        description: '{{ doc("prices_blockchain") }}'
+        description: '{{ doc("evm_prices_blockchain") }}'
       - name: BLOCKCHAIN_ID
-        description: '{{ doc("prices_blockchain_id") }}'
+        description: '{{ doc("evm_prices_blockchain_id") }}'
       - name: DIM_ASSET_METADATA_ID
-        description: '{{ doc("pk") }}'   
+        description: '{{ doc("evm_pk") }}'   
       - name: INSERTED_TIMESTAMP
-        description: '{{ doc("inserted_timestamp") }}'   
+        description: '{{ doc("evm_inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
-        description: '{{ doc("modified_timestamp") }}' 
+        description: '{{ doc("evm_modified_timestamp") }}' 
