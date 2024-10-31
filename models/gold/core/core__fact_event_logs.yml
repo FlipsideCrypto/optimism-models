@@ -12,18 +12,28 @@ models:
         description: '{{ doc("opt_logs_tx_hash") }}'
       - name: EVENT_INDEX
         description: '{{ doc("opt_event_index") }}'
+      - name: TX_POSITION
+        description: '{{ doc("evm_tx_position") }}' 
       - name: CONTRACT_ADDRESS
         description: '{{ doc("opt_logs_contract_address") }}'
       - name: TOPICS
         description: '{{ doc("opt_topics") }}'
+      - name: TOPIC_0
+        description: '{{ doc("evm_topic_0") }}'
+      - name: TOPIC_1
+        description: '{{ doc("evm_topic_1") }}'
+      - name: TOPIC_2
+        description: '{{ doc("evm_topic_2") }}'
+      - name: TOPIC_3
+        description: '{{ doc("evm_topic_3") }}'
       - name: DATA
         description: '{{ doc("opt_logs_data") }}'
       - name: EVENT_REMOVED
         description: '{{ doc("opt_event_removed") }}'  
       - name: _LOG_ID
-        description: '{{ doc("internal_column") }}'  
+        description: '{{ doc("evm_column_deprecation_notice") }}'  
       - name: TX_STATUS
-        description: '{{ doc("opt_tx_status") }}' 
+        description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
         description: '{{ doc("opt_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS

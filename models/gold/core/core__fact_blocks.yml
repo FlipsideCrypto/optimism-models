@@ -11,7 +11,7 @@ models:
       - name: NETWORK
         description: '{{ doc("opt_network") }}'
       - name: BLOCKCHAIN
-        description: '{{ doc("opt_blockchain") }}'
+        description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: TX_COUNT
         description: '{{ doc("opt_tx_count") }}'
       - name: DIFFICULTY
@@ -24,8 +24,10 @@ models:
         description: '{{ doc("opt_gas_limit") }}'
       - name: GAS_USED
         description: '{{ doc("opt_gas_used") }}'
-      - name: HASH
+      - name: BLOCK_HASH
         description: '{{ doc("opt_blocks_hash") }}'
+      - name: HASH
+        description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: PARENT_HASH
         description: '{{ doc("opt_parent_hash") }}'
       - name: RECEIPTS_ROOT
@@ -34,20 +36,30 @@ models:
         description: '{{ doc("opt_sha3_uncles") }}'
       - name: SIZE
         description: '{{ doc("opt_size") }}' 
+      - name: MINER
+        description: '{{ doc("evm_miner") }}'
+      - name: NONCE
+        description: '{{ doc("evm_blocks_nonce") }}'
+      - name: STATE_ROOT
+        description: '{{ doc("evm_state_root") }}'
+      - name: TRANSACTIONS_ROOT
+        description: '{{ doc("evm_transactions_root") }}'
+      - name: LOGS_BLOOM
+        description: '{{ doc("evm_logs_bloom") }}'
       - name: UNCLE_BLOCKS
         description: '{{ doc("opt_uncle_blocks") }}' 
       - name: BLOCK_HEADER_JSON
-        description: '{{ doc("opt_block_header_json") }}'
+        description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: L1_STATE_ROOT_TX_HASH
-        description: '{{ doc("op_l1_state_tx_hash") }}'
+        description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: L1_STATE_ROOT_BATCH_INDEX
-        description: '{{ doc("op_l1_state_batch") }}'
+        description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: L1_SUBMISSION_TX_HASH
-        description: '{{ doc("op_l1_sub_tx_hash") }}'
+        description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: L1_SUBMISSION_BATCH_INDEX
-        description: '{{ doc("op_l1_sub_batch") }}'
+        description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: L1_SUBMISSION_DETAILS
-        description: Variant column that includes details regarding state and submission root, index and tx_hash information for when the block is submitted to Ethereum Mainnet.
+        description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: FACT_BLOCKS_ID
         description: '{{ doc("pk") }}'   
       - name: INSERTED_TIMESTAMP
@@ -55,4 +67,4 @@ models:
       - name: MODIFIED_TIMESTAMP
         description: '{{ doc("modified_timestamp") }}'
       - name: WITHDRAWALS_ROOT
-        description: A hash of the withdrawals that occurred in this block.
+        description: '{{ doc("evm_column_deprecation_notice") }}'

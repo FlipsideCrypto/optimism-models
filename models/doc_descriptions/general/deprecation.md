@@ -9,3 +9,15 @@ Deprecated. This column is no longer used. Please remove from your query by Jan.
 This column is being deprecated for standardization purposes on Jan. 31 2024. Please use the equivalent column without the native asset prefix. For example, use `amount` instead of `eth_amount`.
 
 {% enddocs %}
+
+{% docs evm_column_deprecation_notice %}
+
+This column is being deprecated for standardization purposes.
+
+{% enddocs %}
+
+{% docs evm_table_deprecation_notice %}
+
+This table is being deprecated for standardization purposes.
+
+{% enddocs %}
