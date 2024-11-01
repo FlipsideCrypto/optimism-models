@@ -1,51 +1,51 @@
 version: 2
 models:
   - name: core__fact_transactions
-    description: '{{ doc("opt_tx_table_doc") }}' 
+    description: '{{ doc("evm_tx_table_doc") }}' 
 
     columns:
       - name: BLOCK_NUMBER
-        description: '{{ doc("opt_block_number") }}'   
+        description: '{{ doc("evm_block_number") }}'   
       - name: BLOCK_TIMESTAMP
-        description: '{{ doc("opt_block_timestamp") }}'
+        description: '{{ doc("evm_block_timestamp") }}'
       - name: BLOCK_HASH
         description: '{{ doc("evm_column_deprecation_notice") }}' 
       - name: TX_HASH
-        description: '{{ doc("opt_tx_hash") }}' 
+        description: '{{ doc("evm_tx_hash") }}' 
       - name: NONCE
-        description: '{{ doc("opt_tx_nonce") }}' 
+        description: '{{ doc("evm_tx_nonce") }}' 
       - name: POSITION
         description: '{{ doc("evm_column_deprecation_notice") }}' 
       - name: TX_POSITION
         description: '{{ doc("evm_tx_position") }}' 
       - name: FROM_ADDRESS
-        description: '{{ doc("opt_from_address") }}' 
+        description: '{{ doc("evm_from_address") }}' 
       - name: TO_ADDRESS
-        description: '{{ doc("opt_to_address") }}' 
+        description: '{{ doc("evm_to_address") }}' 
       - name: VALUE
-        description: '{{ doc("opt_value") }}' 
+        description: '{{ doc("evm_value") }}' 
       - name: VALUE_PRECISE_RAW
-        description: '{{ doc("precise_amount_unadjusted") }}'
+        description: '{{ doc("evm_precise_amount_unadjusted") }}'
       - name: VALUE_PRECISE
-        description: '{{ doc("precise_amount_adjusted") }}'
+        description: '{{ doc("evm_precise_amount_adjusted") }}'
       - name: TX_FEE
-        description: '{{ doc("opt_tx_fee") }}' 
+        description: '{{ doc("evm_tx_fee") }}' 
       - name: TX_FEE_PRECISE
-        description: '{{ doc("tx_fee_precise") }}' 
+        description: '{{ doc("evm_tx_fee_precise") }}' 
       - name: GAS_PRICE
-        description: '{{ doc("opt_tx_gas_price") }}' 
+        description: '{{ doc("evm_tx_gas_price") }}' 
       - name: EFFECTIVE_GAS_PRICE
         description: The total base charge plus tip paid for each unit of gas, in Gwei.
       - name: GAS_LIMIT
-        description: '{{ doc("opt_tx_gas_limit") }}' 
+        description: '{{ doc("evm_tx_gas_limit") }}' 
       - name: GAS_USED
-        description: '{{ doc("opt_tx_gas_used") }}'
+        description: '{{ doc("evm_tx_gas_used") }}'
       - name: L1_GAS_PRICE
-        description: '{{ doc("op_l1_gas_price") }}'
+        description: '{{ doc("evm_l1_gas_price") }}'
       - name: L1_GAS_USED
-        description: '{{ doc("op_l1_gas_used") }}'
+        description: '{{ doc("evm_l1_gas_used") }}'
       - name: L1_FEE_SCALAR
-        description: '{{ doc("op_l1_fee_scalar") }}'
+        description: '{{ doc("evm_l1_fee_scalar") }}'
       - name: L1_FEE
         description: The L1 portion of fees paid.
       - name: L1_STATE_ROOT_TX_HASH
@@ -59,7 +59,7 @@ models:
       - name: L1_SUBMISSION_DETAILS
         description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: CUMULATIVE_GAS_USED
-        description: '{{ doc("opt_cumulative_gas_used") }}' 
+        description: '{{ doc("evm_cumulative_gas_used") }}' 
       - name: MAX_FEE_PER_GAS
         description: The maximum fee per gas of the transaction, in Gwei.
       - name: MAX_PRIORITY_FEE_PER_GAS
@@ -69,9 +69,9 @@ models:
       - name: TX_SUCCEEDED
         description: '{{ doc("evm_tx_succeeded") }}' 
       - name: INPUT_DATA
-        description: '{{ doc("opt_tx_input_data") }}'
+        description: '{{ doc("evm_tx_input_data") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE 
-        description: '{{ doc("opt_tx_origin_sig") }}'
+        description: '{{ doc("evm_tx_origin_sig") }}'
       - name: R
         description: The r value of the transaction signature.
       - name: S
@@ -81,11 +81,11 @@ models:
       - name: TX_TYPE
         description: The type of the transaction, 2 for EIP-1559 transactions and 0 for legacy transactions.
       - name: FACT_TRANSACTIONS_ID
-        description: '{{ doc("pk") }}'   
+        description: '{{ doc("evm_pk") }}'   
       - name: INSERTED_TIMESTAMP
-        description: '{{ doc("inserted_timestamp") }}'   
+        description: '{{ doc("evm_inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
-        description: '{{ doc("modified_timestamp") }}' 
+        description: '{{ doc("evm_modified_timestamp") }}' 
       - name: DEPOSIT_NONCE
         description: '{{ doc("evm_column_deprecation_notice") }}'
       - name: DEPOSIT_RECEIPT_VERSION

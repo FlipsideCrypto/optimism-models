@@ -10,14 +10,3 @@ This column is being deprecated for standardization purposes on Jan. 31 2024. Pl
 
 {% enddocs %}
 
-{% docs evm_column_deprecation_notice %}
-
-This column is being deprecated for standardization purposes.
-
-{% enddocs %}
-
-{% docs evm_table_deprecation_notice %}
-
-This table is being deprecated for standardization purposes.
-
-{% enddocs %}
