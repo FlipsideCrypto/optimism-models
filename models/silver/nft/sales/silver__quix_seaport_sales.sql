@@ -28,7 +28,7 @@ seaport_tx_table AS (
         AND topics [0] = '0x9d9af8e38d66c62e2c12f0225249fd9d721c54b83f48d9352c97c6cacdcb6f31'
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
@@ -43,7 +43,7 @@ decoded AS (
         tx_hash,
         decoded_log AS decoded_flat,
         event_index,
-        decoded_data,
+        full_decoded_data AS decoded_data,
         CONCAT(
             tx_hash :: STRING,
             '-',
@@ -51,15 +51,15 @@ decoded AS (
         ) AS _log_id,
         modified_timestamp AS _inserted_timestamp,
         LOWER(
-            full_decoded_data :address :: STRING
+            decoded_data :address :: STRING
         ) AS contract_address,
-        full_decoded_data :name :: STRING AS event_name,
+        decoded_data :name :: STRING AS event_name,
         CASE
-            WHEN full_decoded_data :data [4] :value [0] [0] IN (
+            WHEN decoded_data :data [4] :value [0] [0] IN (
                 2,
                 3
             ) THEN 'buy'
-            WHEN full_decoded_data :data [4] :value [0] [0] IN (1) THEN 'offer_accepted'
+            WHEN decoded_data :data [4] :value [0] [0] IN (1) THEN 'offer_accepted'
             ELSE NULL
         END AS trade_type
     FROM
@@ -95,7 +95,7 @@ offer_length_count_buy AS (
         ) AS offer_length_raw --> this is the number of nfts in a batch buy. If n = 1, then price is known. If n > 1 then price is estimated
     FROM
         decoded,
-        TABLE(FLATTEN(input => full_decoded_data :data [4] :value))
+        TABLE(FLATTEN(input => decoded_data :data [4] :value))
     WHERE
         trade_type = 'buy'
         AND VALUE [0] IN (
@@ -117,7 +117,7 @@ offer_length_count_offer AS (
         ) AS offer_length_raw --> this is the number of nfts in a batch buy. If n = 1, then price is known. If n > 1 then price is estimated
     FROM
         decoded,
-        TABLE(FLATTEN(input => full_decoded_data :data [5] :value))
+        TABLE(FLATTEN(input => decoded_data :data [5] :value))
     WHERE
         trade_type = 'offer_accepted'
         AND VALUE [0] IN (
@@ -136,7 +136,7 @@ flat_raw AS (
         contract_address,
         event_name,
         trade_type,
-        full_decoded_data :data AS full_data,
+        decoded_data :data AS full_data,
         _log_id,
         _inserted_timestamp,
         OBJECT_AGG(
@@ -146,7 +146,7 @@ flat_raw AS (
     FROM
         decoded,
         LATERAL FLATTEN(
-            input => full_decoded_data :data
+            input => decoded_data :data
         ) f
     WHERE
         event_name = 'OrderFulfilled'

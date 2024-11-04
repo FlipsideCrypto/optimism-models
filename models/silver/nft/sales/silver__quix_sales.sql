@@ -190,24 +190,24 @@ eth_payment_raw AS (
         tx_hash,
         from_address,
         to_address,
-        eth_value,
+        value,
         CASE
-            WHEN to_address = '0xec1557a67d4980c948cd473075293204f4d280fd' THEN eth_value
+            WHEN to_address = '0xec1557a67d4980c948cd473075293204f4d280fd' THEN value
             ELSE 0
         END AS platform_fee_raw_,
         CASE
             WHEN ROW_NUMBER() over (
                 PARTITION BY tx_hash
                 ORDER BY
-                    eth_value DESC
+                    value DESC
             ) = 1
-            AND platform_fee_raw_ = 0 THEN eth_value
+            AND platform_fee_raw_ = 0 THEN value
             ELSE 0
         END AS sale_amount_raw_,
         CASE
             WHEN sale_amount_raw_ = 0
             AND platform_fee_raw_ = 0
-            AND to_address != '0xec1557a67d4980c948cd473075293204f4d280fd' THEN eth_value
+            AND to_address != '0xec1557a67d4980c948cd473075293204f4d280fd' THEN value
             ELSE 0
         END AS creator_fee_raw_
     FROM
@@ -228,7 +228,7 @@ eth_payment_raw AS (
         )
         AND tx_succeeded
         AND identifier != 'CALL_ORIGIN'
-        AND eth_value > 0
+        AND value > 0
         AND from_address IN (
             '0xe5c7b4865d7f2b08faadf3f6d392e6d6fa7b903c',
             -- v1
@@ -242,7 +242,7 @@ eth_payment_raw AS (
         )
 
 {% if is_incremental() %}
-AND TO_TIMESTAMP_NTZ(_inserted_timestamp) >= (
+AND TO_TIMESTAMP_NTZ(modified_timestamp) >= (
     SELECT
         MAX(
             _inserted_timestamp

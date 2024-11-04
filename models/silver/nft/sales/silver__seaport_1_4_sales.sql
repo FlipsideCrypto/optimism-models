@@ -61,11 +61,11 @@ mao_buy_tx AS (
         tx_hash,
         event_index,
         CASE
-            WHEN full_decoded_data :data [4] :value [0] [0] IN (
+            WHEN decoded_data :data [4] :value [0] [0] IN (
                 2,
                 3
             ) THEN 'buy'
-            WHEN full_decoded_data :data [4] :value [0] [0] IN (1) THEN 'offer_accepted'
+            WHEN decoded_data :data [4] :value [0] [0] IN (1) THEN 'offer_accepted'
             ELSE NULL
         END AS trade_type
     FROM
@@ -78,11 +78,11 @@ mao_offer_accepted_tx AS (
         block_number,
         tx_hash,
         CASE
-            WHEN full_decoded_data :data [4] :value [0] [0] IN (
+            WHEN decoded_data :data [4] :value [0] [0] IN (
                 2,
                 3
             ) THEN 'buy'
-            WHEN full_decoded_data :data [4] :value [0] [0] IN (1) THEN 'offer_accepted'
+            WHEN decoded_data :data [4] :value [0] [0] IN (1) THEN 'offer_accepted'
             ELSE NULL
         END AS trade_type
     FROM
@@ -180,11 +180,11 @@ mao_orderhash AS (
         mao_raw_decoded AS (
             SELECT
                 CASE
-                    WHEN full_decoded_data :data [4] :value [0] [0] IN (
+                    WHEN decoded_data :data [4] :value [0] [0] IN (
                         2,
                         3
                     ) THEN 'buy'
-                    WHEN full_decoded_data :data [4] :value [0] [0] IN (1) THEN 'offer_accepted'
+                    WHEN decoded_data :data [4] :value [0] [0] IN (1) THEN 'offer_accepted'
                     ELSE NULL
                 END AS trade_type,
                 decoded_flat :orderHash :: STRING AS orderhash,
@@ -233,15 +233,15 @@ mao_orderhash AS (
                 _log_id,
                 _inserted_timestamp,
                 LOWER(
-                    full_decoded_data :address :: STRING
+                    decoded_data :address :: STRING
                 ) AS contract_address,
-                full_decoded_data :name :: STRING AS event_name,
+                decoded_data :name :: STRING AS event_name,
                 CASE
-                    WHEN full_decoded_data :data [4] :value [0] [0] IN (
+                    WHEN decoded_data :data [4] :value [0] [0] IN (
                         2,
                         3
                     ) THEN 'buy'
-                    WHEN full_decoded_data :data [4] :value [0] [0] IN (1) THEN 'offer_accepted'
+                    WHEN decoded_data :data [4] :value [0] [0] IN (1) THEN 'offer_accepted'
                     ELSE NULL
                 END AS trade_type
             FROM
@@ -338,7 +338,7 @@ mao_orderhash AS (
                 ) AS offer_length_raw --> this is the number of nfts in a batch buy. If n = 1, then price is known. If n > 1 then price is estimated
             FROM
                 decoded,
-                TABLE(FLATTEN(input => full_decoded_data :data [4] :value))
+                TABLE(FLATTEN(input => decoded_data :data [4] :value))
             WHERE
                 trade_type = 'buy'
                 AND VALUE [0] IN (
@@ -360,7 +360,7 @@ mao_orderhash AS (
                 ) AS offer_length_raw --> this is the number of nfts in a batch buy. If n = 1, then price is known. If n > 1 then price is estimated
             FROM
                 decoded,
-                TABLE(FLATTEN(input => full_decoded_data :data [5] :value))
+                TABLE(FLATTEN(input => decoded_data :data [5] :value))
             WHERE
                 trade_type = 'offer_accepted'
                 AND VALUE [0] IN (
@@ -379,7 +379,7 @@ mao_orderhash AS (
                 contract_address,
                 event_name,
                 trade_type,
-                full_decoded_data :data AS full_data,
+                decoded_data :data AS full_data,
                 _log_id,
                 _inserted_timestamp,
                 OBJECT_AGG(
@@ -389,7 +389,7 @@ mao_orderhash AS (
             FROM
                 decoded,
                 LATERAL FLATTEN(
-                    input => full_decoded_data :data
+                    input => decoded_data :data
                 ) f
             WHERE
                 event_name IN (
@@ -1715,7 +1715,7 @@ nft_transfer_operator AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
