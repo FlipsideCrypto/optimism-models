@@ -91,7 +91,7 @@ transfer_singles AS (
         utils.udf_hex_to_int(
             segmented_data [1] :: STRING
         ) :: STRING AS erc1155_value,
-        TO_TIMESTAMP_NTZ(modified_timestamp) AS _inserted_timestamp,
+        _inserted_timestamp,
         event_index
     FROM
         base
@@ -119,7 +119,7 @@ transfer_batch_raw AS (
             '-',
             event_index :: STRING
         ) AS _log_id,
-        TO_TIMESTAMP_NTZ(modified_timestamp) AS _inserted_timestamp
+        _inserted_timestamp
     FROM
         base
     WHERE

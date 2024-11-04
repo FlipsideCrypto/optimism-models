@@ -47,8 +47,12 @@ log_pull AS (
         utils.udf_hex_to_int(
             segmented_data [1] :: STRING
         )) AS repay_amount_raw,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
         {{ ref('core__fact_event_logs') }}
         l

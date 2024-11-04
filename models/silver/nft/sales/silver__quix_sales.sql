@@ -83,14 +83,14 @@ quix_event_details AS (
         tx_hash,
         event_name,
         event_index,
-        decoded_log :buyer :: STRING AS buyer_address,
-        decoded_log :seller :: STRING AS seller_address,
-        decoded_log :price :: INT AS total_price_raw,
+        decoded_flat :buyer :: STRING AS buyer_address,
+        decoded_flat :seller :: STRING AS seller_address,
+        decoded_flat :price :: INT AS total_price_raw,
         COALESCE(
-            decoded_log :contractAddress,
-            decoded_log :erc721address
+            decoded_flat :contractAddress,
+            decoded_flat :erc721address
         ) :: STRING AS nft_address,
-        decoded_log :tokenId :: STRING AS tokenId,
+        decoded_flat :tokenId :: STRING AS tokenId,
         block_number,
         block_timestamp,
         contract_address AS platform_address,

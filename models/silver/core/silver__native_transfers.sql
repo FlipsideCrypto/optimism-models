@@ -88,11 +88,11 @@ SELECT
     origin_function_signature,
     from_address,
     to_address,
-    eth_value AS amount,
-    eth_value_precise_raw AS amount_precise_raw,
-    eth_value_precise AS amount_precise,
+    value AS amount,
+    value_precise_raw AS amount_precise_raw,
+    value_precise AS amount_precise,
     ROUND(
-        eth_value * price,
+        value * price,
         2
     ) AS amount_usd,
     _call_id,

@@ -40,8 +40,12 @@ sonne_deposits AS (
     ) :: INTEGER AS mintAmount_raw,
     CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS supplier,
     'Sonne' AS platform,
-    _inserted_timestamp,
-    _log_id
+    modified_timestamp AS _inserted_timestamp,
+    CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+    ) AS _log_id
   FROM
     {{ ref('core__fact_event_logs') }}
   WHERE

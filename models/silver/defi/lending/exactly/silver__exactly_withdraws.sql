@@ -38,8 +38,12 @@ exactly_redemptions AS (
         0 AS redeemed_token_raw,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS redeemer,
         'Exactly' AS platform,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
         {{ ref('core__fact_event_logs') }}
     WHERE

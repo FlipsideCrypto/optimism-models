@@ -38,8 +38,12 @@ WITH flashloan AS (
             WHEN contract_address = LOWER('0x794a61358D6845594F94dc1DB02A252b5b4814aD') THEN 'Aave V3'
             ELSE 'ERROR'
         END AS aave_version,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
         {{ ref('core__fact_event_logs') }}
     WHERE

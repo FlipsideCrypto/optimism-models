@@ -38,8 +38,12 @@ WITH flashloan AS (
             WHEN contract_address = LOWER('0x8FD4aF47E4E63d1D2D45582c3286b4BD9Bb95DfE') THEN 'Granary'
             ELSE 'ERROR'
         END AS granary_version,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
         {{ ref('core__fact_event_logs') }}
     WHERE

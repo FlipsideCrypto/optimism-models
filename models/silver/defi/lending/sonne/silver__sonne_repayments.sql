@@ -38,8 +38,12 @@ sonne_repayments AS (
       segmented_data [2] :: STRING
     ) :: INTEGER AS repayed_amount_raw,
     'Sonne' AS platform,
-    _inserted_timestamp,
-    _log_id
+    modified_timestamp AS _inserted_timestamp,
+    CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+    ) AS _log_id
   FROM
     {{ ref('core__fact_event_logs') }}
   WHERE
