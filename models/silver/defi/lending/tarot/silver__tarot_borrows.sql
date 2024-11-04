@@ -49,7 +49,7 @@ log_pull AS (
         _inserted_timestamp,
         _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
         l
     WHERE
         contract_address IN (
@@ -59,7 +59,7 @@ log_pull AS (
                 asset_details
         )
         AND topics [0] :: STRING = '0x33f3048bd4e6af45e53afb722adfd57dbde82da7e93e44db921fb4b8c6a70c4b'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND loan_amount_raw > 0 --borrow and repay in same log event, value in segmented data determines if borrow or repay
 
 {% if is_incremental() %}

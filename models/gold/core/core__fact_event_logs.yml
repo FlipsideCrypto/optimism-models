@@ -34,6 +34,8 @@ models:
         description: '{{ doc("evm_column_deprecation_notice") }}'  
       - name: TX_STATUS
         description: '{{ doc("evm_column_deprecation_notice") }}'
+      - name: TX_SUCCEEDED
+        description: '{{ doc("evm_tx_succeeded") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
         description: '{{ doc("evm_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS

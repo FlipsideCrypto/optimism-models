@@ -23,14 +23,14 @@ seaport_tx_table AS (
         block_timestamp,
         tx_hash
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         block_timestamp >= '2022-06-01'
         AND contract_address = '0x00000000006c3852cbef3e08e8df289169ede581'
         AND topics [0] = '0x9d9af8e38d66c62e2c12f0225249fd9d721c54b83f48d9352c97c6cacdcb6f31'
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
@@ -43,11 +43,15 @@ AND _inserted_timestamp >= (
 decoded AS (
     SELECT
         tx_hash,
-        decoded_flat,
+        decoded_log AS decoded_flat,
         event_index,
         decoded_data,
-        _log_id,
-        _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp,
         LOWER(
             decoded_data :address :: STRING
         ) AS contract_address,
@@ -61,7 +65,7 @@ decoded AS (
             ELSE NULL
         END AS trade_type
     FROM
-        {{ ref('silver__decoded_logs') }}
+        {{ ref('core__ez_decoded_event_logs') }}
     WHERE
         block_number >= 13379836
         AND contract_address = '0x00000000006c3852cbef3e08e8df289169ede581'
@@ -1039,7 +1043,7 @@ tx_data AS (
         tx_fee,
         input_data
     FROM
-        {{ ref('silver__transactions') }}
+        {{ ref('core__fact_transactions') }}
     WHERE
         block_timestamp :: DATE >= '2022-06-01'
         AND tx_hash IN (
@@ -1050,7 +1054,7 @@ tx_data AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
@@ -1078,7 +1082,7 @@ nft_transfer_operator AS (
             )
         ) AS erc1155_value
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         block_timestamp :: DATE >= '2022-06-01'
         AND tx_hash IN (

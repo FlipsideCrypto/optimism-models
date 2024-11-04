@@ -39,7 +39,7 @@ WITH liquidation AS(
         _inserted_timestamp,
         _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0xe413a321e8681d831f4dbccbca790d2952b56f977908e45be37335533e005286'
 
@@ -54,7 +54,7 @@ AND _inserted_timestamp >= (
 )
 {% endif %}
 AND contract_address = LOWER('0x8FD4aF47E4E63d1D2D45582c3286b4BD9Bb95DfE')
-AND tx_status = 'SUCCESS' --excludes failed txs
+AND tx_succeeded --excludes failed txs
 ),
 atoken_meta AS (
     SELECT

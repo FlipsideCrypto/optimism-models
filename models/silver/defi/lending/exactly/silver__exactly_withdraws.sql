@@ -41,7 +41,7 @@ exactly_redemptions AS (
         _inserted_timestamp,
         _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         contract_address IN (
             SELECT
@@ -50,7 +50,7 @@ exactly_redemptions AS (
                 asset_details
         )
         AND topics [0] :: STRING = '0xfbde797d201c681b91056529119e0b02407c7bb96a4a2c75c01fc9667232c8db'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

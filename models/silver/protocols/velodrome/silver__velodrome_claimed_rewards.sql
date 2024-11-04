@@ -34,15 +34,19 @@ WITH velo_distributions AS (
             segmented_data [3] :: STRING
         ) :: INTEGER AS max_epoch,
         'venft_distribution' AS reward_type,
-        _log_id,
-        _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp,
         '0x3c8b650257cfb5f272f799f5e2b4e65093a11a05' AS token_address
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0xcae2990aa9af8eb1c64713b7eddb3a80bf18e49a94a13fe0d0002b5d61d58f00'
         AND contract_address = '0x5d5bea9f0fc13d967511668a60a3369fd53f784f'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND event_removed = 'false'
 
 {% if is_incremental() %}
@@ -76,13 +80,17 @@ staking_rewards AS (
             WHEN origin_to_address = '0x6b8edc43de878fd5cd5113c42747d32500db3873' THEN 'lp_reward'
             ELSE 'voter_reward'
         END AS reward_type,
-        _log_id,
-        _inserted_timestamp
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0x9aa05b3d70a9e3e2f004f039648839560576334fb45c81f91b6db03ad9e2efc9'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND event_removed = 'false'
 
 {% if is_incremental() %}

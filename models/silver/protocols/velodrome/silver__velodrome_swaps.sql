@@ -58,8 +58,12 @@ WITH base AS (
                 segmented_data [0] :: STRING
             ) :: FLOAT
         END AS transfer_amount,
-        _log_id,
-        _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp,
         event_index,
         CASE
             WHEN topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' THEN 'Transfer'
@@ -69,14 +73,14 @@ WITH base AS (
         'velodrome' AS platform,
         topics [0] :: STRING AS function_type
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING IN (
             '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822',
             '0x112c256902bf554b6ed882d2936687aaeb4225e8cd5b51303c90ca6cf43a8602',
             '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
         )
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND event_removed = 'false'
 
 {% if is_incremental() %}

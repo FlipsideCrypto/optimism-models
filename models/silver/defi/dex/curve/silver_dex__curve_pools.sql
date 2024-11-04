@@ -14,15 +14,24 @@ WITH contract_deployments AS (
         block_timestamp,
         from_address AS deployer_address,
         to_address AS contract_address,
-        _call_id,
-        _inserted_timestamp,
+        concat_ws(
+            '-',
+            block_number,
+            tx_position,
+            CONCAT(
+                type,
+                '_',
+                trace_address
+            )
+        ) AS _call_id,
+        modified_timestamp AS _inserted_timestamp,
         ROW_NUMBER() over (
             ORDER BY
                 contract_address
         ) AS row_num
     FROM
         {{ ref(
-            'silver__traces'
+            'core__fact_traces'
         ) }}
     WHERE
         -- curve contract deployers
@@ -32,8 +41,8 @@ WITH contract_deployments AS (
             '0x745748bcfd8f9c2de519a71d789be8a63dd7d66c'
         )
         AND TYPE ILIKE 'create%'
-        AND tx_status = 'SUCCESS'
-        AND trace_status = 'SUCCESS'
+        AND tx_succeeded
+        AND trace_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

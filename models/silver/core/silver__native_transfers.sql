@@ -16,19 +16,28 @@ WITH eth_base AS (
         identifier,
         from_address,
         to_address,
-        eth_value,
-        _call_id,
-        _inserted_timestamp,
-        eth_value_precise_raw,
-        eth_value_precise,
+        value,
+        concat_ws(
+            '-',
+            block_number,
+            tx_position,
+            CONCAT(
+                type,
+                '_',
+                trace_address
+            )
+        ) AS _call_id,
+        modified_timestamp AS _inserted_timestamp,
+        value_precise_raw,
+        value_precise,
         tx_position,
         trace_index
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
     WHERE
-        eth_value > 0
-        AND tx_status = 'SUCCESS'
-        AND trace_status = 'SUCCESS'
+        value > 0
+        AND tx_succeeded
+        AND trace_succeeded
         AND TYPE NOT IN (
             'DELEGATECALL',
             'STATICCALL'
@@ -51,7 +60,7 @@ tx_table AS (
         to_address AS origin_to_address,
         origin_function_signature
     FROM
-        {{ ref('silver__transactions') }}
+        {{ ref('core__fact_transactions') }}
     WHERE
         tx_hash IN (
             SELECT
@@ -61,7 +70,7 @@ tx_table AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(_inserted_timestamp) - INTERVAL '72 hours'
     FROM

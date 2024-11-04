@@ -21,7 +21,7 @@ seaport_tx_table AS (
         block_timestamp,
         tx_hash
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         block_timestamp >= '2022-07-01'
         AND contract_address = '0x998ef16ea4111094eb5ee72fc2c6f4e6e8647666'
@@ -41,11 +41,15 @@ AND _inserted_timestamp >= (
 decoded AS (
     SELECT
         tx_hash,
-        decoded_flat,
+        decoded_log AS decoded_flat,
         event_index,
         decoded_data,
-        _log_id,
-        _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp,
         LOWER(
             decoded_data :address :: STRING
         ) AS contract_address,
@@ -59,7 +63,7 @@ decoded AS (
             ELSE NULL
         END AS trade_type
     FROM
-        {{ ref('silver__decoded_logs') }}
+        {{ ref('core__ez_decoded_event_logs') }}
     WHERE
         block_timestamp :: DATE >= '2022-07-01'
         AND contract_address = '0x998ef16ea4111094eb5ee72fc2c6f4e6e8647666'
@@ -1035,7 +1039,7 @@ tx_data AS (
         tx_fee,
         input_data
     FROM
-        {{ ref('silver__transactions') }}
+        {{ ref('core__fact_transactions') }}
     WHERE
         block_timestamp :: DATE >= '2022-07-01'
         AND tx_hash IN (
@@ -1046,7 +1050,7 @@ tx_data AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp

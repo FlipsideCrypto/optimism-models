@@ -22,11 +22,14 @@ WITH factory_pull AS (
         utils.udf_hex_to_int(
             segmented_data [3] :: STRING
         ) :: INTEGER AS lendingpoolId,
-        l._inserted_timestamp,
-        l._log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
-        l
+        {{ ref('core__fact_event_logs') }}
     WHERE
         contract_address = LOWER('0xD7cABeF2c1fD77a31c5ba97C724B82d3e25fC83C')
         AND topics [0] = '0x4c3ab495dc8ebd1b2f3232d7632e54411bc7e4d111475e7fbbd5547d9a28c495'
@@ -47,7 +50,7 @@ lp_token_pull AS (
         t.tx_hash,
         C.*
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
         t
         LEFT JOIN {{ ref('silver__contracts') }} C
         ON to_address = contract_address

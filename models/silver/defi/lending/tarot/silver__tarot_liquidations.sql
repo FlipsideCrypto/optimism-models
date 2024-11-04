@@ -60,12 +60,12 @@ log_pull as (
         _inserted_timestamp,
         _log_id
     from 
-        {{ ref('silver__logs') }} l 
+        {{ ref('core__fact_event_logs') }} l 
     WHERE
         contract_address IN (SELECT TOKEN_ADDRESS FROM asset_details)
     AND
         topics [0] :: STRING = '0xb0dbe18c6ffdf0da655dd690e77211d379205c497be44c64447c3f5f021b5167'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT

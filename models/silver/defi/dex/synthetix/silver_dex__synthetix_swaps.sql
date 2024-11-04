@@ -45,15 +45,15 @@ WITH swaps_base AS (
             '-',
             event_index
         ) AS _log_id,
-        _inserted_timestamp
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         contract_address IN (
             '0x8700daec35af8ff88c16bdf0418774cb3d7599b4'
         )
         AND topics [0] = '0x65b6972c94204d84cffd3a95615743e31270f04fdf251f3dccc705cfbad44776'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

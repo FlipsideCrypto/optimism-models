@@ -13,34 +13,38 @@ WITH raw_decoded_logs AS (
         event_name,
         contract_address,
         event_index,
-        decoded_flat,
+        decoded_log AS decoded_flat,
         COALESCE(
-            decoded_flat :dst,
-            decoded_flat :_to,
-            decoded_flat :to
+            decoded_log :dst,
+            decoded_log :_to,
+            decoded_log :to
         ) :: STRING AS to_address,
         COALESCE(
-            decoded_flat :src,
-            decoded_flat :_from,
-            decoded_flat :from
+            decoded_log :src,
+            decoded_log :_from,
+            decoded_log :from
         ) :: STRING AS from_address,
         COALESCE(
-            decoded_flat :wad,
-            decoded_flat :_value,
-            decoded_flat :value
+            decoded_log :wad,
+            decoded_log :_value,
+            decoded_log :value
         ) :: INT AS token_amount,
         block_number,
         block_timestamp,
         origin_from_address,
         origin_to_address,
         origin_function_signature,
-        _log_id,
-        TO_TIMESTAMP_NTZ(_inserted_timestamp) AS _inserted_timestamp
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        TO_TIMESTAMP_NTZ(modified_timestamp) AS _inserted_timestamp
     FROM
-        {{ ref('silver__decoded_logs') }}
+        {{ ref('core__ez_decoded_event_logs') }}
     WHERE
         block_timestamp >= '2021-12-01'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND contract_address IN (
             '0xe5c7b4865d7f2b08faadf3f6d392e6d6fa7b903c',
             -- v1
@@ -79,14 +83,14 @@ quix_event_details AS (
         tx_hash,
         event_name,
         event_index,
-        decoded_flat :buyer :: STRING AS buyer_address,
-        decoded_flat :seller :: STRING AS seller_address,
-        decoded_flat :price :: INT AS total_price_raw,
+        decoded_log :buyer :: STRING AS buyer_address,
+        decoded_log :seller :: STRING AS seller_address,
+        decoded_log :price :: INT AS total_price_raw,
         COALESCE(
-            decoded_flat :contractAddress,
-            decoded_flat :erc721address
+            decoded_log :contractAddress,
+            decoded_log :erc721address
         ) :: STRING AS nft_address,
-        decoded_flat :tokenId :: STRING AS tokenId,
+        decoded_log :tokenId :: STRING AS tokenId,
         block_number,
         block_timestamp,
         contract_address AS platform_address,
@@ -207,7 +211,7 @@ eth_payment_raw AS (
             ELSE 0
         END AS creator_fee_raw_
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
     WHERE
         block_timestamp >= '2021-12-01'
         AND tx_hash IN (
@@ -222,7 +226,7 @@ eth_payment_raw AS (
             FROM
                 token_payments_agg
         )
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND identifier != 'CALL_ORIGIN'
         AND eth_value > 0
         AND from_address IN (
@@ -309,7 +313,7 @@ tx_data AS (
         tx_fee,
         input_data
     FROM
-        {{ ref('silver__transactions') }}
+        {{ ref('core__fact_transactions') }}
     WHERE
         block_timestamp :: DATE >= '2021-12-01'
         AND tx_hash IN (
@@ -320,7 +324,7 @@ tx_data AS (
         )
 
 {% if is_incremental() %}
-AND TO_TIMESTAMP_NTZ(_inserted_timestamp) >= (
+AND TO_TIMESTAMP_NTZ(modified_timestamp) >= (
     SELECT
         MAX(
             _inserted_timestamp

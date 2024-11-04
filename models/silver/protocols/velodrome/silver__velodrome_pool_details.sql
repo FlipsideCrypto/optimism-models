@@ -32,7 +32,7 @@ SELECT
 FROM
     {{ ref('silver__velodrome_pools') }}
     p
-    LEFT JOIN {{ ref('silver__logs') }}
+    LEFT JOIN {{ ref('core__fact_event_logs') }}
     l
     ON p.created_hash = l.tx_hash
     AND p.created_block = l.block_number

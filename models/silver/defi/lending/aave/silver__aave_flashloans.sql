@@ -41,7 +41,7 @@ WITH flashloan AS (
         _inserted_timestamp,
         _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0xefefaba5e921573100900a3ad9cf29f222d995fb3b6045797eaea7521bd8d6f0'
 
@@ -56,7 +56,7 @@ AND _inserted_timestamp >= (
 )
 {% endif %}
 AND contract_address = LOWER('0x794a61358D6845594F94dc1DB02A252b5b4814aD')
-AND tx_status = 'SUCCESS' --excludes failed txs
+AND tx_succeeded --excludes failed txs
 ),
 atoken_meta AS (
     SELECT
