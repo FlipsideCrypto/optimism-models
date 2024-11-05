@@ -24,19 +24,25 @@ SELECT
     value_hex, --new column
     gas,
     gas_used,
-    origin_from_address,
-    origin_to_address,
-    origin_function_signature,
+    origin_from_address, --new column
+    origin_to_address, --new column
+    origin_function_signature, --new column
     trace_succeeded, --new column
-    tx_succeeded, --new column
     error_reason,
     revert_reason, --new column
+    tx_succeeded, --new column
     fact_traces_id,
-    inserted_timestamp,
-    modified_timestamp,
-    trace_status, --deprecate
+    COALESCE(
+        inserted_timestamp,
+        '2000-01-01'
+    ) AS inserted_timestamp,
+    COALESCE(
+        modified_timestamp,
+        '2000-01-01'
+    ) AS modified_timestamp,
+    identifier, --deprecate
     tx_status, --deprecate
-    identifier --deprecate
+    trace_status --deprecate    
 FROM
-    {{ ref('silver__fact_traces2') }} 
-    --ideal state = source from silver.traces2 and materialize this model as a table (core.fact_traces2)
+    {{ ref('silver__fact_traces2') }}
+--ideal state = source from silver.traces2 and materialize this model as a table (core.fact_traces2)

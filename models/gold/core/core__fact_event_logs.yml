@@ -12,8 +12,6 @@ models:
         description: '{{ doc("evm_logs_tx_hash") }}'
       - name: EVENT_INDEX
         description: '{{ doc("evm_event_index") }}'
-      - name: TX_POSITION
-        description: '{{ doc("evm_tx_position") }}' 
       - name: CONTRACT_ADDRESS
         description: '{{ doc("evm_logs_contract_address") }}'
       - name: TOPICS
