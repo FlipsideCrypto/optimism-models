@@ -34,8 +34,8 @@ SELECT
     l1_gas_price,
     l1_gas_used,
     l1_fee_scalar,
-    l1_fee,
     l1_fee_precise,
+    l1_fee,
     r,
     s,
     v,
@@ -47,13 +47,13 @@ SELECT
     ) AS fact_transactions_id,
     GREATEST(
         COALESCE(A.inserted_timestamp, '2000-01-01'), 
-        COALESCE(b.inserted_timestamp, '2000-01-01'), --deprecate
-        COALESCE(C.inserted_timestamp, '2000-01-01') --deprecate
+        COALESCE(b.inserted_timestamp, '2000-01-01'), --remove
+        COALESCE(C.inserted_timestamp, '2000-01-01') --remove
     ) AS inserted_timestamp,
     GREATEST(
         COALESCE(A.modified_timestamp, '2000-01-01'), 
-        COALESCE(b.modified_timestamp, '2000-01-01'), --deprecate
-        COALESCE(C.modified_timestamp, '2000-01-01') --deprecate
+        COALESCE(b.modified_timestamp, '2000-01-01'), --remove
+        COALESCE(C.modified_timestamp, '2000-01-01') --remove
     ) AS modified_timestamp,
     block_hash, --deprecate
     tx_status AS status, --deprecate
@@ -82,7 +82,7 @@ SELECT
     deposit_receipt_version --deprecate, may build separate table
 FROM
     {{ ref('silver__transactions') }} A
-    LEFT JOIN {{ ref('silver__state_hashes') }} --deprecate
+    LEFT JOIN {{ ref('silver__state_hashes') }} --remove
     b USING (block_number)
-    LEFT JOIN {{ ref('silver__submission_hashes') }} --deprecate
+    LEFT JOIN {{ ref('silver__submission_hashes') }} --remove
     C USING (block_number)

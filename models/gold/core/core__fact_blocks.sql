@@ -39,11 +39,11 @@ SELECT
         COALESCE(
             b.inserted_timestamp, 
             '2000-01-01'
-        ), --deprecate
+        ), --remove
         COALESCE(
             C.inserted_timestamp,
             '2000-01-01'
-        ), --deprecate
+        ), --remove
         COALESCE(
             d.inserted_timestamp,
             '2000-01-01'
@@ -57,11 +57,11 @@ SELECT
         COALESCE(
             b.modified_timestamp,
             '2000-01-01'
-        ), --deprecate
+        ), --remove
         COALESCE(
             C.modified_timestamp,
             '2000-01-01'
-        ), --deprecate
+        ), --remove
         COALESCE(
             d.modified_timestamp,
             '2000-01-01'
@@ -133,9 +133,9 @@ SELECT
 FROM
     {{ ref('silver__blocks') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}
-    b --deprecate
+    b --remove
     ON A.block_number = b.block_number
-    LEFT JOIN {{ ref('silver__submission_hashes') }} C --deprecate
+    LEFT JOIN {{ ref('silver__submission_hashes') }} C --remove
     ON A.block_number = C.block_number
     LEFT JOIN {{ ref('silver__tx_count') }}
     d
