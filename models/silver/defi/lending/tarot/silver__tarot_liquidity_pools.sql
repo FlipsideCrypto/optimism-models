@@ -67,7 +67,11 @@ lp_token_pull AS (
             FROM
                 factory_pull
         )
-        AND identifier = 'STATICCALL_3_1_0'
+        AND concat_ws(
+            '_',
+            TYPE,
+            trace_address
+        ) = 'STATICCALL_3_1_0'
 )
 SELECT
     l.tx_hash,

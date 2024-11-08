@@ -227,7 +227,11 @@ eth_payment_raw AS (
                 token_payments_agg
         )
         AND tx_succeeded
-        AND identifier != 'CALL_ORIGIN'
+        AND concat_ws(
+            '_',
+            TYPE,
+            trace_address
+        ) != 'CALL_ORIGIN'
         AND value > 0
         AND from_address IN (
             '0xe5c7b4865d7f2b08faadf3f6d392e6d6fa7b903c',
