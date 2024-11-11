@@ -42,7 +42,7 @@ models:
       - name: DECODED_LOG
         description: 'The flattened decoded log, where the keys are the names of the event parameters, and the values are the values of the event parameters.'
       - name: FULL_DECODED_LOG
-        description: '{{ doc("evm_column_deprecation_notice") }}' 
+        description: '{{ doc("evm_column_deprecation_notice_full_decoded_log") }}' 
       - name: FULL_DECODED_DATA
         description: 'The full decoded log, including the event name, the event parameters, and the data type of the event parameters.'  
       - name: ORIGIN_FUNCTION_SIGNATURE
@@ -66,7 +66,7 @@ models:
       - name: EVENT_REMOVED
         description: '{{ doc("opt_event_removed") }}' 
       - name: TX_STATUS
-        description: '{{ doc("evm_column_deprecation_notice") }}' 
+        description: '{{ doc("evm_column_deprecation_notice_tx_status") }}' 
       - name: TX_SUCCEEDED
         description: '{{ doc("opt_tx_status") }}' 
       - name: EZ_DECODED_EVENT_LOGS_ID

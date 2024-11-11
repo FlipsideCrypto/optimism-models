@@ -9,13 +9,13 @@ models:
       - name: BLOCK_TIMESTAMP
         description: '{{ doc("evm_block_timestamp") }}'
       - name: BLOCK_HASH
-        description: '{{ doc("evm_column_deprecation_notice") }}' 
+        description: '{{ doc("evm_column_deprecation_notice_block_hash") }}' 
       - name: TX_HASH
         description: '{{ doc("evm_tx_hash") }}' 
       - name: NONCE
         description: '{{ doc("evm_tx_nonce") }}' 
       - name: POSITION
-        description: '{{ doc("evm_column_deprecation_notice") }}' 
+        description: '{{ doc("evm_column_deprecation_notice_position") }}' 
       - name: TX_POSITION
         description: '{{ doc("evm_tx_position") }}' 
       - name: FROM_ADDRESS
@@ -49,15 +49,15 @@ models:
       - name: L1_FEE
         description: The L1 portion of fees paid.
       - name: L1_STATE_ROOT_TX_HASH
-        description: '{{ doc("evm_column_deprecation_notice") }}'
+        description: '{{ doc("evm_column_deprecation_notice_l1_state_root_tx_hash") }}'
       - name: L1_STATE_ROOT_BATCH_INDEX
-        description: '{{ doc("evm_column_deprecation_notice") }}'
+        description: '{{ doc("evm_column_deprecation_notice_l1_state_root_batch_index") }}'
       - name: L1_SUBMISSION_TX_HASH
-        description: '{{ doc("evm_column_deprecation_notice") }}'
+        description: '{{ doc("evm_column_deprecation_notice_l1_submission_tx_hash") }}'
       - name: L1_SUBMISSION_BATCH_INDEX
-        description: '{{ doc("evm_column_deprecation_notice") }}'        
+        description: '{{ doc("evm_column_deprecation_notice_l1_submission_batch_index") }}'        
       - name: L1_SUBMISSION_DETAILS
-        description: '{{ doc("evm_column_deprecation_notice") }}'
+        description: '{{ doc("evm_column_deprecation_notice_l1_submission_details") }}'
       - name: CUMULATIVE_GAS_USED
         description: '{{ doc("evm_cumulative_gas_used") }}' 
       - name: MAX_FEE_PER_GAS
@@ -65,7 +65,7 @@ models:
       - name: MAX_PRIORITY_FEE_PER_GAS
         description: The maximum priority fee per gas of the transaction, in Gwei.
       - name: STATUS
-        description: '{{ doc("evm_column_deprecation_notice") }}' 
+        description: '{{ doc("evm_column_deprecation_notice_tx_status") }}' 
       - name: TX_SUCCEEDED
         description: '{{ doc("evm_tx_succeeded") }}' 
       - name: INPUT_DATA
@@ -87,6 +87,6 @@ models:
       - name: MODIFIED_TIMESTAMP
         description: '{{ doc("evm_modified_timestamp") }}' 
       - name: DEPOSIT_NONCE
-        description: '{{ doc("evm_column_deprecation_notice") }}'
+        description: '{{ doc("evm_column_deprecation_notice_deposit_nonce") }}'
       - name: DEPOSIT_RECEIPT_VERSION
-        description: '{{ doc("evm_column_deprecation_notice") }}'
+        description: '{{ doc("evm_column_deprecation_notice_deposit_receipt_version") }}'
