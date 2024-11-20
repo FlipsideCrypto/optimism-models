@@ -23,6 +23,7 @@ FROM
 WHERE
     abi_data :data :result :: STRING <> 'Max rate limit reached'
 {% endif %}
+order by total_interaction_count desc
 LIMIT
     50
 ), all_contracts AS (
