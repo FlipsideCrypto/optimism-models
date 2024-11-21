@@ -47,17 +47,21 @@ WITH new_locks AS (
             WHEN topics [0] :: STRING = '0xff04ccafc360e16b67d682d17bd9503c4c6b9a131f6be6325762dc9ffc7de624' THEN 'deposit'
             WHEN topics [0] :: STRING = '0x02f25270a4d87bea75db541cdfe559334a275b4a233520ed6c0a2429667cca94' THEN 'withdraw'
         END AS velo_action,
-        _log_id,
-        _inserted_timestamp
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING IN (
             '0xff04ccafc360e16b67d682d17bd9503c4c6b9a131f6be6325762dc9ffc7de624',
             '0x02f25270a4d87bea75db541cdfe559334a275b4a233520ed6c0a2429667cca94'
         ) -- velo locks / unlocks
         AND contract_address = '0x9c7305eb78a432ced5c4d14cac27e8ed569a2e26'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND event_removed = 'false'
 
 {% if is_incremental() %}

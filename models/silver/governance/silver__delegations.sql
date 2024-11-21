@@ -118,7 +118,7 @@ SELECT
             FROM
                 {{ ref('silver__receipts') }}
                 r
-                LEFT OUTER JOIN {{ ref('silver__logs') }}
+                LEFT OUTER JOIN {{ ref('core__fact_event_logs') }}
                 l
                 ON r.tx_hash = l.tx_hash
             WHERE
@@ -139,7 +139,7 @@ AND r._inserted_timestamp >= (
     FROM
         {{ this }}
 )
-AND l._inserted_timestamp >= (
+AND l.modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp

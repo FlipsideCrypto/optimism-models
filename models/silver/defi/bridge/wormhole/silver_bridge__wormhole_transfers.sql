@@ -54,7 +54,7 @@ WITH token_transfers AS (
     FROM
         {{ ref('silver__transfers') }}
         tr
-        INNER JOIN {{ ref('silver__transactions') }}
+        INNER JOIN {{ ref('core__fact_transactions') }}
         tx
         ON tr.block_number = tx.block_number
         AND tr.tx_hash = tx.tx_hash

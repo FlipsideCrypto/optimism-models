@@ -43,15 +43,19 @@ log_pull as (
         utils.udf_hex_to_int(
         segmented_data [0] :: STRING
         ) :: INTEGER AS redeemAmount_raw,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     from 
-        {{ ref('silver__logs') }} l 
+        {{ ref('core__fact_event_logs') }} l 
     WHERE
         contract_address IN (SELECT TOKEN_ADDRESS FROM asset_details)
     AND
         topics [0] :: STRING = '0x3f693fff038bb8a046aa76d9516190ac7444f7d69cf952c4cbdc086fdef2d6fc'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT

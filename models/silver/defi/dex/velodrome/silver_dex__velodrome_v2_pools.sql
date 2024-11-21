@@ -22,16 +22,20 @@ SELECT
         ELSE TRUE
     END AS stable,
     CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS pool_address,
-    _log_id,
-    _inserted_timestamp
+    CONCAT(
+        tx_hash :: STRING,
+        '-',
+        event_index :: STRING
+    ) AS _log_id,
+    modified_timestamp AS _inserted_timestamp
 FROM
-    {{ ref('silver__logs') }}
+    {{ ref('core__fact_event_logs') }}
 WHERE
     topics [0] = '0x2128d88d14c80cb081c1252a5acff7a264671bf199ce226b53788fb26065005e'
     AND contract_address = '0xf1046053aa5682b4f9a81b5481394da16be5ff5a'
     AND pool_address <> '0x585af0b397ac42dbef7f18395426bf878634f18d' -- velo v1/v2 converter
     AND block_number > 100000000
-    AND tx_status = 'SUCCESS'
+    AND tx_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

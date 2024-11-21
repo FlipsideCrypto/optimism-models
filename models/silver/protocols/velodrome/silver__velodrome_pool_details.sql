@@ -21,7 +21,11 @@ SELECT
     token1_address,
     token0_decimals,
     token1_decimals,
-    l._log_id,
+    CONCAT(
+        l.tx_hash,
+        '-',
+        l.event_index
+    ) AS _log_id,
     p._inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
         ['pool_address']
@@ -32,7 +36,7 @@ SELECT
 FROM
     {{ ref('silver__velodrome_pools') }}
     p
-    LEFT JOIN {{ ref('silver__logs') }}
+    LEFT JOIN {{ ref('core__fact_event_logs') }}
     l
     ON p.created_hash = l.tx_hash
     AND p.created_block = l.block_number
@@ -45,7 +49,7 @@ WHERE
         FROM
             {{ this }}
     )
-    AND l._inserted_timestamp >= (
+    AND l.modified_timestamp >= (
         SELECT
             MAX(_inserted_timestamp) - INTERVAL '12 hours'
         FROM
