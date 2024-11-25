@@ -54,13 +54,12 @@ exactly_repayments AS (
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
-  SELECT
-    MAX(
-      _inserted_timestamp
-    ) - INTERVAL '12 hours'
-  FROM
-    {{ this }}
+    SELECT
+        MAX(_inserted_timestamp) - INTERVAL '12 hours'
+    FROM
+        {{ this }}
 )
+AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 ),
 exactly_combine AS (

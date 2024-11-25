@@ -46,12 +46,11 @@ WITH deposits AS(
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        MAX(
-            _inserted_timestamp
-        ) - INTERVAL '12 hours'
+        MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )
+AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 AND contract_address = LOWER('0x794a61358D6845594F94dc1DB02A252b5b4814aD')
 AND tx_status = 'SUCCESS' --excludes failed txs
