@@ -46,6 +46,10 @@ traces_pull AS (
                 log_pull
         )
         AND type = 'STATICCALL'
+    UNION ALL
+    SELECT --Market USDC does not have a staticcall trace with underlying asset information
+        '0x6926b434cce9b5b7966ae1bfeef6d0a7dcf3a8bb' AS token_address,
+        '0x0b2c639c533813f4aa9d7837caf62653d097ff85' AS underlying_asset
 ),
 contracts AS (
     SELECT
