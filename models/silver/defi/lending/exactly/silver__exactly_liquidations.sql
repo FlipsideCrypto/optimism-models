@@ -43,10 +43,14 @@ exactly_liquidations AS (
     ) :: INTEGER AS repayAmount_raw,
     CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS tokenCollateral,
     'Exactly' AS platform,
-    _inserted_timestamp,
-    _log_id
+    modified_timestamp AS _inserted_timestamp,
+    CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+    ) AS _log_id
   FROM
-    {{ ref('silver__logs') }}
+    {{ ref('core__fact_event_logs') }}
   WHERE
     contract_address IN (
       SELECT
@@ -55,7 +59,7 @@ exactly_liquidations AS (
         asset_details
     )
     AND topics [0] :: STRING = '0x67bb48f97d82192848c24158abf58ec614777328e19655e0a219652b773fd1db'
-    AND tx_status = 'SUCCESS'
+    AND tx_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
