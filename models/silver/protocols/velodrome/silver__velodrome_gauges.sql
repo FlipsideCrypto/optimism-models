@@ -35,9 +35,9 @@ new_gauges AS (
         CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS pool_address,
         CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 27, 40)) AS creator_address,
         CONCAT('0x', SUBSTR(segmented_data [1] :: STRING, 27, 40)) AS internal_bribe_address,
-        _inserted_timestamp
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0xa4d97e9e7c65249b4cd01acb82add613adea98af32daf092366982f0a0d4e453'
         AND contract_address = '0x09236cff45047dbee6b921e00704bed6d6b8cf7e'

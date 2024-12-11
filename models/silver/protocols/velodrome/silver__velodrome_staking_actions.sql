@@ -35,16 +35,20 @@ WITH staking_actions AS (
         ) :: FLOAT AS amount,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS lp_provider_address,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS gauge_address,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING IN (
             '0xdcbc1c05240f31ff3ad067ef1ee35ce4997762752e3a095284754544f4c709d7',
             '0xf341246adaac6f497bc2a656f546ab9e182111d630394f0c57c710a59a2cb567'
         ) -- deposit / withdrawal
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND event_removed = 'false'
 
 {% if is_incremental() %}
@@ -75,7 +79,7 @@ token_transfer AS (
             )
         ) :: FLOAT AS amount
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         block_timestamp IN (
             SELECT
@@ -92,7 +96,7 @@ token_transfer AS (
         AND topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
