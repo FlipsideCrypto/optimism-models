@@ -25,6 +25,8 @@ SELECT
     state_root, --new column
     transactions_root, --new column
     logs_bloom, --new column
+    base_fee_per_gas, --new column
+    withdrawals_root,
     COALESCE (
         blocks_id,
         {{ dbt_utils.generate_surrogate_key(
@@ -128,8 +130,7 @@ SELECT
         l1_submission_batch_root,
         'l1_submission_tx_hash',
         l1_submission_tx_hash
-    ) AS l1_submission_details, --deprecate, may build separate table
-    withdrawals_root --deprecate, may build separate table
+    ) AS l1_submission_details --deprecate, may build separate table
 FROM
     {{ ref('silver__blocks') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}

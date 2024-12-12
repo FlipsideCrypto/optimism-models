@@ -67,4 +67,6 @@ models:
       - name: MODIFIED_TIMESTAMP
         description: '{{ doc("evm_modified_timestamp") }}'
       - name: WITHDRAWALS_ROOT
-        description: '{{ doc("evm_column_deprecation_notice_withdrawals_root") }}'
+        description: '{{ doc("evm_withdrawals_root") }}'
+      - name: BASE_FEE_PER_GAS
+        description: '{{ doc("evm_base_fee_per_gas") }}'
