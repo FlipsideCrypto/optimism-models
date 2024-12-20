@@ -4,7 +4,7 @@
       "sql_limit": var("DECODED_LOGS_HISTORY_SQL_LIMIT", 7500000),
       "producer_batch_size": var("DECODED_LOGS_HISTORY_PRODUCER_BATCH_SIZE", 400000),
       "worker_batch_size": var("DECODED_LOGS_HISTORY_WORKER_BATCH_SIZE", 100000),
-      "producer_limit_size": var("DECODED_LOGS_HISTORY_WORKER_BATCH_SIZE", 100000)
+      "producer_limit_size": var("DECODED_LOGS_HISTORY_WORKER_BATCH_SIZE", 1000000)
   } -%}
 
   {% set wait_time = var("DECODED_LOGS_HISTORY_WAIT_TIME", 60) %}
