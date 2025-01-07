@@ -30,7 +30,7 @@ jobs:
   run_dbt_jobs:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.event_name == 'workflow_dispatch' && inputs.use_xl_env && 'workflow_prod_2xl' || 'workflow_prod' }}
+      name: ${{ github.event_name == 'workflow_dispatch' && inputs.use_xl_env && 'workflow_prod_2xl' || 'workflow_prod_backfill' }}
 
     steps:
       - uses: actions/checkout@v3
