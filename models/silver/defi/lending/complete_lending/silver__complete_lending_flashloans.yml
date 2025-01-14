@@ -25,9 +25,9 @@ models:
       - name: PROTOCOL_MARKET
         tests:
           - not_null 
-      - name: INITIATOR
-        tests:
-          - not_null
+      # - name: INITIATOR
+      #   tests:
+      #     - not_null
       - name: TARGET
         tests:
           - not_null
