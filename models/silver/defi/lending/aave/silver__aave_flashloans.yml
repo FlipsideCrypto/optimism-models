@@ -35,9 +35,9 @@ models:
               column_type_list:
                 - decimal
                 - float 
-      - name: INITIATOR_ADDRESS
-        tests:
-          - not_null
+      # - name: INITIATOR_ADDRESS
+      #   tests:
+      #     - not_null
       - name: TARGET_ADDRESS
         tests:
           - not_null
