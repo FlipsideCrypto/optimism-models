@@ -38,7 +38,7 @@ missing_txs AS (
         file_name
     FROM
         all_txs
-        LEFT JOIN {{ ref("silver__traces") }}
+        LEFT JOIN {{ ref("core__fact_traces") }}
         tr USING (
             block_number,
             tx_hash

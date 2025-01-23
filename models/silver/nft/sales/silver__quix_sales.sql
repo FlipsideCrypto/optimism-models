@@ -186,7 +186,7 @@ eth_payment_raw AS (
         tx_hash,
         from_address,
         to_address,
-        eth_value,
+        VALUE AS eth_value,
         CASE
             WHEN to_address = '0xec1557a67d4980c948cd473075293204f4d280fd' THEN eth_value
             ELSE 0
@@ -207,7 +207,7 @@ eth_payment_raw AS (
             ELSE 0
         END AS creator_fee_raw_
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
     WHERE
         block_timestamp >= '2021-12-01'
         AND tx_hash IN (
@@ -238,7 +238,7 @@ eth_payment_raw AS (
         )
 
 {% if is_incremental() %}
-AND TO_TIMESTAMP_NTZ(_inserted_timestamp) >= (
+AND TO_TIMESTAMP_NTZ(modified_timestamp) >= (
     SELECT
         MAX(
             _inserted_timestamp

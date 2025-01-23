@@ -68,3 +68,8 @@ sources:
     schema: defillama
     tables:
       - name: dim_chains
+  - name: optimism_gold
+    database: optimism
+    schema: core
+    tables:
+      - name: fact_traces

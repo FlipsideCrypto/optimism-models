@@ -81,7 +81,10 @@ broken_blocks AS (
     FROM
         {{ ref("silver__transactions") }}
         tx
-        LEFT JOIN {{ ref("silver__traces") }}
+        LEFT JOIN {{ source(
+            "optimism_gold",
+            "fact_traces"
+        ) }}
         tr USING (
             block_number,
             tx_hash
