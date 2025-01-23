@@ -69,7 +69,7 @@ sources:
     tables:
       - name: dim_chains
   - name: optimism_gold
-    database: optimism
+    database: "{{ 'optimism' if target.database == 'OPTIMISM' else 'optimism_dev' }}"
     schema: core
     tables:
       - name: fact_traces
