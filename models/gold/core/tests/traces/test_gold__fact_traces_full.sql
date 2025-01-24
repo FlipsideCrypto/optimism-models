@@ -1,12 +1,12 @@
 {{ config (
-    materialized = 'view',
+    materialized = "view",
     tags = ['full_test']
 ) }}
 
 SELECT
     *
 FROM
-    {{ ref('silver__traces') }}
+    {{ ref('core__fact_traces') }}
 WHERE
     block_number NOT IN (
         SELECT
