@@ -1,12 +1,24 @@
+-- depends_on: {{ ref('bronze__overflowed_traces') }}
+{% set warehouse = 'DBT_SNOWPARK' if var('OVERFLOWED_TRACES') else target.warehouse %}
 {{ config (
-    materialized = 'view',
-    tags = ['overflowed_traces']
+    materialized = "incremental",
+    incremental_strategy = 'delete+insert',
+    unique_key = ['block_number','tx_position'],
+    cluster_by = ['modified_timestamp::DATE','partition_key'],
+    tags = ['overflowed_traces'],
+    full_refresh = false,
+    snowflake_warehouse = warehouse
 ) }}
 
+{% if is_incremental() %}
 WITH bronze_overflowed_traces AS (
 
     SELECT
         block_number :: INT AS block_number,
+        ROUND(
+            block_number,
+            -3
+        ) AS partition_key,
         index_vals [1] :: INT AS tx_position,
         IFF(
             path IN (
@@ -21,6 +33,7 @@ WITH bronze_overflowed_traces AS (
                 'result.output',
                 'result.error',
                 'result.revertReason',
+                'result.time',
                 'gasUsed',
                 'gas',
                 'type',
@@ -31,8 +44,7 @@ WITH bronze_overflowed_traces AS (
                 'error',
                 'output',
                 'revertReason',
-                'txHash',
-                'result.txHash'
+                'time'
             ),
             'ORIGIN',
             REGEXP_REPLACE(REGEXP_REPLACE(path, '[^0-9]+', '_'), '^_|_$', '')
@@ -58,7 +70,7 @@ WITH bronze_overflowed_traces AS (
         SPLIT(
             trace_address,
             '_'
-        ) AS str_array
+        ) AS trace_address_array
     FROM
         {{ ref("bronze__overflowed_traces") }}
     GROUP BY
@@ -66,118 +78,40 @@ WITH bronze_overflowed_traces AS (
         tx_position,
         trace_address,
         _inserted_timestamp
-),
-sub_traces AS (
-    SELECT
-        block_number,
-        tx_position,
-        parent_trace_address,
-        COUNT(*) AS sub_traces
-    FROM
-        bronze_overflowed_traces
-    GROUP BY
-        block_number,
-        tx_position,
-        parent_trace_address
-),
-num_array AS (
-    SELECT
-        block_number,
-        tx_position,
-        trace_address,
-        ARRAY_AGG(flat_value) AS num_array
-    FROM
-        (
-            SELECT
-                block_number,
-                tx_position,
-                trace_address,
-                IFF(
-                    VALUE :: STRING = 'ORIGIN',
-                    -1,
-                    VALUE :: INT
-                ) AS flat_value
-            FROM
-                bronze_overflowed_traces,
-                LATERAL FLATTEN (
-                    input => str_array
-                )
-        )
-    GROUP BY
-        block_number,
-        tx_position,
-        trace_address
-),
-cleaned_traces AS (
-    SELECT
-        b.block_number,
-        b.tx_position,
-        b.trace_address,
-        IFNULL(
-            sub_traces,
-            0
-        ) AS sub_traces,
-        num_array,
-        ROW_NUMBER() over (
-            PARTITION BY b.block_number,
-            b.tx_position
-            ORDER BY
-                num_array ASC
-        ) - 1 AS trace_index,
-        trace_json,
-        b._inserted_timestamp
-    FROM
-        bronze_overflowed_traces b
-        LEFT JOIN sub_traces s
-        ON b.block_number = s.block_number
-        AND b.tx_position = s.tx_position
-        AND b.trace_address = s.parent_trace_address
-        JOIN num_array n
-        ON b.block_number = n.block_number
-        AND b.tx_position = n.tx_position
-        AND b.trace_address = n.trace_address
 )
 SELECT
-    tx_position,
-    trace_index,
     block_number,
+    tx_position,
     trace_address,
-    trace_json :error :: STRING AS error_reason,
-    trace_json :from :: STRING AS from_address,
-    trace_json :to :: STRING AS to_address,
-    IFNULL(
-        utils.udf_hex_to_int(
-            trace_json :value :: STRING
-        ),
-        '0'
-    ) AS eth_value_precise_raw,
-    utils.udf_decimal_adjust(
-        eth_value_precise_raw,
-        18
-    ) AS eth_value_precise,
-    eth_value_precise :: FLOAT AS eth_value,
-    utils.udf_hex_to_int(
-        trace_json :gas :: STRING
-    ) :: INT AS gas,
-    utils.udf_hex_to_int(
-        trace_json :gasUsed :: STRING
-    ) :: INT AS gas_used,
-    trace_json :input :: STRING AS input,
-    trace_json :output :: STRING AS output,
-    trace_json :type :: STRING AS TYPE,
-    concat_ws(
-        '_',
-        TYPE,
-        trace_address
-    ) AS identifier,
-    concat_ws(
-        '-',
-        block_number,
-        tx_position,
-        identifier
-    ) AS _call_id,
+    parent_trace_address,
+    trace_address_array,
+    trace_json,
+    partition_key,
     _inserted_timestamp,
-    trace_json AS DATA,
-    sub_traces
+    {{ dbt_utils.generate_surrogate_key(
+        ['block_number', 'tx_position', 'trace_address']
+    ) }} AS traces_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
-    cleaned_traces
+    bronze_overflowed_traces qualify(ROW_NUMBER() over(PARTITION BY traces_id
+ORDER BY
+    _inserted_timestamp DESC)) = 1
+{% else %}
+SELECT
+    NULL :: INT AS block_number,
+    NULL :: INT tx_position,
+    NULL :: text AS trace_address,
+    NULL :: text AS parent_trace_address,
+    NULL :: ARRAY AS trace_address_array,
+    NULL :: OBJECT AS trace_json,
+    NULL :: INT AS partition_key,
+    NULL :: timestamp_ltz AS _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['block_number', 'tx_position', 'trace_address']
+    ) }} AS traces_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
+{% endif %}

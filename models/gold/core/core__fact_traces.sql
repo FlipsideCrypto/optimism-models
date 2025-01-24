@@ -62,7 +62,7 @@ SELECT
     traces_id,
     'overflow' AS source
 FROM
-    {{ ref('silver__overflowed_traces2') }}
+    {{ ref('silver__overflowed_traces') }}
 WHERE
     1 = 1
 

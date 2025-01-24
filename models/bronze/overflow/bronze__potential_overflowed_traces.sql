@@ -6,53 +6,62 @@
 WITH impacted_blocks AS (
 
     SELECT
-        VALUE :: INT AS block_number
+        blocks_impacted_array
     FROM
-        (
-            SELECT
-                blocks_impacted_array
-            FROM
-                {{ ref("silver_observability__traces_completeness") }}
-            ORDER BY
-                test_timestamp DESC
-            LIMIT
-                1
-        ), LATERAL FLATTEN (
+        {{ ref("silver_observability__traces_completeness") }}
+    ORDER BY
+        test_timestamp DESC
+    LIMIT
+        1
+), all_missing AS (
+    SELECT
+        DISTINCT VALUE :: INT AS block_number
+    FROM
+        impacted_blocks,
+        LATERAL FLATTEN (
             input => blocks_impacted_array
         )
 ),
 all_txs AS (
     SELECT
-        t.block_number,
-        t.position,
-        t.tx_hash
+        block_number,
+        POSITION AS tx_position,
+        tx_hash
     FROM
         {{ ref("silver__transactions") }}
-        t
-        JOIN impacted_blocks USING (block_number)
+        JOIN all_missing USING (block_number)
 ),
 missing_txs AS (
     SELECT
-        DISTINCT block_number,
-        POSITION,
+        DISTINCT txs.block_number,
+        txs.tx_position,
         file_name
     FROM
-        all_txs
+        all_txs txs
         LEFT JOIN {{ source(
             "optimism_gold",
             "fact_traces"
         ) }}
-        tr USING (
+        tr2 USING (
             block_number,
-            tx_hash
+            tx_position
         )
         JOIN {{ ref("streamline__complete_debug_traceBlockByNumber") }} USING (block_number)
+        LEFT JOIN {{ source(
+            'optimism_silver',
+            'overflowed_traces'
+        ) }}
+        ot USING (
+            block_number,
+            tx_position
+        )
     WHERE
-        tr.tx_hash IS NULL
+        tr2.block_number IS NULL
+        AND ot.block_number IS NULL
 )
 SELECT
     block_number,
-    POSITION,
+    tx_position AS POSITION,
     file_name,
     build_scoped_file_url(
         @streamline.bronze.external_tables,

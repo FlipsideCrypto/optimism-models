@@ -23,13 +23,7 @@ WITH base AS (
                     'optimism-models',
                     'dbt_run_overflowed_traces.yml',
                     NULL
-                ) AS run_overflow_models,
-                github_actions.workflow_dispatches(
-                    'FlipsideCrypto',
-                    'optimism-models',
-                    'dbt_run_overflowed_traces2.yml',
-                    NULL
-                ) AS run_overflow_models2
+                ) AS run_overflow_models
             FROM
                 base
             WHERE
@@ -47,15 +41,7 @@ WITH base AS (
                 'status',
                 'skipped'
             )
-        ) AS run_overflow_models,
-        COALESCE(
-            run_overflow_models2,
-            OBJECT_CONSTRUCT(
-                'status',
-                'skipped'
-            )
-        ) AS run_overflow_models2,
-        SYSDATE() AS test_timestamp
+        ) AS run_overflow_models SYSDATE() AS test_timestamp
     FROM
         (
             SELECT
