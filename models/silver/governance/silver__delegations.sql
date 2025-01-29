@@ -112,9 +112,13 @@ SELECT
             COALESCE(raw_new_balance / pow(10, 18), 0) AS new_balance,
             COALESCE(raw_previous_balance / pow(10, 18), 0) AS previous_balance,
             r._inserted_timestamp,
-            l._log_id,
+            CONCAT(
+                l.tx_hash :: STRING,
+                '-',
+                l.event_index :: STRING
+            ) AS _log_id,
             {{ dbt_utils.generate_surrogate_key(
-                ['l._log_id']
+                ['l.tx_hash', 'l.event_index']
             ) }} AS delegations_id,
             SYSDATE() AS inserted_timestamp,
             SYSDATE() AS modified_timestamp,
