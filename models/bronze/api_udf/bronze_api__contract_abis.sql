@@ -15,16 +15,18 @@ WITH base AS (
         total_interaction_count >= 100
 
 {% if is_incremental() %}
-EXCEPT
+and contract_address not in (
 SELECT
     contract_address
 FROM
     {{ this }}
-WHERE
-    abi_data :data :result :: STRING <> 'Max rate limit reached'
+    WHERE
+        abi_data :data :result :: STRING <> 'Max rate limit reached'
+)
 {% endif %}
+order by total_interaction_count desc
 LIMIT
-    50
+    400
 ), all_contracts AS (
     SELECT
         contract_address
@@ -46,7 +48,7 @@ row_nos AS (
     FROM
         all_contracts
 ),
-batched AS ({% for item in range(150) %}
+batched AS ({% for item in range(501) %}
 SELECT
     rn.contract_address, live.udf_api('GET', CONCAT('https://api-optimistic.etherscan.io/api?module=contract&action=getabi&address=', rn.contract_address, '&apikey={key}'),{ 'User-Agent': 'FlipsideStreamline' },{}, 'Vault/prod/block_explorers/op_etherscan') AS abi_data, SYSDATE() AS _inserted_timestamp
 FROM

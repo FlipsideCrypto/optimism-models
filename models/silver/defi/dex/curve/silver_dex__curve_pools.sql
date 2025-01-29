@@ -19,7 +19,7 @@ WITH contract_deployments AS (
             block_number,
             tx_position,
             CONCAT(
-                type,
+                TYPE,
                 '_',
                 trace_address
             )
@@ -51,6 +51,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
+AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 
 qualify(ROW_NUMBER() over(PARTITION BY to_address

@@ -4,12 +4,50 @@
     tags = ['streamline_decoded_logs_realtime']
 ) }}
 
-WITH look_back AS (
+WITH target_blocks AS ( 
 
     SELECT
         block_number
+    FROM  
+        {{ ref('core__fact_blocks') }}
+    WHERE 
+        block_number >= (
+            SELECT
+                block_number
+            FROM
+                {{ ref("_block_lookback") }}
+        )
+),
+existing_logs_to_exclude AS (
+    SELECT
+        _log_id
     FROM
-        {{ ref("_24_hour_lookback") }}
+        {{ ref('streamline__complete_decode_logs') }}
+        l
+        INNER JOIN target_blocks b USING (block_number)
+    WHERE
+        l._inserted_timestamp :: DATE >= DATEADD('day', -5, SYSDATE())
+),
+candidate_logs AS (
+    SELECT
+        l.block_number,
+        l.tx_hash,
+        l.event_index,
+        l.contract_address,
+        l.topics,
+        l.data,
+        CONCAT(
+            l.tx_hash :: STRING,
+            '-',
+            l.event_index :: STRING
+        ) AS _log_id
+    FROM
+        target_blocks b
+        INNER JOIN {{ ref('core__fact_event_logs') }}
+        l USING (block_number)
+    WHERE
+        l.tx_status = 'SUCCESS'
+        AND l.inserted_timestamp :: DATE >= DATEADD('day', -5, SYSDATE())
 )
 SELECT
     l.block_number,
@@ -24,34 +62,19 @@ SELECT
         l.contract_address
     ) AS DATA
 FROM
-    {{ ref("silver__logs") }}
-    l
-    INNER JOIN {{ ref("silver__complete_event_abis") }} A
+    candidate_logs l
+    INNER JOIN {{ ref('silver__complete_event_abis') }} A
     ON A.parent_contract_address = l.contract_address
     AND A.event_signature = l.topics [0] :: STRING
     AND l.block_number BETWEEN A.start_block
     AND A.end_block
 WHERE
-    (
-        l.block_number >= (
-            SELECT
-                block_number
-            FROM
-                look_back
-        )
-    )
-    AND l.block_number IS NOT NULL
-    AND l.block_timestamp >= DATEADD('day', -2, CURRENT_DATE())
-    AND _log_id NOT IN (
+    NOT EXISTS (
         SELECT
-            _log_id
+            1
         FROM
-            {{ ref("streamline__complete_decode_logs") }}
+            existing_logs_to_exclude e
         WHERE
-            block_number >= (
-                SELECT
-                    block_number
-                FROM
-                    look_back
-            )
-            AND _inserted_timestamp >= DATEADD('day', -2, CURRENT_DATE()))
+            e._log_id = l._log_id
+    )
+limit 7500000

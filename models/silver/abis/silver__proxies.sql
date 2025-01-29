@@ -99,5 +99,6 @@ FROM
     FINAL f
     JOIN {{ ref('silver__created_contracts') }} C
     ON f.contract_address = C.created_contract_address
-    JOIN {{ ref('silver__created_contracts') }} p
+    JOIN {{ ref('silver__created_contracts') }}
+    p
     ON f.proxy_address = p.created_contract_address

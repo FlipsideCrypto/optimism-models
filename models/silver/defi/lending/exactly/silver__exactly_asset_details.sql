@@ -24,17 +24,15 @@ WITH log_pull AS (
     WHERE
         topics [0] :: STRING = '0x7902cd1307c545e3f5782172612372bf997a93698917ced12b2f83d86e347d0c'
         AND origin_from_address = LOWER('0xe61bdef3fff4c3cf7a07996dcb8802b5c85b665a')
-    
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        MAX(
-            _inserted_timestamp
-        ) - INTERVAL '12 hours'
+        MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )
+AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 ),
 traces_pull AS (
@@ -50,7 +48,12 @@ traces_pull AS (
             FROM
                 log_pull
         )
-        AND type = 'STATICCALL'
+        AND TYPE = 'STATICCALL'
+    UNION ALL
+        --Market USDC does not have a staticcall trace with underlying asset information
+    SELECT
+        '0x6926b434cce9b5b7966ae1bfeef6d0a7dcf3a8bb' AS token_address,
+        '0x0b2c639c533813f4aa9d7837caf62653d097ff85' AS underlying_asset
 ),
 contracts AS (
     SELECT
