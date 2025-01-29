@@ -46,7 +46,7 @@ blocks AS (
                     SELECT
                         MAX(block_number) AS max_block
                     FROM
-                        {{ ref ('silver__blocks') }}
+                        {{ ref ('core__fact_blocks') }}
                 )
             )
         )

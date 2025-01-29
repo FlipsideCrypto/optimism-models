@@ -43,7 +43,11 @@ WITH base_evt AS (
         decoded_log :"transferNonce" :: STRING AS transferNonce,
         decoded_log AS decoded_flat,
         event_removed,
-        tx_succeeded AS tx_status,
+        IFF(
+            tx_succeeded,
+            'SUCCESS',
+            'FAIL'
+        ) AS tx_status,
         CONCAT(
             tx_hash :: STRING,
             '-',

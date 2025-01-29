@@ -25,7 +25,7 @@ raw_decoded_logs AS (
         contract_address,
         event_index,
         decoded_log AS decoded_flat,
-        full_decoded_data AS decoded_data,
+        full_decoded_log AS decoded_data,
         block_number,
         block_timestamp,
         origin_from_address,

@@ -44,7 +44,11 @@ WITH base_evt AS (
         ) AS relayerFeePct,
         decoded_log AS decoded_flat,
         event_removed,
-        tx_succeeded AS tx_status,
+        IFF(
+            tx_succeeded,
+            'SUCCESS',
+            'FAIL'
+        ) AS tx_status,
         CONCAT(
             tx_hash :: STRING,
             '-',
@@ -92,7 +96,11 @@ bridge_to AS (
         decoded_log :"to" :: STRING AS to_address,
         decoded_log AS decoded_flat,
         event_removed,
-        tx_succeeded AS tx_status,
+        IFF(
+            tx_succeeded,
+            'SUCCESS',
+            'FAIL'
+        ) AS tx_status,
         CONCAT(
             tx_hash :: STRING,
             '-',

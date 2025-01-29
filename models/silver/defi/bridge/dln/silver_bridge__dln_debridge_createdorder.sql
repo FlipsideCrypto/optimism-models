@@ -62,7 +62,11 @@ WITH base_evt AS (
         ) AS referralCode,
         decoded_log AS decoded_flat,
         event_removed,
-        tx_status,
+        IFF(
+            tx_succeeded,
+            'SUCCESS',
+            'FAIL'
+        ) AS tx_status,
         _log_id,
         _inserted_timestamp
     FROM

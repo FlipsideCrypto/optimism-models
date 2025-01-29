@@ -89,6 +89,12 @@ This table is being deprecated for standardization purposes. Please update your 
 
 {% enddocs %}
 
+{% docs evm_table_deprecation_notice_fact_token_transfers %}
+
+This table is being deprecated for standardization purposes. Please update your queries to use `ez_token_transfers` instead by February 3, 2025.
+
+{% enddocs %}
+
 {% docs evm_column_deprecation_notice_l1_state_root_tx_hash %}
 
 This column is being deprecated for standardization purposes. Please remove from your queries by February 3, 2025.

@@ -45,7 +45,7 @@ decoded AS (
         tx_hash,
         decoded_log AS decoded_flat,
         event_index,
-        full_decoded_data AS decoded_data,
+        full_decoded_log AS decoded_data,
         CONCAT(
             tx_hash :: STRING,
             '-',
