@@ -41,7 +41,8 @@ WITH base AS (
                 'status',
                 'skipped'
             )
-        ) AS run_overflow_models SYSDATE() AS test_timestamp
+        ) AS run_overflow_models,
+        SYSDATE() AS test_timestamp
     FROM
         (
             SELECT
