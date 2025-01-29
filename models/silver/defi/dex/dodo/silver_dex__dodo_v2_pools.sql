@@ -13,11 +13,20 @@ WITH pool_tr AS (
         block_timestamp,
         from_address AS deployer_address,
         to_address AS pool_address,
-        _call_id,
-        _inserted_timestamp
+        concat_ws(
+            '-',
+            block_number,
+            tx_position,
+            CONCAT(
+                TYPE,
+                '_',
+                trace_address
+            )
+        ) AS _call_id,
+        modified_timestamp AS _inserted_timestamp
     FROM
         {{ ref(
-            'silver__traces'
+            'core__fact_traces'
         ) }}
     WHERE
         from_address IN (

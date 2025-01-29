@@ -52,7 +52,6 @@ sources:
     tables:
       - name: verified_abis
       - name: overflowed_traces
-      - name: overflowed_traces2
   - name: optimism_bronze_api
     database: optimism
     schema: bronze_api
@@ -68,3 +67,8 @@ sources:
     schema: defillama
     tables:
       - name: dim_chains
+  - name: optimism_gold
+    database: "{{ 'optimism' if target.database == 'OPTIMISM' else 'optimism_dev' }}"
+    schema: core
+    tables:
+      - name: fact_traces

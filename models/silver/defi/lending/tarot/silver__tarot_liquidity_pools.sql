@@ -46,7 +46,7 @@ lp_token_pull AS (
         t.tx_hash,
         C.*
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
         t
         LEFT JOIN {{ ref('silver__contracts') }} C
         ON to_address = contract_address

@@ -11,9 +11,9 @@ WITH base AS (
         from_address,
         to_address,
         MIN(block_number) AS start_block,
-        MAX(_inserted_timestamp) AS _inserted_timestamp
+        MAX(modified_timestamp) AS _inserted_timestamp
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
     WHERE
         TYPE = 'DELEGATECALL'
         AND trace_status = 'SUCCESS'
@@ -21,7 +21,7 @@ WITH base AS (
         AND from_address != to_address -- exclude self-calls
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(_inserted_timestamp) - INTERVAL '24 hours'
     FROM
@@ -99,5 +99,6 @@ FROM
     FINAL f
     JOIN {{ ref('silver__created_contracts') }} C
     ON f.contract_address = C.created_contract_address
-    JOIN {{ ref('silver__created_contracts') }} p
+    JOIN {{ ref('silver__created_contracts') }}
+    p
     ON f.proxy_address = p.created_contract_address
