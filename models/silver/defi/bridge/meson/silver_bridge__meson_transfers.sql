@@ -53,7 +53,11 @@ native_transfers AS (
         et.from_address,
         et.to_address,
         amount_precise_raw,
-        concat_ws('-', et.block_number, et.tx_position, CONCAT(et.type, '_', et.trace_address)) AS _call_id,
+        CONCAT(
+            et.tx_hash :: STRING,
+            '-',
+            et.trace_index :: STRING
+        ) AS _call_id,
         et.modified_timestamp AS _inserted_timestamp
     FROM
         {{ ref('core__ez_native_transfers') }}
