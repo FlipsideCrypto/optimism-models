@@ -28,9 +28,9 @@ WITH base_evt AS (
         TRY_TO_NUMBER(utils.udf_hex_to_int(segmented_data [5] :: STRING)) AS messenger,
         tx_succeeded,
         CONCAT(
-            tx_hash,
+            tx_hash :: STRING,
             '-',
-            event_index
+            event_index :: STRING
         ) AS _log_id,
         modified_timestamp AS _inserted_timestamp
     FROM
@@ -68,9 +68,9 @@ lp_evt AS (
         TRY_TO_NUMBER(utils.udf_hex_to_int(segmented_data [4] :: STRING)) AS fee,
         tx_succeeded,
         CONCAT(
-            tx_hash,
+            tx_hash :: STRING,
             '-',
-            event_index
+            event_index :: STRING
         ) AS _log_id,
         modified_timestamp AS _inserted_timestamp
     FROM

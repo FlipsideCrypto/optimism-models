@@ -41,9 +41,9 @@ WITH swaps_base AS (
         event_index,
         'synthetix' AS platform,
         CONCAT(
-            tx_hash,
+            tx_hash :: STRING,
             '-',
-            event_index
+            event_index :: STRING
         ) AS _log_id,
         modified_timestamp AS _inserted_timestamp
     FROM
