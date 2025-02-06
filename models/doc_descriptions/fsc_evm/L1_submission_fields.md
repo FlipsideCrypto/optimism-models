@@ -88,3 +88,8 @@ Confirmed blocks prior to this batch on the OP stack L2 chain.
 
 {% enddocs %}
 
+{% docs evm_l1_fee_precise %}
+
+The precise amount of the L1 fee. This is returned as a string to avoid precision loss. 
+
+{% enddocs %}

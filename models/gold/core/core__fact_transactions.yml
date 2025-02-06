@@ -48,6 +48,8 @@ models:
         description: '{{ doc("evm_l1_fee_scalar") }}'
       - name: L1_FEE
         description: The L1 portion of fees paid.
+      - name: L1_FEE_PRECISE
+        description: '{{ doc("evm_l1_fee_precise") }}'
       - name: L1_STATE_ROOT_TX_HASH
         description: '{{ doc("evm_column_deprecation_notice_l1_state_root_tx_hash") }}'
       - name: L1_STATE_ROOT_BATCH_INDEX
