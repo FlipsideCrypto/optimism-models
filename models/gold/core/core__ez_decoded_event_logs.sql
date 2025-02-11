@@ -1,20 +1,29 @@
-{{ config(
-    materialized = 'view',
-    persist_docs ={ "relation": true,
-    "columns": true }
+{{ config (
+    materialized = "incremental",
+    unique_key = "ez_decoded_event_logs_id",
+    incremental_strategy = 'delete+insert',
+    cluster_by = "block_timestamp::date",
+    incremental_predicates = ["dynamic_range", "block_number"],
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(ez_decoded_event_logs_id, contract_name, contract_address)",
+    tags = ['decoded_logs']
 ) }}
 
 SELECT
     block_number,
     block_timestamp,
     tx_hash,
+    {# tx_position,  #} -- new column
     event_index,
     contract_address,
     topics,
-    topics[0]::STRING AS topic_0, --new column
-    topics[1]::STRING AS topic_1, --new column
-    topics[2]::STRING AS topic_2, --new column
-    topics[3]::STRING AS topic_3, --new column
+    topics [0] :: STRING AS topic_0,
+    --new column
+    topics [1] :: STRING AS topic_1,
+    --new column
+    topics [2] :: STRING AS topic_2,
+    --new column
+    topics [3] :: STRING AS topic_3,
+    --new column
     DATA,
     event_removed,
     origin_from_address,
@@ -23,7 +32,7 @@ SELECT
     CASE
         WHEN tx_status = 'SUCCESS' THEN TRUE
         ELSE FALSE
-    END AS tx_succeeded, --new column
+    END AS tx_succeeded,
     event_name,
     decoded_data AS full_decoded_log,
     decoded_flat AS decoded_log,
@@ -34,10 +43,28 @@ SELECT
             ['tx_hash', 'event_index']
         ) }}
     ) AS ez_decoded_event_logs_id,
-    GREATEST(COALESCE(l.inserted_timestamp, '2000-01-01'), COALESCE(C.inserted_timestamp, '2000-01-01')) AS inserted_timestamp,
-    GREATEST(COALESCE(l.modified_timestamp, '2000-01-01'), COALESCE(C.modified_timestamp, '2000-01-01')) AS modified_timestamp,
+{% if is_incremental() %}
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+{% else %}
+    GREATEST(block_timestamp, dateadd('day', -10, SYSDATE())) AS inserted_timestamp,
+    GREATEST(block_timestamp, dateadd('day', -10, SYSDATE())) AS modified_timestamp,
+{% endif %}
     tx_status --deprecate
 FROM
     {{ ref('silver__decoded_logs') }}
     l
     LEFT JOIN {{ ref('silver__contracts') }} C USING (contract_address)
+WHERE 1=1
+
+    {% if is_incremental() %}
+    AND l.modified_timestamp > (
+        SELECT
+            COALESCE(
+                MAX(modified_timestamp),
+                '2000-01-01'::TIMESTAMP
+            )
+        FROM
+            {{ this }}
+    )
+    {% endif %}
