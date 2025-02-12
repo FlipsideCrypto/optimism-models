@@ -29,8 +29,8 @@ WITH base_contracts AS (
     WHERE
         from_address = '0xe3b53af74a4bf62ae5511055290838050bf764df'
         AND TYPE ILIKE 'create%'
-        AND tx_status = 'SUCCESS'
-        AND trace_status = 'SUCCESS'
+        AND tx_succeeded
+        AND trace_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

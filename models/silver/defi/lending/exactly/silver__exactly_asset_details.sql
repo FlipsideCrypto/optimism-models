@@ -13,10 +13,14 @@ WITH log_pull AS (
         block_number,
         block_timestamp,
         contract_address,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0x7902cd1307c545e3f5782172612372bf997a93698917ced12b2f83d86e347d0c'
         AND origin_from_address = LOWER('0xe61bdef3fff4c3cf7a07996dcb8802b5c85b665a')

@@ -21,37 +21,45 @@ WITH base_evt AS (
         topics [0] :: STRING AS topic_0,
         event_name,
         TRY_TO_NUMBER(
-            decoded_flat :"amount" :: STRING
+            decoded_log :"amount" :: STRING
         ) AS amount,
         TRY_TO_NUMBER(
-            decoded_flat :"amountOutMin" :: STRING
+            decoded_log :"amountOutMin" :: STRING
         ) AS amountOutMin,
         TRY_TO_NUMBER(
-            decoded_flat :"bonderFee" :: STRING
+            decoded_log :"bonderFee" :: STRING
         ) AS bonderFee,
         TRY_TO_NUMBER(
-            decoded_flat :"chainId" :: STRING
+            decoded_log :"chainId" :: STRING
         ) AS chainId,
         TRY_TO_TIMESTAMP(
-            decoded_flat :"deadline" :: STRING
+            decoded_log :"deadline" :: STRING
         ) AS deadline,
         TRY_TO_TIMESTAMP(
-            decoded_flat :"index" :: STRING
+            decoded_log :"index" :: STRING
         ) AS index,
-        decoded_flat :"recipient" :: STRING AS recipient,
-        decoded_flat :"transferId" :: STRING AS transferId,
-        decoded_flat :"transferNonce" :: STRING AS transferNonce,
-        decoded_flat,
+        decoded_log :"recipient" :: STRING AS recipient,
+        decoded_log :"transferId" :: STRING AS transferId,
+        decoded_log :"transferNonce" :: STRING AS transferNonce,
+        decoded_log AS decoded_flat,
         event_removed,
-        tx_status,
-        _log_id,
-        _inserted_timestamp
+        IFF(
+            tx_succeeded,
+            'SUCCESS',
+            'FAIL'
+        ) AS tx_status,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__decoded_logs') }}
+        {{ ref('core__ez_decoded_event_logs') }}
     WHERE
         topics [0] :: STRING = '0xe35dddd4ea75d7e9b3fe93af4f4e40e778c3da4074c9d93e7c6536f1e803c1eb'
         AND origin_to_address IS NOT NULL
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

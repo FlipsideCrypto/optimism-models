@@ -20,11 +20,27 @@ WITH seaport_fees_wallet AS (
 ),
 raw_decoded_logs AS (
     SELECT
-        *,
-        decoded_flat :orderHash :: STRING AS orderhash,
-        tx_hash || '-' || decoded_flat :orderHash AS tx_hash_orderhash
+        tx_hash,
+        event_name,
+        contract_address,
+        event_index,
+        decoded_log AS decoded_flat,
+        full_decoded_log AS decoded_data,
+        block_number,
+        block_timestamp,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        TO_TIMESTAMP_NTZ(modified_timestamp) AS _inserted_timestamp,
+        decoded_log :orderHash :: STRING AS orderhash,
+        tx_hash || '-' || decoded_log :orderHash AS tx_hash_orderhash
     FROM
-        {{ ref('silver__decoded_logs') }}
+        {{ ref('core__ez_decoded_event_logs') }}
     WHERE
         block_timestamp :: DATE >= '2023-05-01'
         AND block_number >= 95884517
@@ -46,7 +62,22 @@ AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 ),
 raw_logs AS (
     SELECT
-        *,
+        tx_hash,
+        contract_address,
+        event_index,
+        block_number,
+        block_timestamp,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        DATA,
+        topics,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        TO_TIMESTAMP_NTZ(modified_timestamp) AS _inserted_timestamp,
         IFF(
             topics [0] :: STRING IN (
                 '0x4b9f2d36e1b4c93de62cc077b00b1a91d84b6c31b4a14e012718dcca230689e7'
@@ -66,7 +97,7 @@ raw_logs AS (
             NULL
         ) AS order_hash
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         block_timestamp :: DATE >= '2023-05-01'
         AND block_number >= 95884517
@@ -1854,7 +1885,7 @@ tx_data AS (
         tx_fee,
         input_data
     FROM
-        {{ ref('silver__transactions') }}
+        {{ ref('core__fact_transactions') }}
     WHERE
         block_timestamp :: DATE >= '2023-05-01'
         AND tx_hash IN (
@@ -1865,13 +1896,13 @@ tx_data AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )
-AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
+AND modified_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 ),
 nft_transfer_operator AS (
@@ -1892,7 +1923,7 @@ nft_transfer_operator AS (
             )
         ) AS erc1155_value
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         block_timestamp :: DATE >= '2023-05-01'
         AND tx_hash IN (
@@ -1907,13 +1938,13 @@ nft_transfer_operator AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )
-AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
+AND modified_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 ),
 final_seaport AS (

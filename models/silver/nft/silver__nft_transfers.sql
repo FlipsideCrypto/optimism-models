@@ -10,7 +10,11 @@
 WITH base AS (
 
     SELECT
-        _log_id,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
         block_number,
         tx_hash,
         block_timestamp,
@@ -19,11 +23,11 @@ WITH base AS (
         topics,
         DATA,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-        TO_TIMESTAMP_NTZ(_inserted_timestamp) AS _inserted_timestamp
+        TO_TIMESTAMP_NTZ(modified_timestamp) AS _inserted_timestamp
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
-        tx_status = 'SUCCESS'
+        tx_succeeded
         AND (
             (
                 topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
@@ -62,7 +66,7 @@ erc721s AS (
             topics [3] :: STRING
         ) :: STRING AS token_id,
         NULL AS erc1155_value,
-        TO_TIMESTAMP_NTZ(_inserted_timestamp) AS _inserted_timestamp,
+        _inserted_timestamp,
         event_index
     FROM
         base
@@ -87,7 +91,7 @@ transfer_singles AS (
         utils.udf_hex_to_int(
             segmented_data [1] :: STRING
         ) :: STRING AS erc1155_value,
-        TO_TIMESTAMP_NTZ(_inserted_timestamp) AS _inserted_timestamp,
+        _inserted_timestamp,
         event_index
     FROM
         base
@@ -110,8 +114,12 @@ transfer_batch_raw AS (
             segmented_data [2] :: STRING
         ) AS tokenid_length,
         tokenid_length AS quantity_length,
-        _log_id,
-        TO_TIMESTAMP_NTZ(_inserted_timestamp) AS _inserted_timestamp
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        _inserted_timestamp
     FROM
         base
     WHERE

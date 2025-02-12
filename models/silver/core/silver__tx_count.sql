@@ -9,14 +9,14 @@ WITH base AS (
 
     SELECT
         block_number,
-        MIN(_inserted_timestamp) AS _inserted_timestamp,
+        MIN(modified_timestamp) AS _inserted_timestamp,
         COUNT(*) AS tx_count
     FROM
-        {{ ref('silver__transactions') }}
+        {{ ref('core__fact_transactions') }}
 
 {% if is_incremental() %}
 WHERE
-    _inserted_timestamp >= (
+    modified_timestamp >= (
         SELECT
             MAX(_inserted_timestamp) _inserted_timestamp
         FROM

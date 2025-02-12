@@ -52,17 +52,21 @@ base AS (
         ) :: INT AS amount1Out,
         token0,
         token1,
-        _log_id,
-        _inserted_timestamp
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
         INNER JOIN pools USING (contract_address)
     WHERE
         block_timestamp :: DATE >= '2022-06-01'
         AND topics [0] :: STRING IN (
             '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822'
         )
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND event_removed = 'false'
 
 {% if is_incremental() %}

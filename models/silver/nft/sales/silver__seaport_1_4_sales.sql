@@ -21,9 +21,25 @@ WITH seaport_fees_wallet AS (
 ),
 raw_decoded_logs AS (
     SELECT
-        *
+        tx_hash,
+        event_name,
+        contract_address,
+        event_index,
+        decoded_log AS decoded_flat,
+        full_decoded_log AS decoded_data,
+        block_number,
+        block_timestamp,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        TO_TIMESTAMP_NTZ(modified_timestamp) AS _inserted_timestamp
     FROM
-        {{ ref('silver__decoded_logs') }}
+        {{ ref('core__ez_decoded_event_logs') }}
     WHERE
         block_number >= 78041957
         AND contract_address = '0x00000000000001ad428e4906ae43d8f9852d0dd6'
@@ -84,13 +100,13 @@ raw_logs AS (
     SELECT
         *
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         block_number >= 78041957
         AND contract_address = '0x00000000000001ad428e4906ae43d8f9852d0dd6'
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
@@ -1645,7 +1661,7 @@ mao_orderhash AS (
                 tx_fee,
                 input_data
             FROM
-                {{ ref('silver__transactions') }}
+                {{ ref('core__fact_transactions') }}
             WHERE
                 block_timestamp :: DATE >= '2023-03-01'
                 AND tx_hash IN (
@@ -1656,7 +1672,7 @@ mao_orderhash AS (
                 )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
@@ -1684,7 +1700,7 @@ nft_transfer_operator AS (
             )
         ) AS erc1155_value
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         block_timestamp :: DATE >= '2022-06-01'
         AND tx_hash IN (
@@ -1699,7 +1715,7 @@ nft_transfer_operator AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp

@@ -13,34 +13,38 @@ WITH raw_decoded_logs AS (
         event_name,
         contract_address,
         event_index,
-        decoded_flat,
+        decoded_log AS decoded_flat,
         COALESCE(
-            decoded_flat :dst,
-            decoded_flat :_to,
-            decoded_flat :to
+            decoded_log :dst,
+            decoded_log :_to,
+            decoded_log :to
         ) :: STRING AS to_address,
         COALESCE(
-            decoded_flat :src,
-            decoded_flat :_from,
-            decoded_flat :from
+            decoded_log :src,
+            decoded_log :_from,
+            decoded_log :from
         ) :: STRING AS from_address,
         COALESCE(
-            decoded_flat :wad,
-            decoded_flat :_value,
-            decoded_flat :value
+            decoded_log :wad,
+            decoded_log :_value,
+            decoded_log :value
         ) :: INT AS token_amount,
         block_number,
         block_timestamp,
         origin_from_address,
         origin_to_address,
         origin_function_signature,
-        _log_id,
-        TO_TIMESTAMP_NTZ(_inserted_timestamp) AS _inserted_timestamp
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        TO_TIMESTAMP_NTZ(modified_timestamp) AS _inserted_timestamp
     FROM
-        {{ ref('silver__decoded_logs') }}
+        {{ ref('core__ez_decoded_event_logs') }}
     WHERE
         block_timestamp >= '2021-12-01'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND contract_address IN (
             '0xe5c7b4865d7f2b08faadf3f6d392e6d6fa7b903c',
             -- v1
@@ -186,24 +190,24 @@ eth_payment_raw AS (
         tx_hash,
         from_address,
         to_address,
-        VALUE AS eth_value,
+        value,
         CASE
-            WHEN to_address = '0xec1557a67d4980c948cd473075293204f4d280fd' THEN eth_value
+            WHEN to_address = '0xec1557a67d4980c948cd473075293204f4d280fd' THEN value
             ELSE 0
         END AS platform_fee_raw_,
         CASE
             WHEN ROW_NUMBER() over (
                 PARTITION BY tx_hash
                 ORDER BY
-                    eth_value DESC
+                    value DESC
             ) = 1
-            AND platform_fee_raw_ = 0 THEN eth_value
+            AND platform_fee_raw_ = 0 THEN value
             ELSE 0
         END AS sale_amount_raw_,
         CASE
             WHEN sale_amount_raw_ = 0
             AND platform_fee_raw_ = 0
-            AND to_address != '0xec1557a67d4980c948cd473075293204f4d280fd' THEN eth_value
+            AND to_address != '0xec1557a67d4980c948cd473075293204f4d280fd' THEN value
             ELSE 0
         END AS creator_fee_raw_
     FROM
@@ -222,9 +226,13 @@ eth_payment_raw AS (
             FROM
                 token_payments_agg
         )
-        AND tx_status = 'SUCCESS'
-        AND identifier != 'CALL_ORIGIN'
-        AND eth_value > 0
+        AND tx_succeeded
+        AND concat_ws(
+            '_',
+            TYPE,
+            trace_address
+        ) != 'CALL_ORIGIN'
+        AND value > 0
         AND from_address IN (
             '0xe5c7b4865d7f2b08faadf3f6d392e6d6fa7b903c',
             -- v1
@@ -309,7 +317,7 @@ tx_data AS (
         tx_fee,
         input_data
     FROM
-        {{ ref('silver__transactions') }}
+        {{ ref('core__fact_transactions') }}
     WHERE
         block_timestamp :: DATE >= '2021-12-01'
         AND tx_hash IN (
@@ -320,7 +328,7 @@ tx_data AS (
         )
 
 {% if is_incremental() %}
-AND TO_TIMESTAMP_NTZ(_inserted_timestamp) >= (
+AND TO_TIMESTAMP_NTZ(modified_timestamp) >= (
     SELECT
         MAX(
             _inserted_timestamp

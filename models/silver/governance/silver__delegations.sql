@@ -10,7 +10,11 @@ SELECT
     r.block_number,
     l.block_timestamp,
     r.tx_hash,
-    l.tx_status AS status,
+    IFF(
+        l.tx_succeeded,
+        'SUCCESS',
+        'FAIL'
+    ) AS status,
     CASE
         WHEN topics [0] :: STRING = '0x3134e8a2e6d97e929a7e54011ea5485d7d196dd5f0ba4d4ef95803e8e3fc257f' THEN 'DelegateChanged'
         WHEN topics [0] :: STRING = '0xdec2bacdd2f05b59de34da9b523dff8be42e5e38e818c82fdb0bae774387a724' THEN 'DelegateVotesChanged'
@@ -108,9 +112,13 @@ SELECT
             COALESCE(raw_new_balance / pow(10, 18), 0) AS new_balance,
             COALESCE(raw_previous_balance / pow(10, 18), 0) AS previous_balance,
             r._inserted_timestamp,
-            l._log_id,
+            CONCAT(
+                l.tx_hash :: STRING,
+                '-',
+                l.event_index :: STRING
+            ) AS _log_id,
             {{ dbt_utils.generate_surrogate_key(
-                ['l._log_id']
+                ['l.tx_hash', 'l.event_index']
             ) }} AS delegations_id,
             SYSDATE() AS inserted_timestamp,
             SYSDATE() AS modified_timestamp,
@@ -118,7 +126,7 @@ SELECT
             FROM
                 {{ ref('silver__receipts') }}
                 r
-                LEFT OUTER JOIN {{ ref('silver__logs') }}
+                LEFT OUTER JOIN {{ ref('core__fact_event_logs') }}
                 l
                 ON r.tx_hash = l.tx_hash
             WHERE
@@ -139,7 +147,7 @@ AND r._inserted_timestamp >= (
     FROM
         {{ this }}
 )
-AND l._inserted_timestamp >= (
+AND l.modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp

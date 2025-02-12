@@ -47,10 +47,14 @@ log_pull AS (
         utils.udf_hex_to_int(
             segmented_data [1] :: STRING
         )) AS repay_amount_raw,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
         l
     WHERE
         contract_address IN (
@@ -60,7 +64,7 @@ log_pull AS (
                 asset_details
         )
         AND topics [0] :: STRING = '0x33f3048bd4e6af45e53afb722adfd57dbde82da7e93e44db921fb4b8c6a70c4b'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND  repay_amount_raw > 0 --borrow and repay in same log event, value in segmented data determines what kind of event
 
 {% if is_incremental() %}

@@ -13,10 +13,14 @@ WITH log_pull AS (
         block_number,
         block_timestamp,
         contract_address,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0x7ac369dbd14fa5ea3f473ed67cc9d598964a77501540ba6751eb0b3decf5870d'
         AND origin_from_address = LOWER('0xFb59Ce8986943163F14C590755b29dB2998F2322')
@@ -44,7 +48,11 @@ traces_pull AS (
             FROM
                 log_pull
         )
-        AND identifier = 'STATICCALL_2'
+        AND concat_ws(
+            '_',
+            TYPE,
+            trace_address
+        ) = 'STATICCALL_2'
 ),
 contracts AS (
     SELECT

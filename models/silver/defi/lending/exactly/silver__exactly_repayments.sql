@@ -38,10 +38,14 @@ exactly_repayments AS (
       segmented_data [1] :: STRING
     ) :: INTEGER AS repayed_amount_raw,
     'Exactly' AS platform,
-    _inserted_timestamp,
-    _log_id
+    modified_timestamp AS _inserted_timestamp,
+    CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+    ) AS _log_id
   FROM
-    {{ ref('silver__logs') }}
+    {{ ref('core__fact_event_logs') }}
   WHERE
     contract_address IN (
       SELECT
@@ -50,7 +54,7 @@ exactly_repayments AS (
         asset_details
     )
     AND topics [0] :: STRING = '0xe4a1ae657f49cb1fb1c7d3a94ae6093565c4c8c0e03de488f79c377c3c3a24e0'
-    AND tx_status = 'SUCCESS'
+    AND tx_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

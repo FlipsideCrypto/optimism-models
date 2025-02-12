@@ -23,10 +23,17 @@ SELECT
     aggregator_name,
     seller_address,
     buyer_address,
-    nft_address,
-    project_name,
-    tokenId,
-    erc1155_value,
+    nft_address AS contract_address, --new column
+    project_name AS NAME, --new column
+    tokenid AS token_id, --new column
+    COALESCE(
+        erc1155_value,
+        '1'
+    ) :: STRING AS quantity, --new column
+    CASE
+        WHEN erc1155_value IS NULL THEN 'erc721'
+        ELSE 'erc1155'
+    END AS token_standard, --new column
     currency_symbol,
     currency_address,
     price,
@@ -37,8 +44,8 @@ SELECT
     total_fees_usd,
     platform_fee_usd,
     creator_fee_usd,
-    tx_fee, 
-    tx_fee_usd, 
+    tx_fee,
+    tx_fee_usd,
     origin_from_address,
     origin_to_address,
     origin_function_signature,
@@ -55,6 +62,10 @@ SELECT
     COALESCE(
         modified_timestamp,
         '2000-01-01'
-    ) AS modified_timestamp
+    ) AS modified_timestamp,
+    tokenId, --deprecate
+    erc1155_value, --deprecate
+    project_name, --deprecate
+    nft_address --deprecate
 FROM
     {{ ref('silver__complete_nft_sales') }}
