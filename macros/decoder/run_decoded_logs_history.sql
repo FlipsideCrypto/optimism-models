@@ -1,14 +1,14 @@
 {% macro run_decoded_logs_history() %}
 
+{% set blockchain = var('GLOBAL_PROD_DB_NAME','').lower() %}
+
 {% set check_for_new_user_abis_query %}
     select 1
     from {{ ref('silver__user_verified_abis') }}
     where _inserted_timestamp::date = sysdate()::date
     and dayname(sysdate()) <> 'Sat'
 {% endset %}
-
 {% set results = run_query(check_for_new_user_abis_query) %}
-
 {% if execute %}
     {% set new_user_abis = results.columns[0].values()[0] %}
     
@@ -17,7 +17,7 @@
             SELECT
                 github_actions.workflow_dispatches(
                     'FlipsideCrypto',
-                    'optimism-models',
+                    '{{ blockchain }}' || '-models',
                     'dbt_run_streamline_decoded_logs_history.yml',
                     NULL
                 )
