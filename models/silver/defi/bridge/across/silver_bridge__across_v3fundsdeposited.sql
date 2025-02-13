@@ -73,7 +73,6 @@ WITH base_evt AS (
         ) AS relayerFeePct,
         segmented_data [10] :: STRING AS message,
         event_removed,
-        tx_succeeded,
         CONCAT(
             tx_hash :: STRING,
             '-',
