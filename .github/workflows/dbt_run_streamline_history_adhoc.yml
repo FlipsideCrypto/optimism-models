@@ -29,7 +29,7 @@ on:
         description: 'DBT Run Command'
         required: true
         options:
-          - dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m "optimism_models,tag:streamline_core_complete" "optimism_models,tag:streamline_core_history"
+          - dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m "optimism_models,tag:streamline_core_complete" "optimism_models,tag:streamline_core_history" "optimism_models,tag:streamline_core_complete_receipts" "optimism_models,tag:streamline_core_history_receipts" "optimism_models,tag:streamline_core_complete_confirm_blocks" "optimism_models,tag:streamline_core_history_confirm_blocks"
           - dbt run --threads 8 --vars '{"STREAMLINE_INVOKE_STREAMS":True,"WAIT":120}' -m "optimism_models,tag:streamline_decoded_logs_complete" "optimism_models,tag:streamline_decoded_logs_history"
     
 env:

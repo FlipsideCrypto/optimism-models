@@ -1,5 +1,5 @@
 {# Set variables #}
-{%- set model_name = 'CONFIRM_BLOCKS' -%}
+{%- set model_name = 'TRACES' -%}
 {%- set model_type = 'REALTIME' -%}
 {%- set min_block = var('GLOBAL_START_UP_BLOCK', none) -%}
 
@@ -45,7 +45,7 @@
         target = "{{this.schema}}.{{this.identifier}}",
         params = streamline_params
     ),
-    tags = ['streamline_core_realtime_confirm_blocks']
+    tags = ['streamline_core_realtime']
 ) }}
 
 {# Main query starts here #}
@@ -57,25 +57,12 @@ WITH
     ),
 {% endif %}
 
-{# Delay blocks #}
-look_back AS (
-    SELECT
-        block_number
-    FROM
-        {{ ref("_max_block_by_hour") }}
-        qualify ROW_NUMBER() over (
-            ORDER BY
-                block_number DESC
-        ) = 6
-    ),
-
 {# Identify blocks that need processing #}
 to_do AS (
     SELECT block_number
     FROM {{ ref("streamline__blocks") }}
     WHERE 
         block_number IS NOT NULL
-        AND block_number <= (SELECT block_number FROM look_back)
     {% if not new_build %}
         AND block_number >= (SELECT block_number FROM last_3_days)
     {% endif %}
@@ -89,13 +76,6 @@ to_do AS (
     SELECT block_number
     FROM {{ ref('streamline__' ~ model_name.lower() ~ '_complete') }}
     WHERE 1=1
-        AND block_number IS NOT NULL
-        AND block_number <= (SELECT block_number FROM look_back)
-        AND _inserted_timestamp >= DATEADD(
-            'day',
-            -4,
-            SYSDATE()
-        )
     {% if not new_build %}
         AND block_number >= (SELECT block_number FROM last_3_days)
     {% endif %}
@@ -105,6 +85,15 @@ to_do AS (
 ,ready_blocks AS (
     SELECT block_number
     FROM to_do
+
+    {% if not new_build %}
+        UNION
+        SELECT block_number
+        FROM {{ ref("_unconfirmed_blocks") }}
+        UNION
+        SELECT block_number
+        FROM {{ ref("_missing_traces") }}
+    {% endif %}
 
     {% if testing_limit is not none %}
         LIMIT {{ testing_limit }} 

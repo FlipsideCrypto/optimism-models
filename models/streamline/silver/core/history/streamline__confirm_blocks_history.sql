@@ -1,7 +1,6 @@
 {# Set variables #}
 {%- set model_name = 'CONFIRM_BLOCKS' -%}
-{%- set model_type = 'REALTIME' -%}
-{%- set min_block = var('GLOBAL_START_UP_BLOCK', none) -%}
+{%- set model_type = 'HISTORY' -%}
 
 {%- set default_vars = set_default_variables_streamline(model_name, model_type) -%}
 
@@ -33,8 +32,7 @@
     new_build=new_build,
     streamline_params=streamline_params,
     method_params=method_params,
-    method=method,
-    min_block=min_block
+    method=method
 ) }}
 
 {# Set up dbt configuration #}
@@ -45,7 +43,7 @@
         target = "{{this.schema}}.{{this.identifier}}",
         params = streamline_params
     ),
-    tags = ['streamline_core_realtime_confirm_blocks']
+    tags = ['streamline_core_history_confirm_blocks']
 ) }}
 
 {# Main query starts here #}
@@ -77,10 +75,7 @@ to_do AS (
         block_number IS NOT NULL
         AND block_number <= (SELECT block_number FROM look_back)
     {% if not new_build %}
-        AND block_number >= (SELECT block_number FROM last_3_days)
-    {% endif %}
-    {% if min_block is not none %}
-        AND block_number >= {{ min_block }}
+        AND block_number <= (SELECT block_number FROM last_3_days)
     {% endif %}
 
     EXCEPT
@@ -97,7 +92,7 @@ to_do AS (
             SYSDATE()
         )
     {% if not new_build %}
-        AND block_number >= (SELECT block_number FROM last_3_days)
+        AND block_number <= (SELECT block_number FROM last_3_days)
     {% endif %}
 )
 
