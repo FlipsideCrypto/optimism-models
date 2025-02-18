@@ -87,13 +87,13 @@ vars:
         - AWS_LAMBDA_OPTIMISM_API
         - INTERNAL_DEV
 
-    # prod:
-    #   API_INTEGRATION: AWS_OPTIMISM_API_PROD_V2
-    #   EXTERNAL_FUNCTION_URI: <insert_uri>.execute-api.us-east-1.amazonaws.com/prod/
-    #   ROLES:
-    #     - AWS_LAMBDA_OPTIMISM_API
-    #     - INTERNAL_DEV
-    #     - DBT_CLOUD_OPTIMISM
+    prod:
+      API_INTEGRATION: AWS_OPTIMISM_API_PROD_V2
+      EXTERNAL_FUNCTION_URI: m8uegnks37.execute-api.us-east-1.amazonaws.com/prod/
+      ROLES:
+        - AWS_LAMBDA_OPTIMISM_API
+        - INTERNAL_DEV
+        - DBT_CLOUD_OPTIMISM
 
 #### STREAMLINE 2.0 END ####
 
