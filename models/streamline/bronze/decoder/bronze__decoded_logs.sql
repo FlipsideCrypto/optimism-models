@@ -1,41 +1,23 @@
-{{ config (
-    materialized = 'view'
+{# Set variables #}
+{% set source_name = 'DECODED_LOGS' %}
+{% set source_version = 'V2' if var('GLOBAL_USES_STREAMLINE_V1', false) else '' %}
+{% set model_type = '' %}
+
+{%- set default_vars = set_default_variables_bronze(source_name, model_type) -%}
+
+{# Log configuration details #}
+{{ log_model_details(
+    vars = default_vars
 ) }}
 
-WITH meta AS (
+{# Set up dbt configuration #}
+{{ config (
+    materialized = 'view',
+    tags = ['bronze_decoded_logs']
+) }}
 
-    SELECT
-        last_modified AS _inserted_timestamp,
-        file_name,
-        CAST(SPLIT_PART(SPLIT_PART(file_name, '/', 6), '_', 1) AS INTEGER) AS _partition_by_block_number,
-        TO_DATE(
-            concat_ws('-', SPLIT_PART(file_name, '/', 3), SPLIT_PART(file_name, '/', 4), SPLIT_PART(file_name, '/', 5))
-        ) AS _partition_by_created_date
-    FROM
-        TABLE(
-            information_schema.external_table_file_registration_history(
-                start_time => DATEADD('day', -3, CURRENT_TIMESTAMP()),
-                table_name => '{{ source( "bronze_streamline", "decoded_logs") }}')
-            ) A
-        )
-    SELECT
-        block_number,
-        id :: STRING AS id,
-        DATA,
-        _inserted_timestamp,
-        s._partition_by_block_number AS _partition_by_block_number,
-        s._partition_by_created_date AS _partition_by_created_date
-    FROM
-        {{ source(
-            "bronze_streamline",
-            "decoded_logs"
-        ) }}
-        s
-        JOIN meta b
-        ON b.file_name = metadata$filename
-        AND b._partition_by_block_number = s._partition_by_block_number
-        AND b._partition_by_created_date = s._partition_by_created_date
-    WHERE
-        b._partition_by_block_number = s._partition_by_block_number
-        AND b._partition_by_created_date = s._partition_by_created_date
-        AND s._partition_by_created_date >= DATEADD('day', -2, CURRENT_TIMESTAMP())
+{# Main query starts here #}
+{{ streamline_external_table_query_decoder(
+    source_name = source_name.lower(),
+    source_version = source_version.lower()
+) }}

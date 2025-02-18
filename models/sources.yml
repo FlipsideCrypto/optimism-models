@@ -38,14 +38,20 @@ sources:
   - name: bronze_streamline
     database: streamline
     schema: |
-      {{ "OPTIMISM_DEV" if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else "OPTIMISM" }}
+      {{ var('GLOBAL_PROD_DB_NAME') ~ ('_dev' if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else '') }}
     tables:
       - name: receipts
       - name: blocks
       - name: transactions
-      - name: debug_traceBlockByNumber
+      - name: debug_traceblockbynumber
       - name: decoded_logs
       - name: confirm_blocks
+      - name: blocks_v2
+      - name: transactions_v2
+      - name: receipts_v2
+      - name: traces_v2
+      - name: confirm_blocks_v2
+      - name: decoded_logs_v2
   - name: optimism_silver
     database: optimism
     schema: silver
