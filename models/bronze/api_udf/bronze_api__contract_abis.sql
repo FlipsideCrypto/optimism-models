@@ -50,7 +50,18 @@ row_nos AS (
 ),
 batched AS ({% for item in range(501) %}
 SELECT
-    rn.contract_address, live.udf_api('GET', CONCAT('https://api-optimistic.etherscan.io/api?module=contract&action=getabi&address=', rn.contract_address, '&apikey={key}'),{ 'User-Agent': 'FlipsideStreamline' },{}, 'Vault/prod/block_explorers/op_etherscan') AS abi_data, SYSDATE() AS _inserted_timestamp
+    rn.contract_address, 
+    live.udf_api(
+        'GET', 
+        CONCAT('https://api-optimistic.etherscan.io/api?module=contract&action=getabi&address=', rn.contract_address, '&apikey={key}'),
+        OBJECT_CONSTRUCT(
+            'Content-Type', 'application/json',
+            'fsc-quantum-state', 'livequery'
+        ),
+        NULL,
+        'Vault/prod/block_explorers/op_etherscan'
+        ) AS abi_data,
+    SYSDATE() AS _inserted_timestamp
 FROM
     row_nos rn
 WHERE
