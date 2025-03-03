@@ -64,7 +64,7 @@ SELECT
     tx_position AS POSITION,
     file_name,
     build_scoped_file_url(
-        @streamline.bronze.external_tables,
+        @streamline.bronze.OPTIMISM_SERVERLESS_PROD,
         file_name
     ) AS file_url,
     ['block_number', 'array_index'] AS index_cols,
