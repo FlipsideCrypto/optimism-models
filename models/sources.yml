@@ -1,44 +1,10 @@
 version: 2
 
 sources:
-  - name: prod
-    database: chainwalkers
-    schema: prod
-    tables:
-      - name: optimism_blocks
-      - name: optimism_txs
-  - name: crosschain
-    database: "{{ 'crosschain' if target.database == 'OPTIMISM' else 'crosschain_dev' }}"
-    schema: core
-    tables:
-      - name: dim_labels
-  - name: ethereum_silver
-    database: ethereum
-    schema: silver
-    tables:
-      - name: optimism_state_hashes
-      - name: optimism_submission_hashes
-  - name: silver_crosschain
-    database: "{{ 'crosschain' if target.database == 'OPTIMISM' else 'crosschain_dev' }}"
-    schema: silver
-    tables:
-      - name: near_address_encoded
-      - name: labels_combined
-      - name: complete_token_asset_metadata
-      - name: complete_token_prices
-      - name: complete_provider_asset_metadata
-      - name: complete_provider_prices
-      - name: complete_native_asset_metadata
-      - name: complete_native_prices
-  - name: crosschain_public
-    database: crosschain
-    schema: bronze_public
-    tables:
-      - name: user_abis
   - name: bronze_streamline
     database: streamline
     schema: |
-      {{ var('GLOBAL_PROD_DB_NAME') ~ ('_dev' if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else '') }}
+      {{ target.database.upper() | replace('_DEV', '') ~ '_DEV' if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else target.database.upper() | replace('_DEV', '') }}
     tables:
       - name: receipts
       - name: blocks
@@ -52,19 +18,32 @@ sources:
       - name: traces_v2
       - name: confirm_blocks_v2
       - name: decoded_logs_v2
-  - name: optimism_silver
-    database: optimism
+      - name: contract_abis
+  - name: crosschain_silver
+    database: >-
+      {{ 'CROSSCHAIN_DEV' if '_DEV' in target.database.upper() else 'CROSSCHAIN' }}
     schema: silver
     tables:
-      - name: verified_abis
-      - name: overflowed_traces
-  - name: optimism_bronze_api
-    database: optimism
-    schema: bronze_api
+      - name: near_address_encoded
+      - name: labels_combined
+      - name: complete_provider_asset_metadata
+      - name: complete_native_asset_metadata
+      - name: complete_native_prices
+      - name: complete_provider_prices
+      - name: complete_token_asset_metadata
+      - name: complete_token_prices
+  - name: crosschain_public
+    database: crosschain
+    schema: bronze_public
     tables:
-      - name: contract_abis
+      - name: user_abis
+  - name: complete_streamline
+    database: "{{ target.database }}"
+    schema: streamline
+    tables:
+      - name: complete_contract_abis
   - name: github_actions
-    database: optimism
+    database: "{{ target.database }}"
     schema: github_actions
     tables:
       - name: workflows
@@ -73,8 +52,20 @@ sources:
     schema: defillama
     tables:
       - name: dim_chains
-  - name: optimism_gold
-    database: "{{ 'optimism' if target.database == 'OPTIMISM' else 'optimism_dev' }}"
-    schema: core
+  - name: abis_silver
+    database: "{{ target.database }}"
+    schema: silver
     tables:
-      - name: fact_traces
+      - name: verified_abis
+  - name: fsc_evm_admin
+    database: >-
+      {{ 'FSC_EVM_DEV' if '_DEV' in target.database.upper() else 'FSC_EVM' }}
+    schema: admin
+    tables:
+      - name: _master_keys
+      - name: rpc_node_logs
+  - name: logs_temp
+    database: "{{ target.database }}"
+    schema: silver
+    tables:
+      - name: logs
