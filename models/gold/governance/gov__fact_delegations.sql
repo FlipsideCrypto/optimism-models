@@ -2,7 +2,7 @@
     materialized = 'view',
     persist_docs ={ "relation": true,
     "columns": true },
-    tags = ['gold','governance']
+    tags = ['gold','governance','curated']
 ) }}
 
 SELECT 
