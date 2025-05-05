@@ -1,5 +1,6 @@
 {# Log configuration details #}
 {{ fsc_evm.log_model_details() }}
+
 {{ config (
     materialized = 'view',
     tags = ['bronze','core','confirm_blocks','phase_1']
@@ -25,4 +26,4 @@ SELECT
     file_name,
     _inserted_timestamp
 FROM
-    {{ ref('bronze__confirm_blocks_fr_v1') }}
+   {{ ref('bronze__confirm_blocks_fr_v1') }}

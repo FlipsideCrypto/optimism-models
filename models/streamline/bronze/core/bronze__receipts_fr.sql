@@ -1,5 +1,6 @@
 {# Log configuration details #}
 {{ fsc_evm.log_model_details() }}
+
 {{ config (
     materialized = 'view',
     tags = ['bronze','core','receipts','phase_1']
@@ -22,11 +23,7 @@ SELECT
     block_number,
     COALESCE(
         VALUE :array_index :: INT,
-        TRY_TO_NUMBER(
-            utils.udf_hex_to_int(
-                VALUE :data :"transactionIndex" :: STRING
-            )
-        )
+        TRY_TO_NUMBER(utils.udf_hex_to_int(VALUE :data :"transactionIndex" :: STRING))
     ) AS array_index,
     VALUE,
     DATA,
@@ -34,4 +31,4 @@ SELECT
     file_name,
     _inserted_timestamp
 FROM
-    {{ ref('bronze__receipts_fr_v1') }}
+   {{ ref('bronze__receipts_fr_v1') }}

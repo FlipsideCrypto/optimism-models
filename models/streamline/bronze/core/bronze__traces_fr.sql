@@ -1,5 +1,6 @@
 {# Log configuration details #}
 {{ fsc_evm.log_model_details() }}
+
 {{ config (
     materialized = 'view',
     tags = ['bronze','core','phase_1']
@@ -27,4 +28,4 @@ SELECT
     file_name,
     _inserted_timestamp
 FROM
-    {{ ref('bronze__traces_fr_v1') }}
+   {{ ref('bronze__traces_fr_v1') }}

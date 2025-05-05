@@ -1,5 +1,6 @@
 {# Log configuration details #}
 {{ fsc_evm.log_model_details() }}
+
 {# Set up dbt configuration #}
 {{ config (
     materialized = 'view',
