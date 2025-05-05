@@ -32,6 +32,12 @@ sources:
       - name: complete_provider_prices
       - name: complete_token_asset_metadata
       - name: complete_token_prices
+  - name: ethereum_silver
+    database: ethereum
+    schema: silver
+    tables:
+      - name: optimism_state_hashes
+      - name: optimism_submission_hashes
   - name: crosschain_public
     database: crosschain
     schema: bronze_public
