@@ -9,7 +9,8 @@
                 'PURPOSE': 'DEX, SWAPS'
             }
         }
-    }
+    },
+    tags = ['gold','defi','dex','curated','ez']
 ) }}
 
 SELECT
