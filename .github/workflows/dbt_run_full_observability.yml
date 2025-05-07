@@ -13,6 +13,7 @@ jobs:
   called_workflow_template:
     uses: FlipsideCrypto/fsc-evm/.github/workflows/dbt_run_template.yml@pre-release/v4-beta
     with:
+      warehouse: DBT_EMERGENCY
       command_name: Run Observability Models
       command: |
         dbt run --threads 2 --vars '{"MAIN_OBSERV_FULL_TEST_ENABLED":True}' -m "fsc_evm,tag:observability"

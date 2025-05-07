@@ -13,7 +13,7 @@ jobs:
   called_workflow_template:
     uses: FlipsideCrypto/fsc-evm/.github/workflows/dbt_run_template.yml@pre-release/v4-beta
     with:
-      target: test
+      warehouse: DBT_EMERGENCY
       command_name: Build Full Testing Views
       command: |
         dbt run -m "fsc_evm,tag:full_test"
