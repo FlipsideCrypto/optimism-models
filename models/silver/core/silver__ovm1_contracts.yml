@@ -1,8 +1,0 @@
-version: 2
-models:
-  - name: silver__ovm1_contracts
-    description: This model identifies all contracts that have been deployed on Optimism's first instance, OVM1, that are not present in OVM2 traces.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - CONTRACT_ADDRESS

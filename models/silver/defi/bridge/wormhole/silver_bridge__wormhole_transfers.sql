@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['curated','reorg']
+    tags = ['silver_bridge','defi','bridge','curated']
 ) }}
 
 WITH token_transfers AS (
@@ -107,7 +107,7 @@ base_near AS (
         addr_encoded
     FROM
         {{ source(
-            'silver_crosschain',
+            'crosschain_silver',
             'near_address_encoded'
         ) }}
 )

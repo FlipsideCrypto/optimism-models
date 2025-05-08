@@ -1066,8 +1066,8 @@ nft_transfers AS (
         to_address AS final_nft_to_address,
         event_index,
         contract_address,
-        tokenId,
-        erc1155_value,
+        token_id AS tokenId,
+        quantity AS erc1155_value,
         CONCAT(
             tx_hash,
             '-',
@@ -1076,7 +1076,7 @@ nft_transfers AS (
             tokenId
         ) AS nft_id
     FROM
-        {{ ref('silver__nft_transfers') }}
+        {{ ref('nft__ez_nft_transfers') }}
     WHERE
         block_timestamp :: DATE >= '2022-07-01'
         AND tx_hash IN (
@@ -1087,7 +1087,7 @@ nft_transfers AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp

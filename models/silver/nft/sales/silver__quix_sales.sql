@@ -190,24 +190,24 @@ eth_payment_raw AS (
         tx_hash,
         from_address,
         to_address,
-        value,
+        VALUE,
         CASE
-            WHEN to_address = '0xec1557a67d4980c948cd473075293204f4d280fd' THEN value
+            WHEN to_address = '0xec1557a67d4980c948cd473075293204f4d280fd' THEN VALUE
             ELSE 0
         END AS platform_fee_raw_,
         CASE
             WHEN ROW_NUMBER() over (
                 PARTITION BY tx_hash
                 ORDER BY
-                    value DESC
+                    VALUE DESC
             ) = 1
-            AND platform_fee_raw_ = 0 THEN value
+            AND platform_fee_raw_ = 0 THEN VALUE
             ELSE 0
         END AS sale_amount_raw_,
         CASE
             WHEN sale_amount_raw_ = 0
             AND platform_fee_raw_ = 0
-            AND to_address != '0xec1557a67d4980c948cd473075293204f4d280fd' THEN value
+            AND to_address != '0xec1557a67d4980c948cd473075293204f4d280fd' THEN VALUE
             ELSE 0
         END AS creator_fee_raw_
     FROM
@@ -232,7 +232,7 @@ eth_payment_raw AS (
             TYPE,
             trace_address
         ) != 'CALL_ORIGIN'
-        AND value > 0
+        AND VALUE > 0
         AND from_address IN (
             '0xe5c7b4865d7f2b08faadf3f6d392e6d6fa7b903c',
             -- v1
@@ -343,10 +343,10 @@ nft_transfers AS (
         tx_hash,
         to_address AS buyer_address,
         contract_address AS nft_address,
-        tokenId,
-        erc1155_value
+        token_id AS tokenId,
+        quantity AS erc1155_value
     FROM
-        {{ ref('silver__nft_transfers') }}
+        {{ ref('nft__ez_nft_transfers') }}
     WHERE
         block_timestamp :: DATE >= '2021-12-01'
         AND tx_hash IN (

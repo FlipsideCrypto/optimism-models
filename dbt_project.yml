@@ -17,6 +17,8 @@ test-paths: ["tests"]
 seed-paths: ["data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
+docs-paths:
+  ["dbt_packages/fsc_evm/doc_descriptions", "models/doc_descriptions", "models"]
 
 target-path: "target" # directory which will store compiled SQL files
 clean-targets: # directories to be removed by `dbt clean`
@@ -32,7 +34,7 @@ on-run-start:
   - "{{ create_udfs() }}"
 
 on-run-end:
-  - '{{ apply_meta_as_tags(results) }}'
+  - "{{ apply_meta_as_tags(results) }}"
 
 dispatch:
   - macro_namespace: dbt
@@ -42,18 +44,66 @@ dispatch:
       - dbt
 
 query-comment:
-  comment: '{{ dbt_snowflake_query_tags.get_query_comment(node) }}'
+  comment: "{{ dbt_snowflake_query_tags.get_query_comment(node) }}"
   append: true # Snowflake removes prefixed comments.
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
 models:
-  +copy_grants: true
-  +persist_docs:
-    relation: true
-    columns: true
-  +on_schema_change: "append_new_columns"
+  optimism_models: # replace with the name of the chain
+    +copy_grants: true
+    +persist_docs:
+      relation: true
+      columns: true
+    +on_schema_change: "append_new_columns"
+  livequery_models:
+    +materialized: ephemeral
+  fsc_evm:
+    +enabled: false # disable fsc_evm package by default
+    +copy_grants: true
+    +persist_docs:
+      relation: true
+      columns: true
+    +on_schema_change: "append_new_columns"
+    main_package:
+      +enabled: false # disable top level package by default, enabled subpackages as needed
+      admin:
+        +enabled: true
+      core:
+        +enabled: true # enable subpackages, as needed
+        bronze:
+          +enabled: false
+          token_reads:
+            +enabled: true
+      github_actions:
+        +enabled: true
+      labels:
+        +enabled: true
+      observability:
+        +enabled: true
+      prices:
+        +enabled: true
+      utils:
+        +enabled: true
+    decoder_package:
+      +enabled: false
+      abis:
+        +enabled: true
+      decoded_logs:
+        +enabled: false
+        gold:
+          +enabled: true
+        silver:
+          +enabled: true
+        streamline:
+          +enabled: true
+    curated_package:
+      +enabled: false
+      stats:
+        +enabled: true
+    scores_package:
+      +enabled: false
 
 # In this example config, we tell dbt to build all models in the example/ directory
 # as tables. These settings can be overridden in the individual model files
@@ -61,25 +111,22 @@ models:
 
 vars:
   "dbt_date:time_zone": GMT
+  STREAMLINE_INVOKE_STREAMS: False
   UPDATE_UDFS_AND_SPS: False
   UPDATE_SNOWFLAKE_TAGS: True
-  STREAMLINE_INVOKE_STREAMS: False
-  STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES: False
-  WAIT: 0
-  OBSERV_FULL_TEST: False
-  OVERFLOWED_TRACES: False
   HEAL_MODEL: False
   HEAL_MODELS: []
-  START_GHA_TASKS: False
+  STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES: False
 
-#### STREAMLINE 2.0 BEGIN ####
+  #### STREAMLINE 2.0 BEGIN ####
 
   API_INTEGRATION: '{{ var("config")[target.name]["API_INTEGRATION"] if var("config")[target.name] else var("config")["dev"]["API_INTEGRATION"] }}'
   EXTERNAL_FUNCTION_URI: '{{ var("config")[target.name]["EXTERNAL_FUNCTION_URI"] if var("config")[target.name] else var("config")["dev"]["EXTERNAL_FUNCTION_URI"] }}'
   ROLES: |
     ["INTERNAL_DEV"]
+
   config:
-  # The keys correspond to dbt profiles and are case sensitive
+    # The keys correspond to dbt profiles and are case sensitive
     dev:
       API_INTEGRATION: AWS_OPTIMISM_API_STG_V2
       EXTERNAL_FUNCTION_URI: 0h08ox8fa4.execute-api.us-east-1.amazonaws.com/stg/
@@ -94,62 +141,4 @@ vars:
         - AWS_LAMBDA_OPTIMISM_API
         - INTERNAL_DEV
         - DBT_CLOUD_OPTIMISM
-
 #### STREAMLINE 2.0 END ####
-
-#### FSC_EVM BEGIN ####
-# Visit https://github.com/FlipsideCrypto/fsc-evm/wiki for more information on required and optional variables
-
-  ### GLOBAL VARIABLES BEGIN ###
-  ## REQUIRED
-  GLOBAL_PROD_DB_NAME: 'optimism' 
-  GLOBAL_NODE_SECRET_PATH: 'Vault/prod/optimism/quicknode/mainnet'
-  GLOBAL_NODE_URL: '{service}/{Authentication}'
-  GLOBAL_BLOCKS_PER_HOUR: 1800 
-  GLOBAL_USES_STREAMLINE_V1: True
-  GLOBAL_USES_SINGLE_FLIGHT_METHOD: True
-
-  ### GLOBAL VARIABLES END ###
-
-  ### MAIN_PACKAGE VARIABLES BEGIN ###
-
-  ### CORE ###
-  ## REQUIRED
-
-  ## OPTIONAL
-  # GOLD_FULL_REFRESH: True
-  # SILVER_FULL_REFRESH: True
-  # BRONZE_FULL_REFRESH: True
-
-  # BLOCKS_COMPLETE_FULL_REFRESH: True
-  # CONFIRM_BLOCKS_COMPLETE_FULL_REFRESH: True
-  # TRACES_COMPLETE_FULL_REFRESH: True
-  # RECEIPTS_COMPLETE_FULL_REFRESH: True
-  # TRANSACTIONS_COMPLETE_FULL_REFRESH: True
-
-  # BLOCKS_TRANSACTIONS_REALTIME_TESTING_LIMIT: 3
-  # BLOCKS_TRANSACTIONS_HISTORY_TESTING_LIMIT: 3
-  # TRACES_REALTIME_TESTING_LIMIT: 3
-  # TRACES_HISTORY_TESTING_LIMIT: 3
-  # ARBTRACE_BLOCK_HISTORY_TESTING_LIMIT: 3
-  # RECEIPTS_REALTIME_TESTING_LIMIT: 3
-  # RECEIPTS_HISTORY_TESTING_LIMIT: 3
-  # CONFIRM_BLOCKS_REALTIME_TESTING_LIMIT: 3
-  # CONFIRM_BLOCKS_HISTORY_TESTING_LIMIT: 3
-
-  # ### MAIN_PACKAGE VARIABLES END ###
-
-  # ### DECODER_PACKAGE VARIABLES BEGIN ###
-
-  # ## REQUIRED
-
-  # ## OPTIONAL
-
-  # DECODED_LOGS_COMPLETE_FULL_REFRESH: True
-
-  # DECODED_LOGS_REALTIME_TESTING_LIMIT: 3
-  # DECODED_LOGS_HISTORY_SQL_LIMIT: 1 #limit per monthly range
-
-  ### DECODER_PACKAGE VARIABLES END ###
-
-#### FSC_EVM END ####
