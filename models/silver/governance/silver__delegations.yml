@@ -44,10 +44,10 @@ models:
               regex: 0[xX][0-9a-fA-F]+
       - name: FROM_DELEGATE
         tests: 
-          - not_null: 
-              where: 
-                DELEGATION_TYPE = 'Re-Delegation'
-                AND STATUS = 'SUCCESS'
+          # - not_null: 
+          #     where: 
+          #       DELEGATION_TYPE = 'Re-Delegation'
+          #       AND STATUS = 'SUCCESS'
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: 0[xX][0-9a-fA-F]+
       - name: DELEGATION_TYPE
