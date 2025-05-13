@@ -9,10 +9,10 @@ models:
       - name: POOL_ADDRESS
         tests:
           - not_null
-      - name: TOKEN0
+      - name: TOKEN0_ADDRESS
         tests:
             - not_null
-      - name: TOKEN1
+      - name: TOKEN1_ADDRESS
         tests:
             - not_null
       - name: _INSERTED_TIMESTAMP
