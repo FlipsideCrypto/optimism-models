@@ -75,31 +75,25 @@ AND _inserted_timestamp >= (
 )
 AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
-),
-FINAL AS (
-    SELECT
-        block_number,
-        block_timestamp,
-        tx_hash,
-        p.contract_address,
-        token0_address,
-        token1_address,
-        tick_spacing,
-        pool_address,
-        COALESCE(
-            init_tick,
-            0
-        ) AS init_tick,
-        p._log_id AS _id,
-        p._inserted_timestamp
-    FROM
-        created_pools p
-        LEFT JOIN initial_info i
-        ON p.pool_address = i.contract_address
 )
 SELECT
-    *
+    block_number,
+    block_timestamp,
+    tx_hash,
+    p.contract_address,
+    token0_address,
+    token1_address,
+    tick_spacing,
+    pool_address,
+    COALESCE(
+        init_tick,
+        0
+    ) AS init_tick,
+    p._log_id AS _id,
+    p._inserted_timestamp
 FROM
-    FINAL qualify(ROW_NUMBER() over(PARTITION BY pool_address
+    created_pools p
+    LEFT JOIN initial_info i
+    ON p.pool_address = i.contract_address qualify(ROW_NUMBER() over(PARTITION BY p.pool_address
 ORDER BY
-    _inserted_timestamp DESC)) = 1
+    p._inserted_timestamp DESC)) = 1

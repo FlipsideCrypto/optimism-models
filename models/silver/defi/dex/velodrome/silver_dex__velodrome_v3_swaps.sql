@@ -59,43 +59,37 @@ pool_data AS (
         pool_address
     FROM
         {{ ref('silver_dex__velodrome_v3_pools') }}
-),
-FINAL AS (
-    SELECT
-        block_number,
-        block_timestamp,
-        tx_hash,
-        contract_address AS pool_address,
-        contract_address,
-        recipient,
-        sender,
-        tick,
-        tick_spacing,
-        liquidity,
-        event_index,
-        token0_address,
-        token1_address,
-        CONCAT(
-            tx_hash :: STRING,
-            '-',
-            event_index :: STRING
-        ) AS _log_id,
-        modified_timestamp AS _inserted_timestamp,
-        origin_function_signature,
-        origin_from_address,
-        origin_to_address,
-        amount0_unadj,
-        amount1_unadj,
-        'Swap' AS event_name,
-        'velodrome-v3' AS platform
-    FROM
-        base_swaps
-        INNER JOIN pool_data
-        ON pool_data.pool_address = base_swaps.contract_address
 )
 SELECT
-    *
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address AS pool_address,
+    contract_address,
+    recipient,
+    sender,
+    tick,
+    tick_spacing,
+    liquidity,
+    event_index,
+    token0_address,
+    token1_address,
+    CONCAT(
+        tx_hash :: STRING,
+        '-',
+        event_index :: STRING
+    ) AS _log_id,
+    modified_timestamp AS _inserted_timestamp,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    amount0_unadj,
+    amount1_unadj,
+    'Swap' AS event_name,
+    'velodrome-v3' AS platform
 FROM
-    FINAL qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    base_swaps
+    INNER JOIN pool_data
+    ON pool_data.pool_address = base_swaps.contract_address qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY
     _inserted_timestamp DESC)) = 1
