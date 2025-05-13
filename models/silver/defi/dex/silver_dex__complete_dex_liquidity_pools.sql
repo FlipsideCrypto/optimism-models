@@ -409,17 +409,17 @@ velodrome AS (
     tx_hash,
     contract_address,
     pool_address,
-    pool_name,
+    NULL AS pool_name,
     NULL AS fee,
     NULL AS tick_spacing,
+    token0,
+    token1,
     NULL AS token2,
     NULL AS token3,
     NULL AS token4,
     NULL AS token5,
     NULL AS token6,
     NULL AS token7,
-    token0,
-    token1,
     'velodrome' AS platform,
     'v1' AS version,
     _log_id AS _id,
@@ -428,6 +428,41 @@ velodrome AS (
     {{ ref('silver_dex__velodrome_v1_pools') }}
 
 {% if is_incremental() and 'velodrome' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+velodrome_v3 AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    NULL AS pool_name,
+    NULL AS fee,
+    tick_spacing,
+    token0_address AS token0,
+    token1_address AS token1,
+    NULL AS token2,
+    NULL AS token3,
+    NULL AS token4,
+    NULL AS token5,
+    NULL AS token6,
+    NULL AS token7,
+    'velodrome-v3' AS platform,
+    'v3' AS version,
+    _id,
+    _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__velodrome_v3_pools') }}
+
+{% if is_incremental() and 'velodrome_v3' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -476,6 +511,11 @@ all_pools AS (
   SELECT
     *
   FROM
+    velodrome_v3
+  UNION ALL
+  SELECT
+    *
+  FROM
     uni_v3
   UNION ALL
   SELECT
@@ -505,7 +545,8 @@ complete_lps AS (
       WHEN pool_name IS NULL
       AND platform IN (
         'uniswap-v3',
-        'kyberswap-v2'
+        'kyberswap-v2',
+        'velodrome-v3'
       ) THEN CONCAT(
         COALESCE(
           c0.token_symbol,
@@ -529,6 +570,7 @@ complete_lps AS (
         CASE
           WHEN platform = 'uniswap-v3' THEN ' UNI-V3 LP'
           WHEN platform = 'kyberswap-v2' THEN ''
+          WHEN platform = 'velodrome-v3' THEN ' VELO-V3 LP'
         END
       )
       WHEN pool_name IS NULL
@@ -681,7 +723,8 @@ heal_model AS (
       WHEN pool_name IS NULL
       AND platform IN (
         'uniswap-v3',
-        'kyberswap-v2'
+        'kyberswap-v2',
+        'velodrome-v3'
       ) THEN CONCAT(
         COALESCE(
           c0.token_symbol,
@@ -705,6 +748,7 @@ heal_model AS (
         CASE
           WHEN platform = 'uniswap-v3' THEN ' UNI-V3 LP'
           WHEN platform = 'kyberswap-v2' THEN ''
+          WHEN platform = 'velodrome-v3' THEN ' VELO-V3 LP'
         END
       )
       WHEN pool_name IS NULL
