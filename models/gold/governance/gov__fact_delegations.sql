@@ -20,9 +20,7 @@ SELECT
     raw_previous_balance,	
     to_delegate, 
     from_delegate,     
-    {{ dbt_utils.generate_surrogate_key(
-        ['_log_id']
-    ) }} AS fact_delegations_id,
+    delegations_id AS fact_delegations_id,
     inserted_timestamp,
     modified_timestamp
 FROM 
