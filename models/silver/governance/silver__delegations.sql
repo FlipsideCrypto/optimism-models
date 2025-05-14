@@ -11,6 +11,7 @@ with base as (
         block_number,
         block_timestamp,
         tx_hash,
+        event_index,
         iff(tx_succeeded, 'SUCCESS', 'FAIL') AS status,
         event_name,
         origin_from_address,
@@ -21,7 +22,8 @@ with base as (
         try_to_number(decoded_log:previousBalance::string) as previous_balance,
         decoded_log:delegator::string as delegator,
         decoded_log:fromDelegate::string as from_delegate,
-        decoded_log:toDelegate::string as to_delegate
+        decoded_log:toDelegate::string as to_delegate,
+        modified_timestamp
     FROM {{ ref('core__ez_decoded_event_logs') }}
     WHERE contract_address = '0x4200000000000000000000000000000000000042'
     AND event_name IN ('DelegateChanged', 'DelegateVotesChanged')
@@ -60,13 +62,13 @@ SELECT
     b0.event_name,
     b1.delegator,
     b1.delegation_type,
-    b1.to_delegate,
-    b1.from_delegate,
     b0.delegate,
     b0.previous_balance as raw_previous_balance,
     b0.new_balance as raw_new_balance,
     COALESCE(raw_previous_balance / pow(10, 18), 0) AS previous_balance,
     COALESCE(raw_new_balance / pow(10, 18), 0) AS new_balance,
+    b1.to_delegate,
+    b1.from_delegate,
     modified_timestamp AS _inserted_timestamp,
     CONCAT(tx_hash :: STRING, '-', event_index :: STRING) AS _log_id,
     {{ dbt_utils.generate_surrogate_key(['tx_hash', 'event_index']) }} AS delegations_id,
