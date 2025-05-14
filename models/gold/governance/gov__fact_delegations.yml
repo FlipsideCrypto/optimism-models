@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: gov__fact_delegations
-    description: '{{ doc("op_delegations_table_doc") }}'
+    description: 'This table contains the details of the OP Delegations made by users on the Optimism network.'
     columns:
       - name: BLOCK_NUMBER
         description: '{{ doc("evm_block_number") }}'   
@@ -10,19 +10,25 @@ models:
       - name: TX_HASH
         description: '{{ doc("evm_tx_hash") }}' 
       - name: STATUS
-        description: '{{ doc("evm_tx_status") }}' 
+        description: '{{ doc("evm_tx_status") }}'
       - name: DELEGATOR
-        description: '{{ doc("delegation_delegator") }}'
-      - name: TO_DELEGATE
-        description: '{{ doc("delegation_to_delegate") }}'
-      - name: FROM_DELEGATE
-        description: '{{ doc("delegation_from_delegate") }}'
+        description: 'The address of the delegator'
+      - name: DELEGATE
+        description: 'The address of the delegate'
       - name: DELEGATION_TYPE
-        description: '{{ doc("delegation_delegation_type") }}'
+        description: 'The type of delegation, can be "First Time Delegator", "Self Delegation", "Re-Delegation" or "First Time Delegator - Self Delegation"'
+      - name: NEW_BALANCE
+        description: 'The new amount the user has delegated after the transaction'
+      - name: PREVIOUS_BALANCE
+        description: 'The amount of OP the user had delegated before the transaction'
       - name: RAW_NEW_BALANCE
-        description: The new amount the user has delegated after the transaction
+        description: 'The new amount the user has delegated after the transaction in raw format'
       - name: RAW_PREVIOUS_BALANCE
-        description: The amount of OP the user had delegated before the transaction.
+        description: 'The amount of OP the user had delegated before the transaction in raw format'
+      - name: TO_DELEGATE
+        description: 'The address of the delegate to which the delegator has delegated their votes'
+      - name: FROM_DELEGATE
+        description: 'The address of the delegate from which the delegator has delegated their votes'
       - name: FACT_DELEGATIONS_ID
         description: '{{ doc("evm_pk") }}'   
       - name: INSERTED_TIMESTAMP
