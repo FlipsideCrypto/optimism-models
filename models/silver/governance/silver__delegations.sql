@@ -47,7 +47,7 @@ votes_changed AS (
         block_number,
         block_timestamp,
         tx_hash,
-        event_index,
+        event_index AS votes_event_index,
         status,
         event_name,
         decoded_log :delegate :: STRING AS delegate,
@@ -67,6 +67,12 @@ change_info AS (
     SELECT
         block_number,
         tx_hash,
+        event_index AS change_event_index,
+        LEAD(event_index) over (
+            PARTITION BY tx_hash
+            ORDER BY
+                event_index ASC
+        ) AS next_change_event_index,
         decoded_log :delegator :: STRING AS delegator,
         decoded_log :fromDelegate :: STRING AS from_delegate,
         decoded_log :toDelegate :: STRING AS to_delegate,
@@ -101,19 +107,22 @@ SELECT
     b1.from_delegate,
     modified_timestamp AS _inserted_timestamp,
     CONCAT(
-        tx_hash :: STRING,
+        b0.tx_hash :: STRING,
         '-',
-        event_index :: STRING
+        b0.votes_event_index :: STRING
     ) AS _log_id,
-    {{ dbt_utils.generate_surrogate_key(['tx_hash', 'event_index']) }} AS delegations_id,
+    {{ dbt_utils.generate_surrogate_key(['b0.tx_hash', 'b0.votes_event_index']) }} AS delegations_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
     votes_changed b0
-    JOIN change_info b1 USING (
-        block_number,
-        tx_hash
+    JOIN change_info b1
+    ON b0.tx_hash = b1.tx_hash
+    AND b0.votes_event_index > b1.change_event_index
+    AND (
+        b0.votes_event_index < b1.next_change_event_index
+        OR b1.next_change_event_index IS NULL
     )
 WHERE
     b0.event_name = 'DelegateVotesChanged'
