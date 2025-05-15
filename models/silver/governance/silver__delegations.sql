@@ -6,53 +6,89 @@
     tags = ['silver','governance', 'curated']
 ) }}
 
-with base as (
-    SELECT 
+WITH base AS (
+
+    SELECT
         block_number,
         block_timestamp,
         tx_hash,
         event_index,
-        iff(tx_succeeded, 'SUCCESS', 'FAIL') AS status,
+        IFF(
+            tx_succeeded,
+            'SUCCESS',
+            'FAIL'
+        ) AS status,
         event_name,
-        origin_from_address,
-        origin_to_address,
         decoded_log,
-        decoded_log:delegate::string as delegate,
-        try_to_number(decoded_log:newBalance::string) as new_balance,
-        try_to_number(decoded_log:previousBalance::string) as previous_balance,
-        decoded_log:delegator::string as delegator,
-        decoded_log:fromDelegate::string as from_delegate,
-        decoded_log:toDelegate::string as to_delegate,
         modified_timestamp
-    FROM {{ ref('core__ez_decoded_event_logs') }}
-    WHERE contract_address = '0x4200000000000000000000000000000000000042'
-    AND event_name IN ('DelegateChanged', 'DelegateVotesChanged')
-    AND tx_succeeded
-    {% if is_incremental() %}
-    AND modified_timestamp >= (
-        SELECT
-            MAX(
-                _inserted_timestamp
-            )
-        FROM {{ this }}
-    )
-    {% endif %}
-), 
-change_info as (
-    select 
+    FROM
+        {{ ref('core__ez_decoded_event_logs') }}
+    WHERE
+        contract_address = '0x4200000000000000000000000000000000000042'
+        AND event_name IN (
+            'DelegateChanged',
+            'DelegateVotesChanged'
+        )
+        AND tx_succeeded
+
+{% if is_incremental() %}
+AND modified_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        )
+    FROM
+        {{ this }}
+)
+{% endif %}
+),
+votes_changed AS (
+    SELECT
+        block_number,
+        block_timestamp,
+        tx_hash,
+        event_index AS votes_event_index,
+        status,
+        event_name,
+        decoded_log :delegate :: STRING AS delegate,
+        TRY_TO_NUMBER(
+            decoded_log :newBalance :: STRING
+        ) AS new_balance,
+        TRY_TO_NUMBER(
+            decoded_log :previousBalance :: STRING
+        ) AS previous_balance,
+        modified_timestamp
+    FROM
+        base
+    WHERE
+        event_name = 'DelegateVotesChanged'
+),
+change_info AS (
+    SELECT
         block_number,
         tx_hash,
-        delegator,
-        from_delegate,
-        to_delegate,
-        case 
-            when delegator = to_delegate and from_delegate = '0x0000000000000000000000000000000000000000' then 'First Time Delegator - Self Delegation'
-            when delegator = to_delegate and from_delegate <> '0x0000000000000000000000000000000000000000' then 'Self Delegation'
-            when delegator <> to_delegate and from_delegate = '0x0000000000000000000000000000000000000000' then 'First Time Delegator'
-            else 'Re-Delegation'
-        end as delegation_type
-    from base 
-    where event_name = 'DelegateChanged'
+        event_index AS change_event_index,
+        LEAD(event_index) over (
+            PARTITION BY tx_hash
+            ORDER BY
+                event_index ASC
+        ) AS next_change_event_index,
+        decoded_log :delegator :: STRING AS delegator,
+        decoded_log :fromDelegate :: STRING AS from_delegate,
+        decoded_log :toDelegate :: STRING AS to_delegate,
+        CASE
+            WHEN delegator = to_delegate
+            AND from_delegate = '0x0000000000000000000000000000000000000000' THEN 'First Time Delegator - Self Delegation'
+            WHEN delegator = to_delegate
+            AND from_delegate <> '0x0000000000000000000000000000000000000000' THEN 'Self Delegation'
+            WHEN delegator <> to_delegate
+            AND from_delegate = '0x0000000000000000000000000000000000000000' THEN 'First Time Delegator'
+            ELSE 'Re-Delegation'
+        END AS delegation_type
+    FROM
+        base
+    WHERE
+        event_name = 'DelegateChanged'
 )
 SELECT
     b0.block_number,
@@ -63,19 +99,30 @@ SELECT
     b1.delegator,
     b1.delegation_type,
     b0.delegate,
-    b0.previous_balance as raw_previous_balance,
-    b0.new_balance as raw_new_balance,
+    b0.previous_balance AS raw_previous_balance,
+    b0.new_balance AS raw_new_balance,
     COALESCE(raw_previous_balance / pow(10, 18), 0) AS previous_balance,
     COALESCE(raw_new_balance / pow(10, 18), 0) AS new_balance,
     b1.to_delegate,
     b1.from_delegate,
     modified_timestamp AS _inserted_timestamp,
-    CONCAT(tx_hash :: STRING, '-', event_index :: STRING) AS _log_id,
-    {{ dbt_utils.generate_surrogate_key(['tx_hash', 'event_index']) }} AS delegations_id,
+    CONCAT(
+        b0.tx_hash :: STRING,
+        '-',
+        b0.votes_event_index :: STRING
+    ) AS _log_id,
+    {{ dbt_utils.generate_surrogate_key(['b0.tx_hash', 'b0.votes_event_index']) }} AS delegations_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
-    FROM 
-        base b0
-    JOIN change_info b1 using (block_number, tx_hash)
-    WHERE b0.event_name = 'DelegateVotesChanged'
+FROM
+    votes_changed b0
+    JOIN change_info b1
+    ON b0.tx_hash = b1.tx_hash
+    AND b0.votes_event_index > b1.change_event_index
+    AND (
+        b0.votes_event_index < b1.next_change_event_index
+        OR b1.next_change_event_index IS NULL
+    )
+WHERE
+    b0.event_name = 'DelegateVotesChanged'
