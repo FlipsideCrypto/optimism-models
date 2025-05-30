@@ -106,7 +106,7 @@
         underlying_decimals AS underlying_asset_decimals,
         created_block AS created_block_number,
         compound_version,
-        {{ dbt_utils.generate_surrogate_key(['ctoken_address']) }} AS comp_asset_details_id,
+        {{ dbt_utils.generate_surrogate_key(['compound_market_address']) }} AS comp_asset_details_id,
         SYSDATE() AS inserted_timestamp,
         SYSDATE() AS modified_timestamp,
         '{{ invocation_id }}' AS _invocation_id
