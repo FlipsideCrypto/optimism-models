@@ -42,7 +42,7 @@ supply AS (
         C.token_name,
         C.token_symbol,
         C.token_decimals,
-        'base' AS blockchain,
+        'optimism' AS blockchain,
         CONCAT(
             tx_hash :: STRING,
             '-',

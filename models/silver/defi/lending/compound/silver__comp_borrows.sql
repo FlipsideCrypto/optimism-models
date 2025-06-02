@@ -44,7 +44,7 @@ borrow AS (
         C.compound_market_decimals AS decimals,
         C.underlying_asset_address,
         C.underlying_asset_symbol,
-        'base' AS blockchain,
+        'optimism' AS blockchain,
         CONCAT(
             tx_hash :: STRING,
             '-',

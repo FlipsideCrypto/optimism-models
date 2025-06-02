@@ -47,7 +47,7 @@ repayments AS (
         compound_market_decimals,
         C.underlying_asset_address AS underlying_asset,
         C.underlying_asset_symbol,
-        'base' AS blockchain,
+        'optimism' AS blockchain,
         CONCAT(
             tx_hash :: STRING,
             '-',
