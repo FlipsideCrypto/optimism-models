@@ -293,7 +293,7 @@ complete_lending_withdraws AS (
 ),
 
 {% if is_incremental() and var(
-    'heal_model'
+    'HEAL_MODEL'
 ) %}
 heal_model AS (
     SELECT
