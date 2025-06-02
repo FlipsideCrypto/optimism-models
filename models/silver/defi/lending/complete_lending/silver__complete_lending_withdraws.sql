@@ -233,6 +233,11 @@ withdraws_union AS (
     SELECT
         *
     FROM
+        comp
+    UNION ALL
+    SELECT
+        *
+    FROM
         exactly
     UNION ALL
     SELECT
@@ -274,8 +279,8 @@ complete_lending_withdraws AS (
         ) AS amount_usd,
         platform,
         A.blockchain,
-        A._log_id,
-        A._inserted_timestamp
+        A._LOG_ID,
+        A._INSERTED_TIMESTAMP
     FROM
         withdraws_union A
         LEFT JOIN {{ ref('price__ez_prices_hourly') }}
@@ -313,8 +318,8 @@ heal_model AS (
         ) AS amount_usd_heal,
         platform,
         t0.blockchain,
-        t0._log_id,
-        t0._inserted_timestamp
+        t0._LOG_ID,
+        t0._INSERTED_TIMESTAMP
     FROM
         {{ this }}
         t0
@@ -342,10 +347,10 @@ heal_model AS (
                 t1
             WHERE
                 t1.amount_usd IS NULL
-                AND t1._inserted_timestamp < (
+                AND t1._INSERTED_TIMESTAMP < (
                     SELECT
                         MAX(
-                            _inserted_timestamp
+                            _INSERTED_TIMESTAMP
                         ) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
                     FROM
                         {{ this }}
@@ -357,7 +362,7 @@ heal_model AS (
                         {{ ref('silver__complete_token_prices') }}
                         p
                     WHERE
-                        p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
+                        p._INSERTED_TIMESTAMP > DATEADD('DAY', -14, SYSDATE())
                         AND p.price IS NOT NULL
                         AND p.token_address = t1.token_address
                         AND p.hour = DATE_TRUNC(
@@ -400,8 +405,8 @@ SELECT
     amount_usd_heal AS amount_usd,
     platform,
     blockchain,
-    _log_id,
-    _inserted_timestamp
+    _LOG_ID,
+    _INSERTED_TIMESTAMP
 FROM
     heal_model
 {% endif %}
@@ -415,6 +420,6 @@ SELECT
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
-    FINAL qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    FINAL qualify(ROW_NUMBER() over(PARTITION BY _LOG_ID
 ORDER BY
-    _inserted_timestamp DESC)) = 1
+    _INSERTED_TIMESTAMP DESC)) = 1

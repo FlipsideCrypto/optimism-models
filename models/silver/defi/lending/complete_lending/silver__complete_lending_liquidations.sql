@@ -249,6 +249,11 @@ liquidation_union AS (
   SELECT
     *
   FROM
+    comp
+  UNION ALL
+  SELECT
+    *
+  FROM
     exactly
   UNION ALL
   SELECT
