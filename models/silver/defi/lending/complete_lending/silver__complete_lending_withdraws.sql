@@ -279,13 +279,13 @@ complete_lending_withdraws AS (
         ) AS amount_usd,
         platform,
         A.blockchain,
-        A._LOG_ID,
-        A._INSERTED_TIMESTAMP
+        a._log_id,
+        a._inserted_timestamp
     FROM
-        withdraws_union A
+        withdraws_union a
         LEFT JOIN {{ ref('price__ez_prices_hourly') }}
         p
-        ON A.token_address = p.token_address
+        ON a.token_address = p.token_address
         AND DATE_TRUNC(
             'hour',
             block_timestamp
@@ -293,7 +293,7 @@ complete_lending_withdraws AS (
 ),
 
 {% if is_incremental() and var(
-    'HEAL_MODEL'
+    'heal_model'
 ) %}
 heal_model AS (
     SELECT
@@ -318,8 +318,8 @@ heal_model AS (
         ) AS amount_usd_heal,
         platform,
         t0.blockchain,
-        t0._LOG_ID,
-        t0._INSERTED_TIMESTAMP
+        t0._log_id,
+        t0._inserted_timestamp
     FROM
         {{ this }}
         t0
@@ -347,11 +347,11 @@ heal_model AS (
                 t1
             WHERE
                 t1.amount_usd IS NULL
-                AND t1._INSERTED_TIMESTAMP < (
+                AND t1._inserted_timestamp < (
                     SELECT
                         MAX(
-                            _INSERTED_TIMESTAMP
-                        ) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+                            _inserted_timestamp
+                        ) - INTERVAL '{{ var("lookback", "4 hours") }}'
                     FROM
                         {{ this }}
                 )
@@ -362,7 +362,7 @@ heal_model AS (
                         {{ ref('silver__complete_token_prices') }}
                         p
                     WHERE
-                        p._INSERTED_TIMESTAMP > DATEADD('DAY', -14, SYSDATE())
+                        p._inserted_timestamp > DATEADD('day', -14, SYSDATE())
                         AND p.price IS NOT NULL
                         AND p.token_address = t1.token_address
                         AND p.hour = DATE_TRUNC(
