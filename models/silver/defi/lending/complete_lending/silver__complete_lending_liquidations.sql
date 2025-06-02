@@ -83,6 +83,44 @@ WHERE
   )
 {% endif %}
 ),
+comp AS (
+  SELECT
+    tx_hash,
+    block_number,
+    block_timestamp,
+    event_index,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    contract_address,
+    absorber AS liquidator,
+    borrower,
+    amount_unadj,
+    amount AS liquidated_amount,
+    amount_usd AS liquidated_amount_usd,
+    compound_market AS protocol_collateral_asset,
+    token_address AS collateral_asset,
+    token_symbol AS collateral_asset_symbol,
+    debt_asset,
+    debt_asset_symbol,
+    l.compound_version AS platform,
+    'optimism' AS blockchain,
+    l._LOG_ID,
+    l._INSERTED_TIMESTAMP
+  FROM
+    {{ ref('silver__comp_liquidations') }}
+    l
+
+{% if is_incremental() and 'comp' not in var('HEAL_MODELS') %}
+WHERE
+  l._inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 exactly AS (
   SELECT
     tx_hash,
@@ -207,6 +245,11 @@ liquidation_union AS (
     *
   FROM
     granary
+  UNION ALL
+  SELECT
+    *
+  FROM
+    comp
   UNION ALL
   SELECT
     *

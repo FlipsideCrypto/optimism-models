@@ -77,6 +77,40 @@ WHERE
   )
 {% endif %}
 ),
+comp AS (
+  SELECT
+    tx_hash,
+    block_number,
+    block_timestamp,
+    event_index,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    contract_address,
+    token_address,
+    compound_market AS protocol_market,
+    amount_unadj,
+    amount,
+    token_symbol,
+    repayer AS payer_address,
+    borrower,
+    compound_version AS platform,
+    'optimism' AS blockchain,
+    _LOG_ID,
+    _INSERTED_TIMESTAMP
+  FROM
+    {{ ref('silver__comp_repayments') }}
+
+{% if is_incremental() and 'comp' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 exactly AS (
   SELECT
     tx_hash,
@@ -189,6 +223,11 @@ repayments_union AS (
     *
   FROM
     granary
+  UNION ALL
+  SELECT
+    *
+  FROM
+    comp
   UNION ALL
   SELECT
     *

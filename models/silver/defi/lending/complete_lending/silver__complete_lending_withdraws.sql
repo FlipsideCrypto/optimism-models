@@ -79,6 +79,41 @@ WHERE
     )
 {% endif %}
 ),
+comp AS (
+    SELECT
+        tx_hash,
+        block_number,
+        block_timestamp,
+        event_index,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        contract_address,
+        compound_market AS protocol_market,
+        token_address,
+        token_symbol,
+        amount_unadj,
+        amount,
+        depositor_address,
+        compound_version AS platform,
+        'optimism' AS blockchain,
+        _LOG_ID,
+        _INSERTED_TIMESTAMP
+    FROM
+        {{ ref('silver__comp_withdraws') }}
+
+{% if is_incremental() and 'comp' not in var('HEAL_MODELS') %}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(
+                _inserted_timestamp
+            ) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+        FROM
+            {{ this }}
+    )
+{% endif %}
+),
 exactly AS (
     SELECT
         tx_hash,
@@ -198,6 +233,11 @@ withdraws_union AS (
     SELECT
         *
     FROM
+        comp
+    UNION ALL
+    SELECT
+        *
+    FROM
         exactly
     UNION ALL
     SELECT
@@ -239,13 +279,13 @@ complete_lending_withdraws AS (
         ) AS amount_usd,
         platform,
         A.blockchain,
-        A._log_id,
-        A._inserted_timestamp
+        a._log_id,
+        a._inserted_timestamp
     FROM
-        withdraws_union A
+        withdraws_union a
         LEFT JOIN {{ ref('price__ez_prices_hourly') }}
         p
-        ON A.token_address = p.token_address
+        ON a.token_address = p.token_address
         AND DATE_TRUNC(
             'hour',
             block_timestamp
@@ -311,7 +351,7 @@ heal_model AS (
                     SELECT
                         MAX(
                             _inserted_timestamp
-                        ) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+                        ) - INTERVAL '{{ var("lookback", "4 hours") }}'
                     FROM
                         {{ this }}
                 )
@@ -322,7 +362,7 @@ heal_model AS (
                         {{ ref('silver__complete_token_prices') }}
                         p
                     WHERE
-                        p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
+                        p._inserted_timestamp > DATEADD('day', -14, SYSDATE())
                         AND p.price IS NOT NULL
                         AND p.token_address = t1.token_address
                         AND p.hour = DATE_TRUNC(
@@ -365,8 +405,8 @@ SELECT
     amount_usd_heal AS amount_usd,
     platform,
     blockchain,
-    _log_id,
-    _inserted_timestamp
+    _LOG_ID,
+    _INSERTED_TIMESTAMP
 FROM
     heal_model
 {% endif %}
@@ -380,6 +420,6 @@ SELECT
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
-    FINAL qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    FINAL qualify(ROW_NUMBER() over(PARTITION BY _LOG_ID
 ORDER BY
-    _inserted_timestamp DESC)) = 1
+    _INSERTED_TIMESTAMP DESC)) = 1
