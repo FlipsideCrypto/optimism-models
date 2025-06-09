@@ -3,11 +3,10 @@
   incremental_strategy = 'delete+insert',
   unique_key = "block_number",
   cluster_by = ['block_timestamp::DATE'],
-    tags = ['silver','defi','lending','curated']
+  tags = ['silver','defi','lending','curated']
 ) }}
--- pull all token addresses and corresponding name
-WITH asset_details AS (
 
+WITH asset_details AS (
   SELECT
     token_address,
     token_symbol,
@@ -17,8 +16,7 @@ WITH asset_details AS (
     underlying_name,
     underlying_symbol,
     underlying_decimals
-  FROM
-    {{ ref('silver__sonne_asset_details') }}
+  FROM {{ ref('silver__sonne_asset_details') }}
 ),
 sonne_repayments AS (
   SELECT
@@ -31,66 +29,49 @@ sonne_repayments AS (
     origin_function_signature,
     contract_address,
     regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-    CONCAT('0x', SUBSTR(segmented_data [1] :: STRING, 25, 40)) AS borrower,
+    CONCAT('0x', SUBSTR(segmented_data[1] :: STRING, 25, 40)) AS borrower,
     contract_address AS token,
-    CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS payer,
-    utils.udf_hex_to_int(
-      segmented_data [2] :: STRING
-    ) :: INTEGER AS repayed_amount_raw,
+    CONCAT('0x', SUBSTR(segmented_data[0] :: STRING, 25, 40)) AS payer,
+    utils.udf_hex_to_int(segmented_data[2] :: STRING) :: INTEGER AS repayed_amount_raw,
     'Sonne' AS platform,
     modified_timestamp AS _inserted_timestamp,
-    CONCAT(
-            tx_hash :: STRING,
-            '-',
-            event_index :: STRING
-    ) AS _log_id
-  FROM
-    {{ ref('core__fact_event_logs') }}
-  WHERE
-    contract_address IN (
-      SELECT
-        token_address
-      FROM
-        asset_details
+    CONCAT(tx_hash :: STRING, '-', event_index :: STRING) AS _log_id
+  FROM {{ ref('core__fact_event_logs') }}
+  WHERE contract_address IN (
+      SELECT token_address FROM asset_details
     )
-    AND topics [0] :: STRING = '0x1a2a22cb034d26d1854bdc6666a5b91fe25efbbb5dcad3b0355478d6f5c362a1'
+    AND topics[0] :: STRING = '0x1a2a22cb034d26d1854bdc6666a5b91fe25efbbb5dcad3b0355478d6f5c362a1'
     AND tx_succeeded
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp) - INTERVAL '12 hours'
-    FROM
-        {{ this }}
-)
-AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
-{% endif %}
+    {% if is_incremental() %}
+      AND modified_timestamp >= (
+        SELECT MAX(_inserted_timestamp) - INTERVAL '12 hours' FROM {{ this }}
+      )
+      AND modified_timestamp >= SYSDATE() - INTERVAL '7 day'
+    {% endif %}
 ),
 sonne_combine AS (
   SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    event_index,
-    origin_from_address,
-    origin_to_address,
-    origin_function_signature,
-    contract_address,
-    borrower,
-    token,
+    b.block_number,
+    b.block_timestamp,
+    b.tx_hash,
+    b.event_index,
+    b.origin_from_address,
+    b.origin_to_address,
+    b.origin_function_signature,
+    b.contract_address,
+    b.borrower,
+    b.token,
     C.token_symbol,
-    payer,
-    repayed_amount_raw,
+    b.payer,
+    b.repayed_amount_raw,
     C.underlying_asset_address AS repay_contract_address,
     C.underlying_symbol AS repay_contract_symbol,
     C.underlying_decimals,
     b.platform,
     b._log_id,
     b._inserted_timestamp
-  FROM
-    sonne_repayments b
-    LEFT JOIN asset_details C
-    ON b.token = C.token_address
+  FROM sonne_repayments b
+  LEFT JOIN asset_details C ON b.token = C.token_address
 )
 SELECT
   block_number,
@@ -102,20 +83,15 @@ SELECT
   origin_function_signature,
   contract_address,
   borrower,
-  token as token_address,
+  token AS token_address,
   token_symbol,
   payer,
   repay_contract_address,
   repay_contract_symbol,
   repayed_amount_raw AS amount_unadj,
-  repayed_amount_raw / pow(
-    10,
-    underlying_decimals
-  ) AS amount,
+  repayed_amount_raw / pow(10, underlying_decimals) AS amount,
   platform,
   _inserted_timestamp,
   _log_id
-FROM
-  sonne_combine qualify(ROW_NUMBER() over(PARTITION BY _log_id
-ORDER BY
-  _inserted_timestamp DESC)) = 1
+FROM sonne_combine
+QUALIFY ROW_NUMBER() OVER (PARTITION BY _log_id ORDER BY _inserted_timestamp DESC) = 1

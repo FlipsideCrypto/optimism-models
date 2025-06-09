@@ -1,0 +1,18 @@
+test_tags:
+  recency: &recency_tags
+    - recency
+  
+  finance: &finance_tags
+    - finance
+    - daily
+
+
+default_test_config: &default_test_config
+  severity: error
+  tags: ['critical', 'data_quality']
+  enabled: true
+
+common_tags: &common_tags
+  - non_realtime
+  - critical
+  - production
