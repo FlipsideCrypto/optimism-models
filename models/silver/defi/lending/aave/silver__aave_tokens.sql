@@ -11,6 +11,7 @@ WITH DECODE AS (
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS underlying_asset,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS aave_version_pool,
+        CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS treasury_address,
         utils.udf_hex_to_int(
             SUBSTR(
                 segmented_data [2] :: STRING,
@@ -60,6 +61,7 @@ a_token_step_1 AS (
         segmented_data,
         underlying_asset,
         aave_version_pool,
+        treasury_address,
         atoken_decimals,
         atoken_name,
         atoken_symbol,
@@ -68,7 +70,7 @@ a_token_step_1 AS (
     FROM
         DECODE
     WHERE
-        atoken_name LIKE '%Aave%'
+        treasury_address = '0xb2289e329d2f85f1ed31adbb30ea345278f21bcf'
 ),
 debt_tokens AS (
     SELECT
@@ -103,6 +105,7 @@ a_token_step_2 AS (
         segmented_data,
         underlying_asset,
         aave_version_pool,
+        treasury_address,
         atoken_decimals,
         atoken_name,
         atoken_symbol,
@@ -111,11 +114,11 @@ a_token_step_2 AS (
         'Aave V3' AS protocol
     FROM
         a_token_step_1
-    WHERE
-        aave_version_pool = LOWER('0x794a61358D6845594F94dc1DB02A252b5b4814aD')
 )
 SELECT
     A.atoken_created_block,
+    A.aave_version_pool,
+    A.treasury_address,
     A.atoken_symbol AS atoken_symbol,
     A.a_token_address AS atoken_address,
     b.atoken_stable_debt_address,
@@ -136,4 +139,4 @@ FROM
     INNER JOIN {{ ref('silver__contracts') }} C
     ON contract_address = A.underlying_asset qualify(ROW_NUMBER() over(PARTITION BY atoken_address
 ORDER BY
-    a.atoken_created_block DESC)) = 1
+    A.atoken_created_block DESC)) = 1
