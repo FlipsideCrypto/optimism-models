@@ -70,7 +70,7 @@ a_token_step_1 AS (
     FROM
         DECODE
     WHERE
-        treasury_address = '0xb2289e329d2f85f1ed31adbb30ea345278f21bcf'
+        treasury_address in ('0xb2289e329d2f85f1ed31adbb30ea345278f21bcf', '0xc01a7ad7fb8a085a3cc16be8eaa10302c78a1783')
 ),
 debt_tokens AS (
     SELECT
