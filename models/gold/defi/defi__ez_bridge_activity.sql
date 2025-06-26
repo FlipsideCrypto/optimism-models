@@ -26,7 +26,7 @@ SELECT
     receiver,
     destination_chain_receiver,
     COALESCE(
-        standard_destination_chain,
+        c.standardized_name,
         b.destination_chain
     ) AS destination_chain,
     destination_chain_id,
@@ -58,5 +58,5 @@ SELECT
 FROM
     {{ ref('silver_bridge__complete_bridge_activity') }}
     b
-    LEFT JOIN {{ ref('silver_bridge__standard_dst_chain_seed') }} C
-    ON b.destination_chain = C.destination_chain
+    LEFT JOIN {{ ref('silver_bridge__standard_chain_seed') }} C
+    ON b.destination_chain = C.variation
