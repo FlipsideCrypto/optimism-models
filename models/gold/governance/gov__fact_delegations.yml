@@ -4,13 +4,13 @@ models:
     description: 'This table contains the details of the OP Delegations made by users on the Optimism network.'
     columns:
       - name: BLOCK_NUMBER
-        description: '{{ doc("evm_block_number") }}'   
+        description: '{{ doc("general_block_number") }}'   
       - name: BLOCK_TIMESTAMP
-        description: '{{ doc("evm_block_timestamp") }}'
+        description: '{{ doc("general_block_timestamp") }}'
       - name: TX_HASH
-        description: '{{ doc("evm_tx_hash") }}' 
+        description: '{{ doc("general_tx_hash") }}' 
       - name: STATUS
-        description: '{{ doc("evm_tx_status") }}'
+        description: '{{ doc("general_tx_succeeded") }}'
       - name: DELEGATOR
         description: 'The address of the delegator'
       - name: DELEGATE
@@ -30,8 +30,8 @@ models:
       - name: FROM_DELEGATE
         description: 'The address of the delegate from which the delegator has delegated their votes'
       - name: FACT_DELEGATIONS_ID
-        description: '{{ doc("evm_pk") }}'   
+        description: '{{ doc("general_pk") }}'   
       - name: INSERTED_TIMESTAMP
-        description: '{{ doc("evm_inserted_timestamp") }}'   
+        description: '{{ doc("general_inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
-        description: '{{ doc("evm_modified_timestamp") }}' 
+        description: '{{ doc("general_modified_timestamp") }}' 
