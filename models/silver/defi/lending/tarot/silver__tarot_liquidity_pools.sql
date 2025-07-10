@@ -107,3 +107,5 @@ FROM
     ON l.token1 = c2.contract_address
     LEFT JOIN lp_token_pull lp
     ON l.tx_hash = lp.tx_hash
+WHERE
+    borrowable2 <> lower('0xdf0157559D0eED9e5feC814084f159Ae35b9F3Bb') --likely some dev token
