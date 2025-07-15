@@ -981,6 +981,7 @@ heal_model AS (
                     GROUP BY
                         1
                 )
+        ),
         newly_verified_tokens as (
           select token_address
           from {{ ref('price__ez_asset_metadata') }}
