@@ -106,6 +106,8 @@ models:
         +enabled: false
         bridge:
           +enabled: true
+        dex:
+          +enabled: true
     scores_package:
       +enabled: true
 
