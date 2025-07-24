@@ -66,15 +66,13 @@ models:
       relation: true
       columns: true
     +on_schema_change: "append_new_columns"
+    +post-hook: "{{ enable_change_tracking() }}"
     main_package:
       +enabled: false # disable top level package by default, enabled subpackages as needed
       admin:
         +enabled: true
       core:
         +enabled: true # enable subpackages, as needed
-        gold:
-          +enabled: true
-          +post-hook: "{{ enable_change_tracking() }}"
         bronze:
           +enabled: false
       github_actions:
