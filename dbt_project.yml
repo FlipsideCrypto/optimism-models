@@ -74,14 +74,7 @@ models:
         +enabled: true # enable subpackages, as needed
         gold:
           +enabled: true
-          +post-hook: >
-            {% if 'exclude_change_tracking' not in config.get('tags') %}
-              {% if config.get('materialized') == 'view' %}
-                ALTER VIEW {{ this }} SET CHANGE_TRACKING = TRUE;
-              {% else %}
-                ALTER TABLE {{ this }} SET CHANGE_TRACKING = TRUE;
-              {% endif %}
-            {% endif %}
+          +post-hook: "{{ enable_change_tracking() }}"
         bronze:
           +enabled: false
       github_actions:
@@ -133,6 +126,7 @@ vars:
   HEAL_MODEL: False
   HEAL_MODELS: []
   STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES: False
+  ENABLE_CHANGE_TRACKING: False
 
   #### STREAMLINE 2.0 BEGIN ####
 
