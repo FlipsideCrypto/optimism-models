@@ -66,6 +66,7 @@ models:
       relation: true
       columns: true
     +on_schema_change: "append_new_columns"
+    +post-hook: "{{ enable_change_tracking() }}"
     main_package:
       +enabled: false # disable top level package by default, enabled subpackages as needed
       admin:
@@ -123,6 +124,7 @@ vars:
   HEAL_MODEL: False
   HEAL_MODELS: []
   STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES: False
+  ENABLE_CHANGE_TRACKING: False
 
   #### STREAMLINE 2.0 BEGIN ####
 
