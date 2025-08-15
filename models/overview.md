@@ -41,29 +41,15 @@ There is more information on how to use dbt docs in the last section of this doc
 - [ez_prices_hourly](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.price__ez_prices_hourly)
 
 ### DeFi Tables (optimism.defi)
-- [ez_bridge_activity](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_bridge_activity)
-- [ez_dex_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_dex_swaps)
-- [dim_dex_liquidity_pools](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__dim_dex_liquidity_pools)
+- [ez_bridge_activity](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.defi__ez_bridge_activity)
+- [ez_dex_swaps](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.defi__ez_dex_swaps)
+- [dim_dex_liquidity_pools](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.defi__dim_dex_liquidity_pools)
 - [ez_lending_borrows](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_lending_borrows) 
 - [ez_lending_deposits](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_lending_deposits)
 - [ez_lending_flashloans](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_lending_flashloans)
 - [ez_lending_liquidations](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_lending_liquidations)
 - [ez_lending_repayments](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_lending_repayments)
 - [ez_lending_withdraws](https://flipsidecrypto.github.io/optimism-models/#!/model/model.optimism_models.defi__ez_lending_withdraws)
-
-### Flipside Partner Tables (optimism.partner_name)
-
-**Vertex Tables:**
-- [dim_products](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.vertex__dim_products)
-- [ez_clearing_house_events](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.vertex__ez_clearing_house_events)
-- [ez_liquidations](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.vertex__ez_liquidations)
-- [ez_perp_trades](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.vertex__ez_perp_trades)
-- [ez_spot_trades](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.vertex__ez_spot_trades)
-- [ez_account_stats](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.vertex__ez_account_stats)
-- [ez_edge_trades](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.vertex__ez_edge_trades)
-- [ez_market_depth_stats](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.vertex__ez_market_depth_stats)
-- [ez_market_stats](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.vertex__ez_market_stats)
-- [ez_money_markets](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.vertex__ez_money_markets)
 
 ### NFT Tables (optimism.nft)
 - [ez_nft_transfers](https://flipsidecrypto.github.io/optimism-models/#!/model/model.fsc_evm.nft__ez_nft_transfers)
