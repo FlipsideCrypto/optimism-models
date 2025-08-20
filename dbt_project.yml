@@ -109,6 +109,8 @@ models:
           +enabled: true
         dex:
           +enabled: true
+        lending:
+          +enabled: true
     scores_package:
       +enabled: true
 
