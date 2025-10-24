@@ -46,6 +46,11 @@ sources:
     schema: bronze_public
     tables:
       - name: user_abis
+  - name: crosschain_gold
+    database: crosschain
+    schema: core
+    tables:
+      - name: dim_dates
   - name: complete_streamline
     database: "{{ target.database }}"
     schema: streamline

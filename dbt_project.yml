@@ -111,6 +111,8 @@ models:
           +enabled: true
         lending:
           +enabled: true
+        stablecoins:
+          +enabled: true
     balances_package:
       +enabled: false
       erc20:
