@@ -95,6 +95,8 @@ models:
       +enabled: false
       stats:
         +enabled: true
+      chain_stats:
+        +enabled: true
       defi:
         +enabled: false
         bridge:
