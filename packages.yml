@@ -1,3 +1,3 @@
 packages:
   - git: https://github.com/FlipsideCrypto/fsc-evm.git
-    revision: v4.39.1
+    revision: v4.40.2
